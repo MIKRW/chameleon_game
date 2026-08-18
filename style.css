@@ -1,0 +1,316 @@
+:root {
+  --bg: #1a120c;
+  --panel: #241a12;
+  --accent: #e3603a;
+  --emerald: #ea7141;
+  --emerald-border: #e3603a;
+  --text: #f3e9dc;
+  --muted: #bda488;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #f3f6f4;
+    --panel: #ffffff;
+    --accent: #2e9e5b;
+    --emerald: #0d9668;
+    --emerald-border: #17a374;
+    --text: #1b1f23;
+    --muted: #5b6470;
+    color-scheme: light;
+  }
+}
+
+/* Manual theme toggle — wins over the OS-level prefers-color-scheme. */
+:root[data-theme='light'] {
+  --bg: #f3f6f4;
+  --panel: #ffffff;
+  --accent: #2e9e5b;
+  --emerald: #0d9668;
+  --emerald-border: #17a374;
+  --text: #1b1f23;
+  --muted: #5b6470;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #1a120c;
+  --panel: #241a12;
+  --accent: #e3603a;
+  --emerald: #ea7141;
+  --emerald-border: #e3603a;
+  --text: #f3e9dc;
+  --muted: #bda488;
+  color-scheme: dark;
+}
+
+.theme-toggle-btn {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  font-family: 'Space Grotesk', 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  background: var(--panel);
+  color: var(--text);
+  border: 2px solid var(--emerald-border);
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 20;
+}
+
+.theme-toggle-btn:hover {
+  opacity: 0.85;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  display: flex;
+  justify-content: center;
+  padding: 24px 12px;
+}
+
+.game-wrap {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: var(--bg);
+  border: 3px solid var(--emerald-border);
+  border-radius: 10px;
+}
+
+.game-header {
+  width: 100%;
+  text-align: center;
+}
+
+.game-header h1 {
+  font-family: 'Space Grotesk', 'Courier New', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  letter-spacing: 0.5px;
+  color: var(--text);
+}
+
+.title-accent {
+  color: var(--emerald);
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.canvas-wrap {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+}
+
+#game-canvas {
+  image-rendering: pixelated;
+  background: #241a10;
+  border-radius: 6px;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
+/* Reusable popup overlay — sized to whatever it's placed inside (the
+   canvas-wrap, currently). Used for the start screen now; later popups
+   (win screen, hints, etc.) can reuse the same markup pattern. */
+.popup-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 5;
+}
+
+.popup-overlay.hidden {
+  display: none;
+}
+
+.popup-content {
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+/* Text color is pinned (not var(--text)) since the overlay behind it is
+   always dark regardless of the light/dark theme toggle. */
+.popup-content h2 {
+  font-family: 'Space Grotesk', 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  color: #f3e9dc;
+}
+
+.popup-text {
+  font-size: 10px;
+  line-height: 2.1;
+  letter-spacing: 0.8px;
+  word-spacing: 3px;
+  color: #f3e9dc;
+  margin: 0;
+}
+
+.dialog-form-btn {
+  font-family: inherit;
+  font-size: 10px;
+  line-height: 1;
+  padding: 10px 18px;
+  margin-top: 26px;
+  background: var(--accent);
+  color: #0a0a0a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dialog-form-btn:hover {
+  opacity: 0.9;
+}
+
+.controls-hint {
+  font-size: 8px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 10;
+}
+
+.dialog.hidden {
+  display: none;
+}
+
+.dialog-box {
+  background: var(--panel);
+  border: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 20px;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dialog-box h2 {
+  font-size: 12px;
+  margin: 0;
+  color: var(--accent);
+}
+
+.dialog-prompt {
+  font-size: 10px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.dialog-hint {
+  font-size: 9px;
+  color: #ffd54f;
+  min-height: 12px;
+}
+
+.dialog-form {
+  display: flex;
+  gap: 8px;
+}
+
+.dialog-form input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 10px;
+  padding: 8px;
+  background: #1b130a;
+  border: 2px solid #4a3a24;
+  color: var(--text);
+  border-radius: 4px;
+}
+
+.dialog-form button,
+.secondary-btn {
+  font-family: inherit;
+  font-size: 9px;
+  line-height: 1;
+  padding: 8px 10px;
+  background: var(--accent);
+  color: #0a0a0a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.restart-btn {
+  font-size: 8px;
+  padding: 6px 10px;
+  opacity: 0.75;
+}
+
+
+.restart-btn:hover {
+  opacity: 1;
+}
+
+.dialog-feedback {
+  font-size: 9px;
+  min-height: 12px;
+  color: var(--accent);
+}
+
+.win-flag {
+  font-size: 11px;
+  color: #ffd54f;
+  background: #1b130a;
+  padding: 10px;
+  border-radius: 4px;
+  word-break: break-all;
+  text-align: center;
+}
+
+.win-note {
+  font-size: 8px;
+  color: var(--muted);
+  line-height: 1.7;
+}

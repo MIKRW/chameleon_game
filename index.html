@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Escape the Terrarium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <button id="theme-toggle-btn" class="theme-toggle-btn" type="button">☀ Light</button>
+
+  <main class="game-wrap">
+    <header class="game-header">
+      <h1>Escape <span class="title-accent">the Terrarium</span></h1>
+    </header>
+
+    <div class="canvas-wrap">
+      <canvas id="game-canvas" width="480" height="320"></canvas>
+
+      <div id="start-screen" class="popup-overlay">
+        <div class="popup-content">
+          <h2>Escape <span class="title-accent">the Terrarium</span></h2>
+          <p class="popup-text">Help the clever little chameleon escape the tank. That's if you can find him first! Help him, and he promises to stick with you forever.</p>
+          <button id="start-btn" class="dialog-form-btn" type="button">Start</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="controls-hint">Move: Arrow keys / WASD &nbsp;·&nbsp; Jump: Space</p>
+
+    <p id="skill-status" class="controls-hint">Skill unlocked: NO</p>
+
+    <button id="restart-btn" class="secondary-btn restart-btn" type="button">Restart</button>
+  </main>
+
+  <script src="sprites.js"></script>
+  <script src="sprites/palette.js"></script>
+  <script src="sprites/glass-edge-1.js"></script>
+  <script src="sprites/glass-edge-2.js"></script>
+  <script src="sprites/glass-edge-3.js"></script>
+  <script src="sprites/glass-edge-4.js"></script>
+  <script src="sprites/floor.js"></script>
+  <script src="sprites/ground-plant-1.js"></script>
+  <script src="sprites/ground-plant-2.js"></script>
+  <script src="sprites/ground-plant-3.js"></script>
+  <script src="sprites/ground-plant-4.js"></script>
+  <script src="sprites/ground-plant-5.js"></script>
+  <script src="sprites/tree-plant-1.js"></script>
+  <script src="sprites/tree-plant-2.js"></script>
+  <script src="sprites/tree-plant-3.js"></script>
+  <script src="sprites/tree-plant-4.js"></script>
+  <script src="sprites/tree-plant-5.js"></script>
+  <script src="sprites/vine-1.js"></script>
+  <script src="sprites/vine-2.js"></script>
+  <script src="sprites/tree-trunk-fore-1.js"></script>
+  <script src="sprites/tree-trunk-fore-2.js"></script>
+  <script src="sprites/tree-trunk-fore-3.js"></script>
+  <script src="sprites/tree-trunk-fore-4.js"></script>
+  <script src="sprites/tree-trunk-fore-5.js"></script>
+  <script src="sprites/tree-trunk-back-1.js"></script>
+  <script src="sprites/tree-trunk-back-2.js"></script>
+  <script src="sprites/tree-trunk-back-3.js"></script>
+  <script src="sprites/tree-trunk-back-4.js"></script>
+  <script src="sprites/tree-trunk-back-5.js"></script>
+  <script src="sprites/tree-canopy-1.js"></script>
+  <script src="sprites/tree-canopy-2.js"></script>
+  <script src="sprites/tree-branch-1.js"></script>
+  <script src="sprites/tree-branch-2.js"></script>
+  <script src="sprites/index.js"></script>
+  <script src="world-props.js"></script>
+  <script src="game.js"></script>
+  <script>
+    (function () {
+      var startScreen = document.getElementById('start-screen');
+      var startBtn = document.getElementById('start-btn');
+      startBtn.addEventListener('click', function () {
+        startScreen.classList.add('hidden');
+      });
+    })();
+
+    (function () {
+      var root = document.documentElement;
+      var btn = document.getElementById('theme-toggle-btn');
+      var stored = localStorage.getItem('terrarium-theme');
+      if (stored) {
+        root.setAttribute('data-theme', stored);
+      }
+
+      function isLight() {
+        if (root.hasAttribute('data-theme')) return root.getAttribute('data-theme') === 'light';
+        return window.matchMedia('(prefers-color-scheme: light)').matches;
+      }
+
+      function syncLabel() {
+        btn.textContent = isLight() ? '☾ Dark' : '☀ Light';
+      }
+
+      btn.addEventListener('click', function () {
+        var next = isLight() ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('terrarium-theme', next);
+        syncLabel();
+      });
+
+      syncLabel();
+    })();
+  </script>
+</body>
+</html>
