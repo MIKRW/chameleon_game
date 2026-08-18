@@ -150,7 +150,7 @@ const SPRITES = {
 // `maxAlpha` (bottom, last row) — same vertical fade convention as
 // drawSpriteBlocky in game.js, for sprites that don't need the blocky
 // background texture treatment.
-function drawSprite(ctx, spriteRows, x, y, scale, palette = PALETTE, fade, flipX) {
+function drawSprite(ctx, spriteRows, x, y, scale, palette = PALETTE, fade, flipX, flipY) {
   const lastRow = spriteRows.length - 1;
   for (let row = 0; row < spriteRows.length; row++) {
     const line = spriteRows[row];
@@ -158,12 +158,13 @@ function drawSprite(ctx, spriteRows, x, y, scale, palette = PALETTE, fade, flipX
       const t = lastRow > 0 ? row / lastRow : 1;
       ctx.globalAlpha = fade.minAlpha + (fade.maxAlpha - fade.minAlpha) * t;
     }
+    const drawRow = flipY ? lastRow - row : row;
     for (let col = 0; col < line.length; col++) {
       const color = palette[line[col]];
       if (!color) continue;
       ctx.fillStyle = color;
       const drawCol = flipX ? line.length - 1 - col : col;
-      ctx.fillRect(x + drawCol * scale, y + row * scale, scale, scale);
+      ctx.fillRect(x + drawCol * scale, y + drawRow * scale, scale, scale);
     }
   }
   if (fade) ctx.globalAlpha = 1;

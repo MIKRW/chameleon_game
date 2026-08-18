@@ -20,6 +20,7 @@ const GRAVITY = 0.7;
 const JUMP_VELOCITY = -12;
 const CLIMB_SPEED = 3;
 const CLIMB_GRAB_MARGIN = 6; // extra px of forgiveness when checking for a trunk to grab
+const CLIMB_MIN_AIR_HEIGHT = 16; // min px the player must have jumped above the floor line before a trunk can grab them — keeps a low hop near a trunk's base (where ground plants often sit) from snapping onto the trunk and reading as "stuck" on the plants
 const CLIMB_JUMP_KICK = 4; // horizontal push when jumping off a trunk toward a direction
 const CLIMB_JUMP_AWAY_KICK = 2; // horizontal push when jumping off with no direction held
 const CLIMB_SIDE_PEEK_FRACTION = 0.8; // fraction of player width left visible outside the trunk when side-climbing
@@ -66,11 +67,24 @@ const state = {
   climb: null, // { trunk: <TREE_PLACEMENTS entry>, face: 'front' | 'side' } while attached to a trunk
   branch: null, // { geo: <BRANCH_GEOMETRIES entry>, mode: 'stand' | 'hang' } while on/under a branch
   recentlyLeftTrunk: null, // trunk just jumped off of, ignored by findClimbableTrunk() until cleared
+  branchExitY: null, // player.y at the moment they walked off a branch's end (not jumped) — findClimbableTrunk() stays blind to every trunk until they've fallen CLIMB_MIN_AIR_HEIGHT clear of it
   // Manual dev toggle for the trunk-side-swap / branch-traversal skill. Currently
   // set directly via the Yes/No buttons; a real in-game unlock mechanism will
   // replace this later. The movement it unlocks isn't implemented yet either.
   skillUnlocked: false,
+  gateSolved: false, // the gatekeeper tree's moss puzzle (room 1) — see GATE_TRUNK below
+  levelsComplete: 0,
 };
+
+const TOTAL_LEVELS = 4; // one per PUZZLES entry in puzzles.js
+
+// The gatekeeper tree — the first tree right of the player's start position
+// (see TREE_PLACEMENTS in world-props.js) — walled off by red gate moss
+// (TREE_PLANT_1) until room 1's puzzle is solved.
+const GATE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 550 && p.layer === 6);
+const GATE_MOSS_FINGER_MARGIN = 2 * SCALE; // TREE_PLANT_1's 2 leftmost columns are finger tips, not bark overlay
+const GATE_INTERACT_RANGE = 60; // px of horizontal slack on either side of the gate trunk that still counts as "at" it
+let gatePopupOpen = false;
 
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -93,6 +107,21 @@ function playerCenter() {
   return { x: state.player.x + PLAYER_W / 2, y: state.player.y + PLAYER_H / 2 };
 }
 
+// While the gatekeeper tree's moss puzzle is unsolved, its trunk acts as a
+// solid wall for ground/air horizontal movement, same as the world's glass
+// walls — the player can still climb it (climbing moves y, not x, see
+// updateClimbing) but can't walk or arc past it. Only applied to the main
+// grounded/airborne movement below; climb/branch positioning never crosses
+// the gate trunk anyway since it's the trunk being climbed.
+function clampPlayerX(nx) {
+  let clamped = Math.max(GLASS_SIDE_THICKNESS, Math.min(WORLD_WIDTH - GLASS_SIDE_THICKNESS - PLAYER_W, nx));
+  if (!state.gateSolved) {
+    const gateRect = treeTrunkRect(GATE_TRUNK);
+    clamped = Math.min(clamped, gateRect.left - PLAYER_W);
+  }
+  return clamped;
+}
+
 function update() {
   let dx = 0;
   if (state.keys['arrowleft'] || state.keys['a']) dx -= 1;
@@ -112,7 +141,7 @@ function update() {
   const moveX = dx * PLAYER_SPEED + state.vx;
   if (moveX !== 0) {
     const nx = state.player.x + moveX;
-    state.player.x = Math.max(GLASS_SIDE_THICKNESS, Math.min(WORLD_WIDTH - GLASS_SIDE_THICKNESS - PLAYER_W, nx));
+    state.player.x = clampPlayerX(nx);
   }
   state.vx *= 0.85;
 
@@ -216,8 +245,47 @@ function jumpOffTrunk() {
   state.onGround = false;
 }
 
+// While climbing a trunk, a branch mounted on that same trunk blocks the way
+// rather than letting the player pass straight through it. Climbing up runs
+// into the branch's underside first (same as jumping up into it in open air
+// — see findHangableBranch), so it catches in 'hang' mode; climbing down runs
+// into its top surface first (same as falling onto it — see
+// findStandableBranch), so it catches in 'stand' mode. To get past a branch
+// and keep climbing in the same direction, the player has to press jump
+// together with that direction (see passBranchAlongTrunk) rather than just
+// walking into it.
+//
+// Only a branch on the side of the trunk the player is actually gripping
+// (state.climb.side, side-climb only — front-climb has no side, it's
+// centered on the trunk) can catch them — otherwise a branch mounted on the
+// opposite face of the trunk would reach through the bark and pull the
+// player around to a side they were never climbing on.
+function findBranchCrossedClimbingUp(trunk, climbSide, prevY, nextY) {
+  const prevFeetY = prevY + PLAYER_H;
+  const nextFeetY = nextY + PLAYER_H;
+  for (const geo of BRANCH_GEOMETRIES) {
+    if (geo.placement.layer !== trunk.layer || geo.placement.trunkX !== trunk.x) continue;
+    if (climbSide && geo.placement.side !== climbSide) continue;
+    const underY = geo.baseY + geo.thickness;
+    if (nextFeetY <= underY && prevFeetY > underY) return geo;
+  }
+  return null;
+}
+
+function findBranchCrossedClimbingDown(trunk, climbSide, prevY, nextY) {
+  const prevFeetY = prevY + PLAYER_H;
+  const nextFeetY = nextY + PLAYER_H;
+  for (const geo of BRANCH_GEOMETRIES) {
+    if (geo.placement.layer !== trunk.layer || geo.placement.trunkX !== trunk.x) continue;
+    if (climbSide && geo.placement.side !== climbSide) continue;
+    if (nextFeetY >= geo.baseY && prevFeetY < geo.baseY) return geo;
+  }
+  return null;
+}
+
 function updateClimbing(dx) {
   const rect = treeTrunkRect(state.climb.trunk);
+  const climbSide = state.climb.face === 'side' ? state.climb.side : null;
 
   let dy = 0;
   if (state.keys['arrowup'] || state.keys['w']) dy -= 1;
@@ -225,6 +293,33 @@ function updateClimbing(dx) {
 
   if (dy !== 0) {
     const ny = state.player.y + dy * CLIMB_SPEED;
+
+    if (dy < 0) {
+      const geo = findBranchCrossedClimbingUp(state.climb.trunk, climbSide, state.player.y, ny);
+      if (geo) {
+        state.climb = null;
+        state.player.x = Math.max(GLASS_SIDE_THICKNESS, Math.min(WORLD_WIDTH - GLASS_SIDE_THICKNESS - PLAYER_W, geo.baseX - PLAYER_W / 2));
+        state.player.y = geo.baseY + geo.thickness;
+        state.vy = 0;
+        state.vx = 0;
+        state.onGround = false;
+        state.branch = { geo, mode: 'hang' };
+        return;
+      }
+    } else {
+      const geo = findBranchCrossedClimbingDown(state.climb.trunk, climbSide, state.player.y, ny);
+      if (geo) {
+        state.climb = null;
+        state.player.x = Math.max(GLASS_SIDE_THICKNESS, Math.min(WORLD_WIDTH - GLASS_SIDE_THICKNESS - PLAYER_W, geo.baseX - PLAYER_W / 2));
+        state.player.y = geo.baseY - PLAYER_H;
+        state.vy = 0;
+        state.vx = 0;
+        state.onGround = false;
+        state.branch = { geo, mode: 'stand' };
+        return;
+      }
+    }
+
     if (ny >= FLOOR_Y) {
       // climbed down past the floor line — detach back to grounded
       state.climb = null;
@@ -234,6 +329,54 @@ function updateClimbing(dx) {
     } else {
       state.player.y = Math.max(rect.top, ny);
     }
+  }
+}
+
+// px of clearance put between the player and a branch's contact line
+// (top surface when passing up, underside when passing down) after
+// passBranchAlongTrunk repositions them back onto the trunk — just enough
+// that next frame's findBranchCrossedClimbingUp/Down doesn't immediately
+// re-trigger on the same branch.
+const BRANCH_PASS_MARGIN = 4;
+
+// Jump (space) held together with up/down while on a branch (stand or hang,
+// however it was reached) detaches the player and puts them back on the
+// branch's trunk, past its contact line in that direction, so they can keep
+// climbing — the deliberate way past a branch that would otherwise auto-catch
+// them (see findBranchCrossedClimbingUp/Down above and updateBranch below).
+function passBranchAlongTrunk(direction) {
+  const { geo } = state.branch;
+  const trunkPlacement = TREE_PLACEMENTS.find((p) => p.layer === geo.placement.layer && p.x === geo.placement.trunkX);
+  if (!trunkPlacement) {
+    jumpOffBranch();
+    return;
+  }
+
+  const face = trunkPlacement.layer === 4 ? 'front' : 'side';
+  const side = face === 'side' ? geo.placement.side : null;
+  const rect = treeTrunkRect(trunkPlacement);
+  const targetX = face === 'front'
+    ? rect.left + (rect.right - rect.left) / 2 - PLAYER_W / 2
+    : side === 'left'
+      ? rect.left - PLAYER_W * CLIMB_SIDE_PEEK_FRACTION
+      : rect.right - PLAYER_W * (1 - CLIMB_SIDE_PEEK_FRACTION);
+  const targetY = direction < 0
+    ? geo.baseY - PLAYER_H - BRANCH_PASS_MARGIN
+    : geo.baseY + geo.thickness + BRANCH_PASS_MARGIN;
+
+  state.branch = null;
+  state.player.x = Math.max(GLASS_SIDE_THICKNESS, Math.min(WORLD_WIDTH - GLASS_SIDE_THICKNESS - PLAYER_W, targetX));
+  state.vy = 0;
+  state.vx = 0;
+  state.onGround = false;
+
+  if (targetY >= FLOOR_Y) {
+    // passing down landed at/past the floor line — just stand up instead of climbing
+    state.player.y = FLOOR_Y;
+    state.onGround = true;
+  } else {
+    state.player.y = Math.max(rect.top, targetY);
+    state.climb = { trunk: trunkPlacement, face, side };
   }
 }
 
@@ -275,17 +418,15 @@ function updateBranch(dx) {
       state.branch = null;
       state.onGround = false;
       state.player.x = Math.max(GLASS_SIDE_THICKNESS, Math.min(WORLD_WIDTH - GLASS_SIDE_THICKNESS - PLAYER_W, centerX - PLAYER_W / 2));
+      // Walking off the end this way is an incidental step off a ledge, not a
+      // deliberate leap (that's jumpOffBranch, via space) — suppress grabbing
+      // any trunk that happens to be within reach until the player has
+      // actually fallen clear of the branch, so simply walking along a
+      // branch toward a neighboring tree doesn't auto-grab it.
+      state.branchExitY = state.player.y;
       return;
     }
     state.player.x = centerX - PLAYER_W / 2;
-  }
-
-  // Hanging underneath, holding down lets go and drops straight down —
-  // reads as releasing a grip rather than a jump (no upward kick).
-  if (mode === 'hang' && (state.keys['arrowdown'] || state.keys['s'])) {
-    state.branch = null;
-    state.onGround = false;
-    return;
   }
 
   const centerX = state.player.x + PLAYER_W / 2;
@@ -449,6 +590,17 @@ function rectsOverlap(a, b) {
   return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 }
 
+// True while the player is close enough to the gatekeeper tree — standing on
+// the ground within reach, or gripping that exact trunk — to press E and
+// open its keypad popup.
+function nearGate() {
+  const rect = treeTrunkRect(GATE_TRUNK);
+  const centerX = state.player.x + PLAYER_W / 2;
+  const inRange = centerX >= rect.left - GATE_INTERACT_RANGE && centerX <= rect.right + GATE_INTERACT_RANGE;
+  const stationary = state.onGround || (state.climb && state.climb.trunk === GATE_TRUNK);
+  return inRange && stationary;
+}
+
 // World-space geometry for a BRANCH_PLACEMENTS entry (world-props.js),
 // shared by both rendering (drawTreeBranches) and branch physics
 // (findStandableBranch/findHangableBranch/updateBranch below) so the two
@@ -474,27 +626,52 @@ function branchGeometry(bp) {
   const h = branchSprite.height * SCALE;
   const baseX = bp.side === 'right' ? originX : originX + w - SCALE;
   const tipX = bp.side === 'right' ? originX + w - SCALE : originX;
+  // The branch's solid base band (branchSprite.thickness, grid units) sits
+  // flush with the bottom of the sprite's bounding box, tapering away toward
+  // the tip — so its bottom edge is the sprite's bottom edge (originY + h),
+  // and its top edge (thickness above that) is the standing surface. Using
+  // the full sprite height here instead of the local band thickness would
+  // put both of those lines way off: the bounding box also covers the
+  // tapered reach out to the tip, well above where the bark actually is at
+  // the trunk-contact end.
+  const thickness = (branchSprite.thickness || branchSprite.height) * SCALE;
+  const spriteBottom = originY + h;
+  // The branch sprite stays level for its first branchSprite.flatCols columns
+  // (the right-angle launch out of the trunk) before it starts rising toward
+  // the tip (see the sprite files' generator comments) — so the walkable
+  // surface isn't one straight line from base to tip, it's flat, then a
+  // rise. tBend is where that bend falls along the base(0)-to-tip(1) line;
+  // branchSurfaceYAt below uses it so standing/hanging movement tracks the
+  // branch's actual silhouette instead of cutting the corner across it.
+  const flatCols = branchSprite.flatCols || 0;
+  const tBend = branchSprite.width > 1 ? Math.min(1, flatCols / (branchSprite.width - 1)) : 0;
   return {
     placement: bp,
     originX, originY,
-    baseX, baseY: originY + h - SCALE, tipX, tipY: originY,
+    baseX, baseY: spriteBottom - thickness, tipX, tipY: originY,
     minX: Math.min(baseX, tipX),
     maxX: Math.max(baseX, tipX),
-    thickness: h,
+    thickness,
+    tBend,
   };
 }
 
 // All branches, resolved once at load time (BRANCH_PLACEMENTS is static).
 const BRANCH_GEOMETRIES = BRANCH_PLACEMENTS.map(branchGeometry).filter(Boolean);
 
-// The branch's top-surface world y at a given world x, linearly interpolated
-// along its base-to-tip line and clamped to the branch's actual span so a
-// query slightly past either end still returns that end's height rather
-// than extrapolating off the branch.
+// The branch's top-surface world y at a given world x — flat for the first
+// geo.tBend fraction of the base-to-tip line (the right-angle launch out of
+// the trunk), then linearly interpolated the rest of the way to the tip, so
+// this matches the branch's actual flat-then-rising silhouette instead of
+// cutting a single straight line across it. Clamped to the branch's actual
+// span so a query slightly past either end still returns that end's height
+// rather than extrapolating off the branch.
 function branchSurfaceYAt(geo, worldX) {
   const span = geo.tipX - geo.baseX;
   const t = span === 0 ? 0 : Math.max(0, Math.min(1, (worldX - geo.baseX) / span));
-  return geo.baseY + t * (geo.tipY - geo.baseY);
+  if (t <= geo.tBend) return geo.baseY;
+  const riseT = geo.tBend >= 1 ? 0 : (t - geo.tBend) / (1 - geo.tBend);
+  return geo.baseY + riseT * (geo.tipY - geo.baseY);
 }
 
 // While falling (or level), catch the player onto any branch whose surface
@@ -552,6 +729,11 @@ function playerGrabRect() {
 // overlapping the trunk they just left, and without this they'd instantly
 // re-attach to it instead of actually jumping away.
 function findClimbableTrunk() {
+  if (state.player.y > FLOOR_Y - CLIMB_MIN_AIR_HEIGHT) return null;
+  if (state.branchExitY !== null) {
+    if (state.player.y - state.branchExitY < CLIMB_MIN_AIR_HEIGHT) return null;
+    state.branchExitY = null;
+  }
   const playerRect = playerGrabRect();
   const dirX = horizontalTravelDirection();
   for (const placement of TREE_PLACEMENTS) {
@@ -679,6 +861,19 @@ function drawSpriteBlocky(ctx, spriteRows, x, y, scale, palette, block, fade) {
 const TREE_FADE_MIN_ALPHA = 0.12;
 const TREE_FADE_MAX_ALPHA = 1;
 
+// Tiles the gate moss sprite (TREE_PLANT_1) down the gatekeeper tree's full
+// height, the same tiling approach drawGlassEdgeSide uses for the tank
+// walls. Skipped entirely once the tree's puzzle is solved.
+function drawGateMoss(camera) {
+  if (state.gateSolved) return;
+  const rect = treeTrunkRect(GATE_TRUNK);
+  const tileH = TREE_PLANT_1.height * SCALE;
+  const screenX = rect.left - GATE_MOSS_FINGER_MARGIN - camera.x;
+  for (let y = rect.top; y < rect.bottom; y += tileH) {
+    drawSprite(ctx, TREE_PLANT_1.rows, screenX, y - camera.y, SCALE, TERRARIUM_PALETTE);
+  }
+}
+
 // Purely cosmetic background scenery from BACKGROUND_PLACEMENTS (layer 3,
 // world-props.js) — painted before the far-plants pass, with no floor
 // occlusion/interaction logic, just depth. Reuses the tree-trunk resolver
@@ -728,13 +923,15 @@ function draw() {
   // player — invisible until CHAMELEON_VISIBLE is flipped on (see top of file)
   if (window.CHAMELEON_VISIBLE) {
     const playerSprite = playerSpriteForState();
+    const hanging = state.branch && state.branch.mode === 'hang';
     const flipDefaultPose = !state.climb && state.facing === 'left';
-    drawSprite(ctx, playerSprite, state.player.x - camera.x, state.player.y - camera.y, SCALE, PALETTE, undefined, flipDefaultPose);
+    drawSprite(ctx, playerSprite, state.player.x - camera.x, state.player.y - camera.y, SCALE, PALETTE, undefined, flipDefaultPose, hanging);
   }
 
   // layer 6: near plants and tree trunks, in front of the player
   drawGroundPlants(camera, 6);
   drawTreeTrunks(camera, 6);
+  drawGateMoss(camera);
   drawTreeBranches(camera, 6);
 
   drawTankFraming(camera);
@@ -755,19 +952,42 @@ function resetGame() {
   state.climb = null;
   state.branch = null;
   state.recentlyLeftTrunk = null;
+  state.branchExitY = null;
 }
 
 // --- Input handling ---
 window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
+
+  if (gatePopupOpen) {
+    // Let the input field handle its own typing; only Escape reaches the
+    // game while the popup is up, and nothing here should move the player.
+    if (key === 'escape') closeGatePopup();
+    return;
+  }
+
   state.keys[key] = true;
+
+  if (key === 'e' && !e.repeat && !state.gateSolved && nearGate()) {
+    e.preventDefault();
+    openGatePopup();
+  }
 
   if (key === ' ') {
     e.preventDefault(); // stop the page from scrolling
     if (!e.repeat && state.climb) {
       jumpOffTrunk();
     } else if (!e.repeat && state.branch) {
-      jumpOffBranch();
+      // Jump held together with up/down passes the player back onto the
+      // branch's trunk beyond its contact line, continuing the climb in that
+      // direction; jump alone leaps off the branch into open air instead.
+      if (state.keys['arrowup'] || state.keys['w']) {
+        passBranchAlongTrunk(-1);
+      } else if (state.keys['arrowdown'] || state.keys['s']) {
+        passBranchAlongTrunk(1);
+      } else {
+        jumpOffBranch();
+      }
     } else if (!e.repeat && state.onGround) {
       state.vy = JUMP_VELOCITY;
       state.onGround = false;
@@ -790,6 +1010,53 @@ function setSkillUnlocked(unlocked) {
   state.skillUnlocked = unlocked;
   skillStatusEl.textContent = `Skill unlocked: ${unlocked ? 'YES' : 'NO'}`;
 }
+
+// --- Level counter display ---
+const levelStatusEl = document.getElementById('level-status');
+
+function setLevelsComplete(n) {
+  state.levelsComplete = n;
+  levelStatusEl.textContent = `Levels complete: ${n} / ${TOTAL_LEVELS}`;
+}
+
+// --- Gatekeeper tree popup (room 1) ---
+// Styled and structured the same as #start-screen (see index.html/style.css:
+// .popup-overlay/.popup-content), plus the input/feedback markup already
+// defined in style.css for puzzle dialogs (.dialog-form/.dialog-feedback).
+const gatePopupEl = document.getElementById('gate-popup');
+const gateFormEl = document.getElementById('gate-form');
+const gateInputEl = document.getElementById('gate-input');
+const gateFeedbackEl = document.getElementById('gate-feedback');
+const gateCloseBtn = document.getElementById('gate-close-btn');
+
+function openGatePopup() {
+  gatePopupOpen = true;
+  gateFeedbackEl.textContent = '';
+  gateInputEl.value = '';
+  gatePopupEl.classList.remove('hidden');
+  gateInputEl.focus();
+}
+
+function closeGatePopup() {
+  gatePopupOpen = false;
+  gatePopupEl.classList.add('hidden');
+}
+
+gateCloseBtn.addEventListener('click', closeGatePopup);
+
+gateFormEl.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const correct = await checkAnswer(1, gateInputEl.value);
+  if (correct) {
+    state.gateSolved = true;
+    closeGatePopup();
+    setLevelsComplete(state.levelsComplete + 1);
+  } else {
+    gateFeedbackEl.textContent = 'Incorrect code. Try again.';
+    gateInputEl.value = '';
+    gateInputEl.focus();
+  }
+});
 
 // --- Init ---
 requestAnimationFrame(loop);

@@ -46,9 +46,9 @@
 }
 
 .theme-toggle-btn {
-  position: fixed;
-  top: 12px;
-  left: 12px;
+  position: absolute;
+  top: 19px;
+  left: 10px;
   font-family: 'Space Grotesk', 'Courier New', monospace;
   font-size: 12px;
   font-weight: 500;
@@ -80,6 +80,7 @@ body {
 }
 
 .game-wrap {
+  position: relative;
   width: 100%;
   max-width: 520px;
   display: flex;
@@ -151,6 +152,30 @@ body {
   display: none;
 }
 
+.popup-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  background: transparent;
+  color: #f3e9dc;
+  border: 2px solid #f3e9dc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.popup-close-btn:hover {
+  opacity: 0.8;
+}
+
 .popup-content {
   max-width: 380px;
   display: flex;
@@ -203,6 +228,13 @@ body {
   line-height: 1.6;
 }
 
+.status-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
 .dialog {
   position: fixed;
   inset: 0;
@@ -251,6 +283,27 @@ body {
 .dialog-form {
   display: flex;
   gap: 8px;
+}
+
+/* Gate popup form — button stacked under the input, same as the start
+   screen's text-then-button layout, instead of the side-by-side .dialog-form
+   default. */
+.gate-form {
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.gate-form input {
+  flex: none;
+  width: 100%;
+  max-width: 220px;
+}
+
+.gate-form .dialog-form-btn {
+  margin-top: 10px;
 }
 
 .dialog-form input {

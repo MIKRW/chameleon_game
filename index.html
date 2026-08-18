@@ -7,11 +7,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <!-- the 143-year-old tree is covered in sphagnum capillifolium -->
 </head>
 <body>
-  <button id="theme-toggle-btn" class="theme-toggle-btn" type="button">☀ Light</button>
-
   <main class="game-wrap">
+    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button">☀ Light</button>
+
     <header class="game-header">
       <h1>Escape <span class="title-accent">the Terrarium</span></h1>
     </header>
@@ -26,11 +27,27 @@
           <button id="start-btn" class="dialog-form-btn" type="button">Start</button>
         </div>
       </div>
+
+      <div id="gate-popup" class="popup-overlay hidden">
+        <button id="gate-close-btn" class="popup-close-btn" type="button" aria-label="Close">×</button>
+        <div class="popup-content">
+          <h2>The Gatekeeper Tree</h2>
+          <p class="popup-text">That red moss is stopping me from passing. There must be a way to remove it.</p>
+          <form id="gate-form" class="dialog-form gate-form">
+            <input id="gate-input" type="text" autocomplete="off" placeholder="Enter code" />
+            <button type="submit" class="dialog-form-btn">Remove Moss</button>
+          </form>
+          <p id="gate-feedback" class="dialog-feedback"></p>
+        </div>
+      </div>
     </div>
 
-    <p class="controls-hint">Move: Arrow keys / WASD &nbsp;·&nbsp; Jump: Space</p>
+    <p class="controls-hint">Move: Arrow keys / WASD &nbsp;·&nbsp; Jump: Space &nbsp;·&nbsp; Interact: E</p>
 
-    <p id="skill-status" class="controls-hint">Skill unlocked: NO</p>
+    <div class="status-row">
+      <p id="skill-status" class="controls-hint">Skill unlocked: NO</p>
+      <p id="level-status" class="controls-hint">Levels complete: 0 / 4</p>
+    </div>
 
     <button id="restart-btn" class="secondary-btn restart-btn" type="button">Restart</button>
   </main>
@@ -70,6 +87,7 @@
   <script src="sprites/tree-branch-2.js"></script>
   <script src="sprites/index.js"></script>
   <script src="world-props.js"></script>
+  <script src="puzzles.js"></script>
   <script src="game.js"></script>
   <script>
     (function () {

@@ -66,6 +66,10 @@ const TERRARIUM_PALETTE = {
   'G': '#90caf9', // glass tint shade
   'w': '#ffffff', // glass highlight / light catch
   'o': '#546e7a', // glass frame / seal
+
+  // gate moss (tree-plant-1) — bright/dark red lichen
+  'z': '#ff5252', // moss bright red
+  'Z': '#7a1414', // moss dark red shade
 };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = TERRARIUM_PALETTE;

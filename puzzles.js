@@ -14,7 +14,7 @@ const PUZZLES = {
     title: 'The Gatekeeper Tree',
     prompt: 'A colossal tree blocks the path, its bark carved into a keypad. Somewhere on this very page, a note explains the code...',
     hint: 'Try viewing the page source (Ctrl+U) and look for a comment.',
-    answerHash: 'abb9f0871e3a1b72c62bcca07e82fe2709eb1fad58011eee5fcaf21225ba051b',
+    answerHash: 'd6f0c71ef0c88e45e4b3a2118fcb83b0def392d759c901e9d755d0e879028727',
     useConsole: false,
   },
   2: {
