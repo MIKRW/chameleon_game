@@ -7,3 +7,4 @@ verified "active" work — git can't see idle time, walking away, etc.
 
 - 2026-08-18 21:51 — `4563504` Initial commit: terrarium chameleon movement demo (start)
 - 2026-08-18 22:18 — `579c838` Updated README (+27m)
+- 2026-08-18 23:18 — `ac36773` Add first gated tree puzzle and refine branch geometry/rendering (+60m)
