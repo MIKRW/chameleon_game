@@ -90,7 +90,7 @@ body {
   padding: 20px;
   background: var(--bg);
   border: 3px solid var(--emerald-border);
-  border-radius: 0;
+  border-radius: 10px;
 }
 
 .game-header {
@@ -127,7 +127,7 @@ body {
 #game-canvas {
   image-rendering: pixelated;
   background: #241a10;
-  border-radius: 0;
+  border-radius: 6px;
   max-width: 100%;
   width: 100%;
   height: auto;
@@ -140,7 +140,7 @@ body {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.8);
-  border-radius: 0;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
