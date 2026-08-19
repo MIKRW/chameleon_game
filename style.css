@@ -83,6 +83,12 @@ body {
   position: relative;
   width: 100%;
   max-width: 900px;
+  /* Flex items default to min-width:auto, which for a container holding
+     the canvas (a replaced element with an intrinsic 720x480 size) locks
+     the shrink floor to roughly that size — the card stops scaling down
+     once the window gets narrower than the canvas's intrinsic width.
+     min-width:0 lets it shrink freely instead. */
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -414,12 +420,26 @@ body.touch-controls .controls-hint {
   }
 
   .touch-controls-card {
-    padding: 12px 10px;
+    padding: 8px 8px;
     gap: 8px;
   }
 
+  .dpad {
+    grid-template-columns: repeat(3, minmax(0, 30px));
+    grid-template-rows: repeat(3, minmax(0, 30px));
+  }
+
   .action-buttons {
-    grid-template-columns: repeat(2, minmax(0, 48px));
+    grid-template-columns: repeat(2, minmax(0, 36px));
+    gap: 6px;
+  }
+
+  .touch-btn {
+    font-size: 9px;
+  }
+
+  .touch-btn.jump-btn {
+    font-size: 7px;
   }
 }
 
@@ -439,9 +459,9 @@ body.touch-controls .touch-controls-card {
   justify-content: space-between;
   gap: 16px;
   width: 100%;
-  padding: 14px 18px;
-  background: var(--panel);
-  border: 3px solid var(--emerald-border);
+  padding: 10px 14px;
+  background: var(--bg);
+  border: none;
   border-radius: 10px;
 }
 
@@ -454,8 +474,8 @@ body.touch-controls .touch-controls-card {
 }
 
 .dpad {
-  grid-template-columns: repeat(3, minmax(0, 44px));
-  grid-template-rows: repeat(3, minmax(0, 44px));
+  grid-template-columns: repeat(3, minmax(0, 36px));
+  grid-template-rows: repeat(3, minmax(0, 36px));
   gap: 4px;
 }
 
@@ -485,8 +505,8 @@ body.touch-controls .touch-controls-card {
 }
 
 .action-buttons {
-  grid-template-columns: repeat(2, minmax(0, 52px));
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 42px));
+  gap: 8px;
   align-items: end;
 }
 
