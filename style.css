@@ -6,7 +6,6 @@
   --emerald-border: #e3603a;
   --text: #f3e9dc;
   --muted: #bda488;
-  color-scheme: dark;
 }
 
 @media (prefers-color-scheme: light) {
@@ -18,7 +17,6 @@
     --emerald-border: #17a374;
     --text: #1b1f23;
     --muted: #5b6470;
-    color-scheme: light;
   }
 }
 
@@ -31,7 +29,6 @@
   --emerald-border: #17a374;
   --text: #1b1f23;
   --muted: #5b6470;
-  color-scheme: light;
 }
 
 :root[data-theme='dark'] {
@@ -42,7 +39,6 @@
   --emerald-border: #e3603a;
   --text: #f3e9dc;
   --muted: #bda488;
-  color-scheme: dark;
 }
 
 .theme-toggle-btn {
@@ -67,6 +63,10 @@
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  background: transparent;
 }
 
 body {
