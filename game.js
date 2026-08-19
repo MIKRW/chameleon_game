@@ -12,8 +12,8 @@
 // No in-game hint points at this yet; that'll be added later.
 window.CHAMELEON_VISIBLE = false;
 
-const CANVAS_W = 480;
-const CANVAS_H = 320;
+const CANVAS_W = 720;
+const CANVAS_H = 480;
 const SCALE = 4; // sprite pixel scale
 const PLAYER_SPEED = 5;
 const GRAVITY = 0.7;
