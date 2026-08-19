@@ -369,8 +369,11 @@ body {
   line-height: 1.7;
 }
 
-/* Touch-only players get on-screen controls instead of the keyboard hint
-   (see game.js's pointer:coarse check that adds this class to <body>). */
+/* Touch-only players get on-screen controls instead of the keyboard hint.
+   Which mode applies is decided in index.html: an initial pointer:coarse
+   guess, then live-corrected the moment the player actually uses a keyboard
+   or a touch input, so hybrid devices (touchscreen laptops, tablets with a
+   paired keyboard) settle on whichever they're really using. */
 body.touch-controls .controls-hint {
   display: none;
 }
@@ -409,14 +412,23 @@ body.touch-controls .controls-hint {
   .status-row {
     gap: 12px;
   }
+
+  .touch-controls-card {
+    padding: 12px 10px;
+    gap: 8px;
+  }
+
+  .action-buttons {
+    grid-template-columns: repeat(2, minmax(0, 48px));
+  }
 }
 
-/* On-screen D-pad + action buttons, shown only on coarse-pointer (touch)
-   devices — see the pointer:coarse check in index.html that adds
-   touch-controls to <body>. Rendered as a themed control card in normal
-   document flow below the canvas (not overlaid on top of it) so it never
-   obstructs the game view; the resize-report script in index.html picks up
-   the extra height automatically. */
+/* On-screen D-pad + action buttons, shown while body.touch-controls is set
+   (see index.html for the initial guess + live input-based correction).
+   Rendered as a themed control card in normal document flow below the
+   canvas (not overlaid on top of it) so it never obstructs the game view;
+   the resize-report script in index.html picks up the extra height
+   automatically. */
 .touch-controls-card {
   display: none;
 }
@@ -507,7 +519,7 @@ body.touch-controls .touch-controls-card {
 /* Short landscape viewports (phone rotated) — compact the card so it
    doesn't eat too much of the little vertical space available. */
 @media (orientation: landscape) and (max-height: 480px) {
-  body.touch-controls .touch-controls-card {
+  .touch-controls-card {
     padding: 8px 14px;
     gap: 10px;
   }

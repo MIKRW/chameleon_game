@@ -168,13 +168,35 @@
       syncLabel();
     })();
 
-    // Touch devices get on-screen controls instead of the keyboard hint;
-    // see body.touch-controls rules in style.css and the button wiring
-    // in game.js.
+    // Decide whether to show the on-screen D-pad/buttons or the keyboard
+    // hint (see body.touch-controls rules in style.css and the button
+    // wiring in game.js). A single pointer:coarse check at load time gets
+    // phones and most tablets right, but is wrong for hybrid devices — a
+    // touchscreen laptop with a keyboard, or a tablet with one paired —
+    // where the "right" answer is really "however the player is actually
+    // playing". So this takes an initial guess from pointer:coarse, then
+    // corrects live: real keyboard input switches to the keyboard hint,
+    // a real touch switches to the on-screen buttons, and whichever the
+    // player used most recently wins.
     (function () {
+      var body = document.body;
+      var GAME_KEYS = {
+        arrowup: 1, arrowdown: 1, arrowleft: 1, arrowright: 1,
+        w: 1, a: 1, s: 1, d: 1, ' ': 1, e: 1
+      };
+
       if (window.matchMedia('(pointer: coarse)').matches) {
-        document.body.classList.add('touch-controls');
+        body.classList.add('touch-controls');
       }
+
+      window.addEventListener('keydown', function (event) {
+        if (!(event.key.toLowerCase() in GAME_KEYS)) return;
+        body.classList.remove('touch-controls');
+      });
+
+      window.addEventListener('touchstart', function () {
+        body.classList.add('touch-controls');
+      }, { passive: true });
     })();
 
     // Lets an embedding page size its iframe to fit the game exactly,
