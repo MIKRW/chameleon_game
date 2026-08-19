@@ -101,10 +101,6 @@
     (function () {
       var root = document.documentElement;
       var btn = document.getElementById('theme-toggle-btn');
-      var stored = localStorage.getItem('terrarium-theme');
-      if (stored) {
-        root.setAttribute('data-theme', stored);
-      }
 
       function isLight() {
         if (root.hasAttribute('data-theme')) return root.getAttribute('data-theme') === 'light';
@@ -115,11 +111,34 @@
         btn.textContent = isLight() ? '☾ Dark' : '☀ Light';
       }
 
-      btn.addEventListener('click', function () {
-        var next = isLight() ? 'dark' : 'light';
-        root.setAttribute('data-theme', next);
-        localStorage.setItem('terrarium-theme', next);
+      function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        localStorage.setItem('terrarium-theme', theme);
         syncLabel();
+      }
+
+      // Initial theme: an embedding page can pin it via ?theme=light|dark
+      // on the iframe src (e.g. to match its own theme on first paint).
+      // Falls back to whatever the player picked here last time.
+      var urlTheme = new URLSearchParams(window.location.search).get('theme');
+      if (urlTheme === 'light' || urlTheme === 'dark') {
+        root.setAttribute('data-theme', urlTheme);
+      } else {
+        var stored = localStorage.getItem('terrarium-theme');
+        if (stored) root.setAttribute('data-theme', stored);
+      }
+
+      btn.addEventListener('click', function () {
+        applyTheme(isLight() ? 'dark' : 'light');
+      });
+
+      // Lets an embedding page keep the game's theme in sync live, e.g.
+      // iframe.contentWindow.postMessage({ type: 'set-theme', theme: 'light' }, '*')
+      window.addEventListener('message', function (event) {
+        var data = event.data;
+        if (data && data.type === 'set-theme' && (data.theme === 'light' || data.theme === 'dark')) {
+          applyTheme(data.theme);
+        }
       });
 
       syncLabel();
