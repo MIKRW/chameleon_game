@@ -8,6 +8,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <!-- the 143-year-old tree is covered in sphagnum capillifolium -->
+  <script>
+    // Set the theme attribute before first paint so an embedding page's
+    // ?theme= param (or a returning player's saved choice) applies
+    // immediately, instead of flashing the default dark theme first.
+    (function () {
+      var urlTheme = new URLSearchParams(window.location.search).get('theme');
+      var theme = (urlTheme === 'light' || urlTheme === 'dark')
+        ? urlTheme
+        : localStorage.getItem('terrarium-theme');
+      if (theme === 'light' || theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+    })();
+  </script>
 </head>
 <body>
   <main class="game-wrap">
@@ -134,16 +148,9 @@
         syncLabel();
       }
 
-      // Initial theme: an embedding page can pin it via ?theme=light|dark
-      // on the iframe src (e.g. to match its own theme on first paint).
-      // Falls back to whatever the player picked here last time.
-      var urlTheme = new URLSearchParams(window.location.search).get('theme');
-      if (urlTheme === 'light' || urlTheme === 'dark') {
-        root.setAttribute('data-theme', urlTheme);
-      } else {
-        var stored = localStorage.getItem('terrarium-theme');
-        if (stored) root.setAttribute('data-theme', stored);
-      }
+      // Initial theme (from an embedding page's ?theme= param, or the
+      // player's saved choice) is already applied by the inline script
+      // in <head>, before first paint.
 
       btn.addEventListener('click', function () {
         applyTheme(isLight() ? 'dark' : 'light');
