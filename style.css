@@ -412,38 +412,38 @@ body.touch-controls .controls-hint {
 
 /* On-screen D-pad + action buttons, shown only on coarse-pointer (touch)
    devices — see the pointer:coarse check in index.html that adds
-   touch-controls to <body>. Overlaid on the canvas itself (rather than
-   stacked below it) so it adds no extra page height. */
-.touch-controls-overlay {
+   touch-controls to <body>. Rendered as a themed control card in normal
+   document flow below the canvas (not overlaid on top of it) so it never
+   obstructs the game view; the resize-report script in index.html picks up
+   the extra height automatically. */
+.touch-controls-card {
   display: none;
 }
 
-body.touch-controls .touch-controls-overlay {
-  display: block;
-  position: absolute;
-  inset: 0;
-  z-index: 8;
-  pointer-events: none;
+body.touch-controls .touch-controls-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--panel);
+  border: 3px solid var(--emerald-border);
+  border-radius: 10px;
 }
 
 .dpad,
 .action-buttons {
-  position: absolute;
-  bottom: 4%;
   display: grid;
-  pointer-events: auto;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
 
 .dpad {
-  left: 3%;
-  grid-template-columns: repeat(3, 15vw);
-  grid-template-rows: repeat(3, 15vw);
-  max-width: 168px;
-  max-height: 168px;
-  gap: 2px;
+  grid-template-columns: repeat(3, minmax(0, 44px));
+  grid-template-rows: repeat(3, minmax(0, 44px));
+  gap: 4px;
 }
 
 .dpad button {
@@ -472,9 +472,7 @@ body.touch-controls .touch-controls-overlay {
 }
 
 .action-buttons {
-  right: 3%;
-  grid-template-columns: repeat(2, 15vw);
-  max-width: 130px;
+  grid-template-columns: repeat(2, minmax(0, 52px));
   gap: 10px;
   align-items: end;
 }
@@ -482,23 +480,51 @@ body.touch-controls .touch-controls-overlay {
 .touch-btn {
   width: 100%;
   aspect-ratio: 1;
-  font-family: inherit;
-  font-size: 9px;
-  color: #f3e9dc;
-  background: rgba(36, 26, 18, 0.55);
-  border: 2px solid rgba(243, 233, 220, 0.55);
-  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--emerald-border);
+  border-radius: 8px;
   padding: 0;
   touch-action: none;
 }
 
 .touch-btn:active {
-  background: rgba(227, 96, 58, 0.55);
+  background: var(--accent);
+  color: #0a0a0a;
 }
 
 .touch-btn.jump-btn {
   border-radius: 50%;
+  font-size: 8px;
+}
+
+/* Short landscape viewports (phone rotated) — compact the card so it
+   doesn't eat too much of the little vertical space available. */
+@media (orientation: landscape) and (max-height: 480px) {
+  body.touch-controls .touch-controls-card {
+    padding: 8px 14px;
+    gap: 10px;
+  }
+
+  .dpad {
+    grid-template-columns: repeat(3, minmax(0, 32px));
+    grid-template-rows: repeat(3, minmax(0, 32px));
+  }
+
+  .action-buttons {
+    grid-template-columns: repeat(2, minmax(0, 40px));
+  }
+
+  .touch-btn {
+    font-size: 9px;
+  }
+
+  .touch-btn.jump-btn {
+    font-size: 7px;
+  }
 }

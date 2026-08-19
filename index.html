@@ -40,17 +40,22 @@
         </div>
       </div>
 
-      <div class="touch-controls-overlay" aria-hidden="true">
-        <div class="dpad">
-          <button type="button" class="touch-btn dpad-up" data-key="arrowup">▲</button>
-          <button type="button" class="touch-btn dpad-left" data-key="arrowleft">◀</button>
-          <button type="button" class="touch-btn dpad-right" data-key="arrowright">▶</button>
-          <button type="button" class="touch-btn dpad-down" data-key="arrowdown">▼</button>
-        </div>
-        <div class="action-buttons">
-          <button type="button" id="touch-interact-btn" class="touch-btn">E</button>
-          <button type="button" id="touch-jump-btn" class="touch-btn jump-btn">Jump</button>
-        </div>
+    </div>
+
+    <!-- Visible D-pad + action buttons for touch devices, stacked below the
+         canvas in normal document flow (not overlaid on top of it) so they
+         never obstruct the game view. Gated to pointer:coarse via
+         body.touch-controls in style.css. -->
+    <div class="touch-controls-card">
+      <div class="dpad">
+        <button type="button" class="touch-btn dpad-up" data-key="arrowup" aria-label="Up">▲</button>
+        <button type="button" class="touch-btn dpad-left" data-key="arrowleft" aria-label="Left">◀</button>
+        <button type="button" class="touch-btn dpad-right" data-key="arrowright" aria-label="Right">▶</button>
+        <button type="button" class="touch-btn dpad-down" data-key="arrowdown" aria-label="Down">▼</button>
+      </div>
+      <div class="action-buttons">
+        <button type="button" id="touch-interact-btn" class="touch-btn" aria-label="Interact">E</button>
+        <button type="button" id="touch-jump-btn" class="touch-btn jump-btn" aria-label="Jump">Jump</button>
       </div>
     </div>
 
@@ -170,22 +175,38 @@
     // viewports. Listen on the parent page for:
     //   { type: 'content-resize', height: <number> }
     // and set iframe.style.height to match.
+    //
+    // Measures <body> (not .game-wrap) so body's own top/bottom padding is
+    // included in the reported number, not just the wrap's own box.
+    //
+    // The webfonts (Press Start 2P / Space Grotesk) load with font-display:
+    // swap, so the page first lays out with a fallback font and reflows
+    // taller once the real, wider pixel font swaps in. ResizeObserver
+    // catches that on its own, but only *after* the swap — on a slow
+    // connection the embedding iframe can be left showing the pre-swap
+    // (shorter) height for a moment, clipping the bottom border. Forcing a
+    // report once document.fonts.ready resolves closes that gap instead of
+    // relying on timing.
     (function () {
-      var wrap = document.querySelector('.game-wrap');
+      var target = document.body;
       var lastHeight = null;
 
       function reportHeight() {
-        var height = Math.ceil(wrap.getBoundingClientRect().height);
+        var height = Math.ceil(target.getBoundingClientRect().height);
         if (height === lastHeight) return;
         lastHeight = height;
         window.parent.postMessage({ type: 'content-resize', height: height }, '*');
       }
 
       if (window.ResizeObserver) {
-        new ResizeObserver(reportHeight).observe(wrap);
+        new ResizeObserver(reportHeight).observe(target);
       } else {
         window.addEventListener('resize', reportHeight);
         reportHeight();
+      }
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(reportHeight);
       }
     })();
   </script>
