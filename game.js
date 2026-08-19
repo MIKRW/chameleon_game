@@ -956,6 +956,35 @@ function resetGame() {
 }
 
 // --- Input handling ---
+
+// Edge-triggered (fire once per press, not per repeat/hold) so keyboard
+// and touch buttons can share the same logic.
+function handleInteractPress() {
+  if (!state.gateSolved && nearGate()) {
+    openGatePopup();
+  }
+}
+
+function handleJumpPress() {
+  if (state.climb) {
+    jumpOffTrunk();
+  } else if (state.branch) {
+    // Jump held together with up/down passes the player back onto the
+    // branch's trunk beyond its contact line, continuing the climb in that
+    // direction; jump alone leaps off the branch into open air instead.
+    if (state.keys['arrowup'] || state.keys['w']) {
+      passBranchAlongTrunk(-1);
+    } else if (state.keys['arrowdown'] || state.keys['s']) {
+      passBranchAlongTrunk(1);
+    } else {
+      jumpOffBranch();
+    }
+  } else if (state.onGround) {
+    state.vy = JUMP_VELOCITY;
+    state.onGround = false;
+  }
+}
+
 window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
 
@@ -968,30 +997,14 @@ window.addEventListener('keydown', (e) => {
 
   state.keys[key] = true;
 
-  if (key === 'e' && !e.repeat && !state.gateSolved && nearGate()) {
+  if (key === 'e' && !e.repeat) {
     e.preventDefault();
-    openGatePopup();
+    handleInteractPress();
   }
 
   if (key === ' ') {
     e.preventDefault(); // stop the page from scrolling
-    if (!e.repeat && state.climb) {
-      jumpOffTrunk();
-    } else if (!e.repeat && state.branch) {
-      // Jump held together with up/down passes the player back onto the
-      // branch's trunk beyond its contact line, continuing the climb in that
-      // direction; jump alone leaps off the branch into open air instead.
-      if (state.keys['arrowup'] || state.keys['w']) {
-        passBranchAlongTrunk(-1);
-      } else if (state.keys['arrowdown'] || state.keys['s']) {
-        passBranchAlongTrunk(1);
-      } else {
-        jumpOffBranch();
-      }
-    } else if (!e.repeat && state.onGround) {
-      state.vy = JUMP_VELOCITY;
-      state.onGround = false;
-    }
+    if (!e.repeat) handleJumpPress();
   }
 });
 
@@ -1000,6 +1013,38 @@ window.addEventListener('keyup', (e) => {
 });
 
 document.getElementById('restart-btn').addEventListener('click', resetGame);
+
+// --- Touch controls ---
+(function () {
+  const dpadButtons = document.querySelectorAll('.dpad [data-key]');
+  dpadButtons.forEach((btn) => {
+    const key = btn.dataset.key;
+    const press = (e) => {
+      e.preventDefault();
+      state.keys[key] = true;
+    };
+    const release = (e) => {
+      e.preventDefault();
+      state.keys[key] = false;
+    };
+    btn.addEventListener('pointerdown', press);
+    btn.addEventListener('pointerup', release);
+    btn.addEventListener('pointercancel', release);
+    btn.addEventListener('pointerleave', release);
+  });
+
+  const jumpBtn = document.getElementById('touch-jump-btn');
+  jumpBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    handleJumpPress();
+  });
+
+  const interactBtn = document.getElementById('touch-interact-btn');
+  interactBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    handleInteractPress();
+  });
+})();
 
 // --- Skill status display ---
 // Reflects state.skillUnlocked; flipped by the real unlock mechanism (TODO)

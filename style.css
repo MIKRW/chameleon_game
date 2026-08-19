@@ -367,3 +367,138 @@ body {
   color: var(--muted);
   line-height: 1.7;
 }
+
+/* Touch-only players get on-screen controls instead of the keyboard hint
+   (see game.js's pointer:coarse check that adds this class to <body>). */
+body.touch-controls .controls-hint {
+  display: none;
+}
+
+/* Compact stack for narrow embeds (e.g. a fixed-height portfolio iframe on
+   mobile) — the theme toggle moves above the title instead of beside it
+   (it otherwise sits directly on top of the centered heading text once the
+   heading spans wide enough to reach the button), and paddings/gaps/type
+   shrink so the whole stack fits a short viewport without scrolling. */
+@media (max-width: 480px) {
+  body {
+    padding: 12px 8px;
+  }
+
+  .game-wrap {
+    padding: 34px 10px 12px;
+    gap: 8px;
+  }
+
+  .theme-toggle-btn {
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .game-header h1 {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .controls-hint {
+    font-size: 7px;
+  }
+
+  .status-row {
+    gap: 12px;
+  }
+}
+
+/* On-screen D-pad + action buttons, shown only on coarse-pointer (touch)
+   devices — see the pointer:coarse check in index.html that adds
+   touch-controls to <body>. Overlaid on the canvas itself (rather than
+   stacked below it) so it adds no extra page height. */
+.touch-controls-overlay {
+  display: none;
+}
+
+body.touch-controls .touch-controls-overlay {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.dpad,
+.action-buttons {
+  position: absolute;
+  bottom: 4%;
+  display: grid;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dpad {
+  left: 3%;
+  grid-template-columns: repeat(3, 15vw);
+  grid-template-rows: repeat(3, 15vw);
+  max-width: 168px;
+  max-height: 168px;
+  gap: 2px;
+}
+
+.dpad button {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.dpad-up {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+}
+
+.dpad-down {
+  grid-column: 2 !important;
+  grid-row: 3 !important;
+}
+
+.dpad-left {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+}
+
+.dpad-right {
+  grid-column: 3 !important;
+  grid-row: 2 !important;
+}
+
+.action-buttons {
+  right: 3%;
+  grid-template-columns: repeat(2, 15vw);
+  max-width: 130px;
+  gap: 10px;
+  align-items: end;
+}
+
+.touch-btn {
+  width: 100%;
+  aspect-ratio: 1;
+  font-family: inherit;
+  font-size: 9px;
+  color: #f3e9dc;
+  background: rgba(36, 26, 18, 0.55);
+  border: 2px solid rgba(243, 233, 220, 0.55);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  touch-action: none;
+}
+
+.touch-btn:active {
+  background: rgba(227, 96, 58, 0.55);
+}
+
+.touch-btn.jump-btn {
+  border-radius: 50%;
+}

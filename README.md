@@ -34,6 +34,22 @@ python -m http.server
 <iframe src="https://yourdomain.github.io/chameleon_game/" width="100%" height="480" style="border:0;"></iframe>
 ```
 
+  A fixed `height` will scroll internally on narrow/mobile viewports,
+  since the game's vertical stack doesn't fit 480px at every width. To
+  avoid that, listen for a resize message and size the iframe to match:
+
+  ```js
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'content-resize') {
+      iframe.style.height = event.data.height + 'px';
+    }
+  });
+  ```
+
+  The game also accepts `?theme=light|dark` on the iframe `src` to pin
+  its initial theme, and `iframe.contentWindow.postMessage({ type:
+  'set-theme', theme: 'light' }, '*')` to sync it live.
+
 ## Design notes
 
 - **No secrets in the repo.** Anything sensitive to gameplay is verified
