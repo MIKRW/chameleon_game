@@ -50,6 +50,25 @@ python -m http.server
   its initial theme, and `iframe.contentWindow.postMessage({ type:
   'set-theme', theme: 'light' }, '*')` to sync it live.
 
+  Add the `allowfullscreen` attribute so the mobile dev-tools button (see
+  below) can expand to fill the screen:
+
+  ```html
+  <iframe src="..." width="100%" height="480" style="border:0;" allowfullscreen></iframe>
+  ```
+
+## Mobile dev tools
+
+Puzzles 1 and 3 expect a player to use real browser devtools (view-source,
+storage inspection, a console — see `puzzles/README.md`), which mobile and
+tablet browsers don't expose. On a touch device (same `pointer: coarse`
+check that swaps in the on-screen D-pad), a 🛠 button appears top-right of
+the title. Tapping it lazy-loads [Eruda](https://github.com/liriliri/eruda)
+(vendored locally at `vendor/eruda.js`, MIT-licensed, no network calls of
+its own) and requests fullscreen so the panel has real room to work with.
+Its Elements/Resources/Console tabs cover the same ground a desktop
+player's devtools would.
+
 ## Design notes
 
 - **No secrets in the repo.** Anything sensitive to gameplay is verified

@@ -29,6 +29,7 @@
 
     <header class="game-header">
       <h1>Escape <span class="title-accent">the Terrarium</span></h1>
+      <button id="devtools-btn" class="devtools-btn" type="button" aria-label="Open mobile dev tools">🛠</button>
     </header>
 
     <div class="canvas-wrap">
@@ -251,6 +252,86 @@
       window.addEventListener('touchstart', function () {
         body.classList.add('touch-controls');
       }, { passive: true });
+    })();
+
+    // Mobile/tablet players have no browser devtools to solve the puzzles
+    // that expect view-source, storage inspection, or a console (see
+    // puzzles/README.md). This button (shown only via body.touch-controls,
+    // same signal as the on-screen D-pad) lazy-loads Eruda — a small,
+    // vendored-locally, MIT-licensed in-page devtools panel that gives
+    // touch players equivalent Elements/Resources/Console tabs.
+    //
+    // The panel is only useful if it has real screen space, so opening it
+    // also requests the Fullscreen API on this document. That works
+    // whether the game is loaded standalone (fullscreens the tab) or
+    // embedded in an iframe (fullscreens just the iframe's content) —
+    // the latter requires the embedding <iframe> to carry the
+    // `allowfullscreen` attribute (see README.md). If fullscreen is
+    // denied (attribute missing, or browser policy), the panel still
+    // opens at whatever size the iframe currently has — degraded, but
+    // still usable.
+    (function () {
+      var btn = document.getElementById('devtools-btn');
+      if (!btn) return;
+
+      var open = false;
+      var loaded = false;
+
+      function setOpenState(isOpen) {
+        open = isOpen;
+        btn.textContent = isOpen ? '✕' : '🛠';
+        btn.setAttribute('aria-label', isOpen ? 'Close mobile dev tools' : 'Open mobile dev tools');
+      }
+
+      function loadEruda(cb) {
+        if (loaded) { cb(); return; }
+        var s = document.createElement('script');
+        s.src = 'vendor/eruda.js';
+        s.onload = function () {
+          loaded = true;
+          window.eruda.init({ tool: ['console', 'elements', 'resources'] });
+          cb();
+        };
+        document.body.appendChild(s);
+      }
+
+      function enterFullscreen() {
+        var el = document.documentElement;
+        if (!el.requestFullscreen) return;
+        el.requestFullscreen().catch(function () {
+          // Denied (no allowfullscreen on the embedding iframe, or
+          // browser policy) — fall back to showing the panel at
+          // whatever size is already available.
+        });
+      }
+
+      function exitFullscreen() {
+        if (document.fullscreenElement) document.exitFullscreen();
+      }
+
+      btn.addEventListener('click', function () {
+        if (!open) {
+          loadEruda(function () {
+            enterFullscreen();
+            window.eruda.show();
+            setOpenState(true);
+          });
+        } else {
+          window.eruda.hide();
+          exitFullscreen();
+          setOpenState(false);
+        }
+      });
+
+      // Keep the button in sync if the player exits fullscreen some other
+      // way (Android back gesture, Esc on a hybrid device, etc.) instead
+      // of tapping this button again.
+      document.addEventListener('fullscreenchange', function () {
+        if (!document.fullscreenElement && open) {
+          if (window.eruda) window.eruda.hide();
+          setOpenState(false);
+        }
+      });
     })();
 
     // Lets an embedding page size its iframe to fit the game exactly,

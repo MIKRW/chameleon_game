@@ -100,9 +100,46 @@ body {
 }
 
 .game-header {
+  position: relative;
   width: 100%;
   text-align: center;
   padding: 6px 0 4px;
+}
+
+/* Mobile/tablet devtools-panel toggle — only shown for touch players (see
+   body.touch-controls, driven from index.html), since desktop/laptop
+   players already have real browser devtools for the puzzles that need
+   them (see puzzles/README.md). Hidden by default so keyboard/mouse
+   players never see it. */
+.devtools-btn {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 10px;
+  font-size: 16px;
+  line-height: 1;
+  padding: 6px 10px;
+  background: var(--panel);
+  color: var(--text);
+  border: 2px solid var(--emerald-border);
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 20;
+}
+
+body.touch-controls .devtools-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .devtools-btn {
+    top: 0;
+    right: 8px;
+    font-size: 13px;
+    padding: 4px 8px;
+  }
 }
 
 .game-header h1 {
