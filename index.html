@@ -74,6 +74,23 @@
         </div>
       </div>
 
+      <div id="skill-popup" class="popup-overlay hidden">
+        <button id="skill-close-btn" class="popup-close-btn" type="button" aria-label="Close">×</button>
+        <div class="popup-content">
+          <p id="skill-popup-text" class="popup-text"></p>
+        </div>
+      </div>
+
+      <div id="completion-popup" class="popup-overlay hidden">
+        <button id="completion-close-btn" class="popup-close-btn" type="button" aria-label="Close">×</button>
+        <div class="popup-content">
+          <h2>So Close...</h2>
+          <p class="popup-text">I'm so close to escaping! Take this code outside the tank and enter it into the chameleon pet — that's how you'll finally see me on screen.</p>
+          <p id="completion-flag" class="win-flag"></p>
+          <p class="win-note">Enter this code into the chameleon pet on the portfolio site.</p>
+        </div>
+      </div>
+
     </div>
 
     <!-- Visible D-pad + action buttons for touch devices, stacked below the
@@ -89,15 +106,17 @@
       </div>
       <div class="action-buttons">
         <button type="button" id="touch-interact-btn" class="touch-btn" aria-label="Interact">Interact</button>
+        <button type="button" id="touch-swap-btn" class="touch-btn" aria-label="Swap trunk side">Swap</button>
         <button type="button" id="touch-jump-btn" class="touch-btn jump-btn" aria-label="Jump">Jump</button>
       </div>
     </div>
 
-    <p class="controls-hint">Move: Arrow keys / WASD &nbsp;·&nbsp; Jump: Space &nbsp;·&nbsp; Interact: E</p>
+    <p class="controls-hint">Move: Arrow keys / WASD &nbsp;·&nbsp; Jump: Space &nbsp;·&nbsp; Interact: E &nbsp;·&nbsp; Swap trunk side: Q</p>
 
     <div class="status-row">
       <p id="skill-status" class="controls-hint">Skill unlocked: NO</p>
-      <p id="puzzle-status" class="controls-hint">Puzzles complete: 0 / 2</p>
+      <p id="puzzle-status" class="controls-hint">Puzzles complete: 0 / 3</p>
+      <p id="bug-status" class="controls-hint">Bugs found: 0 / 0</p>
     </div>
 
     <button id="restart-btn" class="secondary-btn restart-btn" type="button">Restart</button>
@@ -126,6 +145,8 @@
   <script src="sprites/tree-plants/tree-plant-3.js"></script>
   <script src="sprites/tree-plants/tree-plant-4.js"></script>
   <script src="sprites/tree-plants/tree-plant-5.js"></script>
+  <script src="sprites/tree-plants/tree-plant-slime.js"></script>
+  <script src="sprites/bugs/bug-1.js"></script>
   <script src="sprites/vines/vine-1.js"></script>
   <script src="sprites/vines/vine-2.js"></script>
   <script src="sprites/tree-trunk-fores/tree-trunk-fore-1.js"></script>
@@ -151,6 +172,7 @@
   <script src="puzzles/engine.js"></script>
   <script src="puzzles/puzzle-1.js"></script>
   <script src="puzzles/puzzle-2.js"></script>
+  <script src="puzzles/puzzle-3.js"></script>
   <script type="module" src="game/main.js"></script>
   <script>
     (function () {

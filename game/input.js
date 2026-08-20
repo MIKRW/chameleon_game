@@ -2,7 +2,7 @@
 // interact buttons, and the restart button.
 
 import { state, resetGame } from './state.js';
-import { handleInteractPress, handleJumpPress, gatePopupOpen, lightPopupOpen, codePopupOpen, closeGatePopup, closeLightPopup, closeCodePopup } from './interactions.js';
+import { handleInteractPress, handleJumpPress, handleSwapSidePress, gatePopupOpen, lightPopupOpen, codePopupOpen, completionPopupOpen, skillPopupOpen, closeGatePopup, closeLightPopup, closeCodePopup, closeCompletionPopup, closeSkillPopup } from './interactions.js';
 
 window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
@@ -24,11 +24,26 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
+  if (completionPopupOpen) {
+    if (key === 'escape') closeCompletionPopup();
+    return;
+  }
+
+  if (skillPopupOpen) {
+    if (key === 'escape') closeSkillPopup();
+    return;
+  }
+
   state.keys[key] = true;
 
   if (key === 'e' && !e.repeat) {
     e.preventDefault();
     handleInteractPress();
+  }
+
+  if (key === 'q' && !e.repeat) {
+    e.preventDefault();
+    handleSwapSidePress();
   }
 
   if (key === ' ') {
@@ -72,5 +87,11 @@ document.getElementById('restart-btn').addEventListener('click', resetGame);
   interactBtn.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     handleInteractPress();
+  });
+
+  const swapBtn = document.getElementById('touch-swap-btn');
+  swapBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    handleSwapSidePress();
   });
 })();

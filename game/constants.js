@@ -58,7 +58,8 @@ export const START_POS = { x: 60, y: FLOOR_Y };
 export const LIGHT_WARNING_FLICKS = 10;
 export const LIGHT_BREAK_FLICKS = 12;
 
-export const TOTAL_PUZZLES = 2; // one per PUZZLES entry in puzzles/puzzle-N.js
+export const TOTAL_PUZZLES = 3; // one per PUZZLES entry in puzzles/puzzle-N.js
+export const BUGS_REQUIRED = BUG_PLACEMENTS.length; // see world-props.js
 
 export const GATE_MOSS_FINGER_MARGIN = 2 * SCALE; // TREE_PLANT_1's 2 leftmost columns are finger tips, not bark overlay
 export const GATE_INTERACT_RANGE = 60; // px of horizontal slack on either side of the gate trunk that still counts as "at" it

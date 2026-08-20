@@ -444,7 +444,7 @@ body.touch-controls .controls-hint {
   }
 
   .action-buttons {
-    grid-template-columns: repeat(2, minmax(0, 36px));
+    grid-template-columns: repeat(3, minmax(0, 36px));
     gap: 6px;
   }
 
@@ -523,7 +523,7 @@ body.touch-controls .touch-controls-card {
 }
 
 .action-buttons {
-  grid-template-columns: repeat(2, minmax(0, 42px));
+  grid-template-columns: repeat(3, minmax(0, 42px));
   gap: 8px;
   align-items: end;
 }
@@ -554,10 +554,11 @@ body.touch-controls .touch-controls-card {
   font-size: 8px;
 }
 
-/* "Interact" is a longer label than the other single-word/glyph buttons,
-   so it needs a smaller size and permission to wrap onto two lines
-   inside the same square footprint. */
-#touch-interact-btn {
+/* "Interact"/"Swap" are longer labels than the other single-word/glyph
+   buttons, so they need a smaller size and permission to wrap onto two
+   lines inside the same square footprint. */
+#touch-interact-btn,
+#touch-swap-btn {
   font-size: 8px;
   line-height: 1.2;
   white-space: normal;
@@ -578,7 +579,7 @@ body.touch-controls .touch-controls-card {
   }
 
   .action-buttons {
-    grid-template-columns: repeat(2, minmax(0, 40px));
+    grid-template-columns: repeat(3, minmax(0, 40px));
   }
 
   .touch-btn {

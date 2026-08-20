@@ -78,8 +78,7 @@ export function update() {
       state.recentlyLeftTrunk = null;
     }
     const trunk = findClimbableTrunk();
-    if (trunk) {
-      attachToTrunk(trunk);
+    if (trunk && attachToTrunk(trunk)) {
       return;
     }
     const hang = findHangableBranch();
@@ -96,6 +95,10 @@ export function update() {
 // purely by whichever layer the trunk is already placed on (see world-props.js) —
 // layer 4 trunks paint behind the player (front-climb), layer 6 trunks paint
 // in front of the player (side-climb), so no extra render logic is needed.
+// Returns false (and leaves the player airborne) instead of attaching if the
+// approach side is the trunk's right face and the trunk-side-swap skill
+// isn't unlocked yet — that face is coated in slime (see drawSkillSlime() in
+// game/render.js) until then, too slick to grip.
 export function attachToTrunk(placement) {
   const rect = treeTrunkRect(placement);
   const face = placement.layer === 4 ? 'front' : 'side';
@@ -114,6 +117,7 @@ export function attachToTrunk(placement) {
     const trunkCenter = rect.left + (rect.right - rect.left) / 2;
     const approachedFromLeft = state.player.x + PLAYER_W / 2 < trunkCenter;
     side = approachedFromLeft ? 'left' : 'right';
+    if (side === 'right' && !state.skillUnlocked) return false;
     targetX = approachedFromLeft
       ? rect.left - PLAYER_W * CLIMB_SIDE_PEEK_FRACTION
       : rect.right - PLAYER_W * (1 - CLIMB_SIDE_PEEK_FRACTION);
@@ -124,6 +128,26 @@ export function attachToTrunk(placement) {
   state.vx = 0;
   state.onGround = false;
   state.climb = { trunk: placement, face, side };
+  return true;
+}
+
+// Trunk-side-swap skill (puzzle 3 unlock): while side-climbing, shimmy
+// around to the opposite face of the same trunk without detaching, using the
+// same peek-offset math attachToTrunk() uses for its initial approach side.
+// Front-climbing trunks have no side to swap, and the skill has to actually
+// be unlocked (state.skillUnlocked, see setSkillUnlocked() in
+// game/interactions.js) — otherwise this is a no-op.
+export function swapTrunkSide() {
+  if (!state.skillUnlocked || !state.climb || state.climb.face !== 'side') return;
+
+  const rect = treeTrunkRect(state.climb.trunk);
+  const newSide = state.climb.side === 'left' ? 'right' : 'left';
+  const targetX = newSide === 'left'
+    ? rect.left - PLAYER_W * CLIMB_SIDE_PEEK_FRACTION
+    : rect.right - PLAYER_W * (1 - CLIMB_SIDE_PEEK_FRACTION);
+
+  state.player.x = Math.max(GLASS_SIDE_THICKNESS, Math.min(WORLD_WIDTH - GLASS_SIDE_THICKNESS - PLAYER_W, targetX));
+  state.climb.side = newSide;
 }
 
 // Detach and jump off the current trunk, kicking toward whatever direction is
@@ -243,6 +267,11 @@ export function updateClimbing(dx) {
 // branch's trunk, past its contact line in that direction, so they can keep
 // climbing — the deliberate way past a branch that would otherwise auto-catch
 // them (see findBranchCrossedClimbingUp/Down above and updateBranch below).
+// A branch can be reached directly (falling onto it, reaching up into it)
+// without ever side-climbing its trunk first, so a branch rooted on a
+// trunk's right face is gated the same way attachToTrunk() gates a direct
+// grab of that face — otherwise it'd be a free bypass of the slime-locked
+// side before the trunk-side-swap skill is unlocked.
 export function passBranchAlongTrunk(direction) {
   const { geo } = state.branch;
   const trunkPlacement = TREE_PLACEMENTS.find((p) => p.layer === geo.placement.layer && p.x === geo.placement.trunkX);
@@ -253,6 +282,10 @@ export function passBranchAlongTrunk(direction) {
 
   const face = trunkPlacement.layer === 4 ? 'front' : 'side';
   const side = face === 'side' ? geo.placement.side : null;
+  if (side === 'right' && !state.skillUnlocked) {
+    jumpOffBranch();
+    return;
+  }
   const rect = treeTrunkRect(trunkPlacement);
   const targetX = face === 'front'
     ? rect.left + (rect.right - rect.left) / 2 - PLAYER_W / 2

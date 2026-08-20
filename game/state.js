@@ -9,6 +9,12 @@ import { START_POS } from './constants.js';
 // No in-game hint points at this yet; that'll be added later.
 window.CHAMELEON_VISIBLE = false;
 
+// Puzzle 3 (trunk-side-swap skill unlock) has no in-world trigger — its
+// passcode lives here in localStorage, next to the theme preference, for a
+// player to find via the Application/Storage devtools panel, then submit
+// via skillUnlockPasscode() (see game/interactions.js) from the console.
+localStorage.setItem('terrarium-skill-hint', 'heartwood');
+
 export const state = {
   player: { ...START_POS },
   vy: 0,
@@ -20,12 +26,14 @@ export const state = {
   branch: null, // { geo: <BRANCH_GEOMETRIES entry>, mode: 'stand' | 'hang' } while on/under a branch
   recentlyLeftTrunk: null, // trunk just jumped off of, ignored by findClimbableTrunk() until cleared
   branchExitY: null, // player.y at the moment they walked off a branch's end (not jumped) — findClimbableTrunk() stays blind to every trunk until they've fallen CLIMB_MIN_AIR_HEIGHT clear of it
-  // Manual dev toggle for the trunk-side-swap / branch-traversal skill. Currently
-  // set directly via the Yes/No buttons; a real in-game unlock mechanism will
-  // replace this later. The movement it unlocks isn't implemented yet either.
+  // Trunk-side-swap skill flag, flipped by skillUnlockPasscode() (puzzle 3,
+  // see game/interactions.js) once its localStorage passcode is found and
+  // submitted from the console. Gates swapTrunkSide() in game/movement.js.
   skillUnlocked: false,
   gateSolved: false, // the gatekeeper tree's moss puzzle (room 1) — see GATE_TRUNK in game/world-geometry.js
   puzzlesComplete: 0,
+  bugsFound: {}, // index into BUG_GEOMETRIES (game/world-geometry.js) -> true once collected, see updateBugs() in game/interactions.js
+  bugsCollectedCount: 0,
   lightOn: false, // flipped by the light switch (LIGHT_SWITCH_PLACEMENT) — see nearLightSwitch()/handleInteractPress()
   lightFlickCount: 0, // times the switch has been flicked since the last bulb reset — see handleInteractPress()
   bulbBroken: false, // true once lightFlickCount hits LIGHT_BREAK_FLICKS; blocks the switch until resetLightbulb() clears it

@@ -37,6 +37,12 @@ export function resolveTreePlantSprite(id) {
   return TERRARIUM_SPRITES.treePlant[index];
 }
 
+// "bug-1" -> TERRARIUM_SPRITES.bug[0]
+export function resolveBugSprite(id) {
+  const index = Number(id.slice('bug-'.length)) - 1;
+  return TERRARIUM_SPRITES.bug[index];
+}
+
 // Placements within a layer paint in ascending z order, so a higher z sits
 // on top wherever two instances' footprints overlap (see world-props.js).
 export function byAscendingZ(a, b) {
@@ -132,6 +138,49 @@ export function treePlantGeometry(pp) {
 
 // All decorative trunk plants, resolved once at load time (TREE_PLANT_PLACEMENTS is static).
 export const TREE_PLANT_GEOMETRIES = TREE_PLANT_PLACEMENTS.map(treePlantGeometry).filter(Boolean);
+
+// World-space geometry for a BUG_PLACEMENTS entry (world-props.js) — three
+// modes: `ground` bugs snap to the floor at `x` like PLANT_PLACEMENTS;
+// `trunk` bugs mount onto a trunk's side at `attachRow` the same way
+// treePlantGeometry() does, reusing TREE_PLANT_TRUNK_OVERLAP so a bug tucked
+// onto a trunk's face reads as perched on the bark rather than floating off
+// it; `air` bugs hang at a fixed `x`/`heightAboveFloor` in open space between
+// trees, with no prop underneath — reachable by a plain jump (max jump apex
+// is JUMP_VELOCITY^2 / (2*GRAVITY), see game/constants.js) rather than by
+// climbing.
+export function bugGeometry(bp) {
+  const sprite = resolveBugSprite(bp.sprite);
+  if (bp.mode === 'trunk') {
+    const trunkPlacement = TREE_PLACEMENTS.find((p) => p.layer === bp.layer && p.x === bp.trunkX);
+    if (!trunkPlacement) return null;
+    const trunkSprite = resolveTreeTrunkSprite(trunkPlacement.sprite);
+    const trunkTopY = GROUND_TOP - trunkSprite.height * SCALE;
+    const originX = bp.side === 'right'
+      ? trunkPlacement.x + trunkSprite.width * SCALE - TREE_PLANT_TRUNK_OVERLAP * SCALE
+      : trunkPlacement.x - (sprite.width - TREE_PLANT_TRUNK_OVERLAP) * SCALE;
+    const originY = trunkTopY + bp.attachRow * SCALE - (sprite.height - 1) * SCALE;
+    return { placement: bp, originX, originY, width: sprite.width * SCALE, height: sprite.height * SCALE };
+  }
+  if (bp.mode === 'air') {
+    const originX = bp.x;
+    const originY = GROUND_TOP - bp.heightAboveFloor - sprite.height * SCALE;
+    return { placement: bp, originX, originY, width: sprite.width * SCALE, height: sprite.height * SCALE };
+  }
+  const originX = bp.x;
+  const originY = GROUND_TOP - sprite.height * SCALE;
+  return { placement: bp, originX, originY, width: sprite.width * SCALE, height: sprite.height * SCALE };
+}
+
+// All bugs, resolved once at load time (BUG_PLACEMENTS is static). Both
+// game/render.js (drawBugs) and game/interactions.js (updateBugs) iterate
+// this same array in the same order, using the array index as the id for
+// state.bugsFound — so this is the single source of truth for "which bug is
+// which".
+export const BUG_GEOMETRIES = BUG_PLACEMENTS.map(bugGeometry).filter(Boolean);
+
+export function bugRect(geo) {
+  return { left: geo.originX, right: geo.originX + geo.width, top: geo.originY, bottom: geo.originY + geo.height };
+}
 
 // The branch's top-surface world y at a given world x — flat for the first
 // geo.tBend fraction of the base-to-tip line (the right-angle launch out of

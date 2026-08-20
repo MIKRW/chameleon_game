@@ -97,6 +97,11 @@ const TERRARIUM_PALETTE = {
   // Oyster mushroom shelf fungi (tree-plant-4) — pale ivory caps on bark
   'P': '#ece0c8', // mushroom cap, pale cream highlight
   'H': '#c4a878', // mushroom cap, tan shade / gill underside
+
+  // Bug (bug-1.js) — small collectible critter, unlocked by the trunk-side-
+  // swap skill (puzzle 3) — see BUG_PLACEMENTS in world-props.js
+  'I': '#c0392b', // shell, dark red
+  'O': '#e67e22', // shell, orange eye-spot highlight
 };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = TERRARIUM_PALETTE;
