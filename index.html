@@ -54,6 +54,26 @@
         </div>
       </div>
 
+      <div id="light-popup" class="popup-overlay hidden">
+        <button id="light-close-btn" class="popup-close-btn" type="button" aria-label="Close">×</button>
+        <div class="popup-content">
+          <p id="light-popup-text" class="popup-text"></p>
+        </div>
+      </div>
+
+      <div id="code-popup" class="popup-overlay hidden">
+        <button id="code-close-btn" class="popup-close-btn" type="button" aria-label="Close">×</button>
+        <div class="popup-content">
+          <h2>The Warm Light</h2>
+          <p id="code-popup-text" class="popup-text">Enter the code to keep the Lights on</p>
+          <form id="code-form" class="dialog-form">
+            <input id="code-input" type="text" autocomplete="off" placeholder="Enter code" />
+            <button type="submit" class="dialog-form-btn">Submit</button>
+          </form>
+          <p id="code-feedback" class="dialog-feedback"></p>
+        </div>
+      </div>
+
     </div>
 
     <!-- Visible D-pad + action buttons for touch devices, stacked below the
@@ -77,49 +97,61 @@
 
     <div class="status-row">
       <p id="skill-status" class="controls-hint">Skill unlocked: NO</p>
-      <p id="level-status" class="controls-hint">Levels complete: 0 / 4</p>
+      <p id="puzzle-status" class="controls-hint">Puzzles complete: 0 / 2</p>
     </div>
 
     <button id="restart-btn" class="secondary-btn restart-btn" type="button">Restart</button>
   </main>
 
   <script src="sprites.js"></script>
-  <script src="sprites/palette.js"></script>
-  <script src="sprites/glass-edge-1.js"></script>
-  <script src="sprites/glass-edge-2.js"></script>
-  <script src="sprites/glass-edge-3.js"></script>
-  <script src="sprites/glass-edge-4.js"></script>
+  <script src="sprites/palette/terrarium-palette.js"></script>
+  <script src="sprites/palette/player-palette.js"></script>
+  <script src="sprites/user/player/player.js"></script>
+  <script src="sprites/user/player/player-front.js"></script>
+  <script src="sprites/user/player/player-side-left.js"></script>
+  <script src="sprites/user/player/player-side-right.js"></script>
+  <script src="sprites/user/player/index.js"></script>
+  <script src="sprites/glass-edges/glass-edge-1.js"></script>
+  <script src="sprites/glass-edges/glass-edge-2.js"></script>
+  <script src="sprites/glass-edges/glass-edge-3.js"></script>
+  <script src="sprites/glass-edges/glass-edge-4.js"></script>
   <script src="sprites/floor.js"></script>
-  <script src="sprites/ground-plant-1.js"></script>
-  <script src="sprites/ground-plant-2.js"></script>
-  <script src="sprites/ground-plant-3.js"></script>
-  <script src="sprites/ground-plant-4.js"></script>
-  <script src="sprites/ground-plant-5.js"></script>
-  <script src="sprites/tree-plant-1.js"></script>
-  <script src="sprites/tree-plant-2.js"></script>
-  <script src="sprites/tree-plant-3.js"></script>
-  <script src="sprites/tree-plant-4.js"></script>
-  <script src="sprites/tree-plant-5.js"></script>
-  <script src="sprites/vine-1.js"></script>
-  <script src="sprites/vine-2.js"></script>
-  <script src="sprites/tree-trunk-fore-1.js"></script>
-  <script src="sprites/tree-trunk-fore-2.js"></script>
-  <script src="sprites/tree-trunk-fore-3.js"></script>
-  <script src="sprites/tree-trunk-fore-4.js"></script>
-  <script src="sprites/tree-trunk-fore-5.js"></script>
-  <script src="sprites/tree-trunk-back-1.js"></script>
-  <script src="sprites/tree-trunk-back-2.js"></script>
-  <script src="sprites/tree-trunk-back-3.js"></script>
-  <script src="sprites/tree-trunk-back-4.js"></script>
-  <script src="sprites/tree-trunk-back-5.js"></script>
-  <script src="sprites/tree-canopy-1.js"></script>
-  <script src="sprites/tree-canopy-2.js"></script>
-  <script src="sprites/tree-branch-1.js"></script>
-  <script src="sprites/tree-branch-2.js"></script>
+  <script src="sprites/ground-plants/ground-plant-1.js"></script>
+  <script src="sprites/ground-plants/ground-plant-2.js"></script>
+  <script src="sprites/ground-plants/ground-plant-3.js"></script>
+  <script src="sprites/ground-plants/ground-plant-4.js"></script>
+  <script src="sprites/ground-plants/ground-plant-5.js"></script>
+  <script src="sprites/tree-plants/tree-plant-1.js"></script>
+  <script src="sprites/tree-plants/tree-plant-2.js"></script>
+  <script src="sprites/tree-plants/tree-plant-3.js"></script>
+  <script src="sprites/tree-plants/tree-plant-4.js"></script>
+  <script src="sprites/tree-plants/tree-plant-5.js"></script>
+  <script src="sprites/vines/vine-1.js"></script>
+  <script src="sprites/vines/vine-2.js"></script>
+  <script src="sprites/tree-trunk-fores/tree-trunk-fore-1.js"></script>
+  <script src="sprites/tree-trunk-fores/tree-trunk-fore-2.js"></script>
+  <script src="sprites/tree-trunk-fores/tree-trunk-fore-3.js"></script>
+  <script src="sprites/tree-trunk-fores/tree-trunk-fore-4.js"></script>
+  <script src="sprites/tree-trunk-fores/tree-trunk-fore-5.js"></script>
+  <script src="sprites/tree-trunk-backs/tree-trunk-back-1.js"></script>
+  <script src="sprites/tree-trunk-backs/tree-trunk-back-2.js"></script>
+  <script src="sprites/tree-trunk-backs/tree-trunk-back-3.js"></script>
+  <script src="sprites/tree-trunk-backs/tree-trunk-back-4.js"></script>
+  <script src="sprites/tree-trunk-backs/tree-trunk-back-5.js"></script>
+  <script src="sprites/tree-branches/tree-branch-1.js"></script>
+  <script src="sprites/tree-branches/tree-branch-2.js"></script>
+  <script src="sprites/lights/lightbulb.js"></script>
+  <script src="sprites/lights/lightbulb-2.js"></script>
+  <script src="sprites/lights/lightbulb-3.js"></script>
+  <script src="sprites/background-texture.js"></script>
+  <script src="sprites/lights/light-switch.js"></script>
+  <script src="sprites/lights/light-switch-2.js"></script>
   <script src="sprites/index.js"></script>
   <script src="world-props.js"></script>
-  <script src="puzzles.js"></script>
-  <script src="game.js"></script>
+  <script src="puzzles/engine.js"></script>
+  <script src="puzzles/puzzle-1.js"></script>
+  <script src="puzzles/puzzle-2.js"></script>
+  <script type="module" src="game/main.js"></script>
   <script>
     (function () {
       var startScreen = document.getElementById('start-screen');
@@ -170,7 +202,7 @@
 
     // Decide whether to show the on-screen D-pad/buttons or the keyboard
     // hint (see body.touch-controls rules in style.css and the button
-    // wiring in game.js). A single pointer:coarse check at load time gets
+    // wiring in game/input.js). A single pointer:coarse check at load time gets
     // phones and most tablets right, but is wrong for hybrid devices — a
     // touchscreen laptop with a keyboard, or a tablet with one paired —
     // where the "right" answer is really "however the player is actually

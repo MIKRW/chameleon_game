@@ -1,0 +1,106 @@
+// === Tree Trunk Fore 5 - Forked ===
+// Theme: trunk that splits into two branches near the top
+//
+// Two top attach points (rows 0-2, left and right), from the trunk's fork.
+// Size: 8x75 (grid units; multiply by render scale) — height is half the
+// terrarium's floor-to-lid span (see tree-trunk-fore-1's 151-row full span),
+// so this reads as a real (if smaller) tree rather than a stub: the original
+// 14-row fork crown (rows 0-4) and root flare (last 2 rows before the floor
+// row) are unchanged, with the bark shaft between them repeated out to the
+// new height using the same plain/highlight-grain cadence as the other
+// trunks.
+// Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
+
+const TREE_TRUNK_FORE_5 = {
+  name: 'Tree Trunk Fore 5 - Forked',
+  theme: 'trunk that splits into two branches near the top',
+  behavior: {
+    type: "static",
+    layer: "background",
+    collision: false,
+    placement: "floor",
+    animated: false,
+    attach_points: "two, left and right at top"
+  },
+  width: 8,
+  height: 75,
+  rows: [
+    'rr....rr',
+    'Rr....rR',
+    '.rr..rr.',
+    '..rrrr..',
+    '..rRRr..',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    'rrRrrRrr',
+    'rrRrrRrr',
+    'kkkkkkkk'
+  ],
+};
+
+if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_FORE_5;

@@ -3,7 +3,7 @@
 //
 // Only floor sprite for now; player and props sit with their bottom edge on row 0 of this tile. Scattered 'x' pebbles break up flatness - vary their positions if a second variant is added later.
 // Size: 24x4 (grid units; multiply by render scale)
-// Uses the shared TERRARIUM_PALETTE from palette.js.
+// Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
 const FLOOR = {
   name: 'Floor - Terrarium Substrate',

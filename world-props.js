@@ -1,5 +1,5 @@
 // World prop placement — where each terrarium sprite instance sits, laid out
-// against the 8-layer scene stack (see game.js header comment):
+// against the 8-layer scene stack (see game/render.js header comment):
 //   1 background, 2 background texture, 3 background decor (cosmetic only —
 //   no floor placement/occlusion logic, painted before everything else),
 //   4 far plants (behind player), 5 player, 6 near plants (in front of
@@ -105,7 +105,7 @@ const PLANT_PLACEMENTS = [
 // Purely cosmetic background scenery — furthest back, painted before the
 // far-plants layer, never occluding or interacting with the player.
 // Scattered across all 5 tree-trunk-back-* silhouettes at varied x
-// positions and heights (see sprites/tree-trunk-back-*.js) so the backdrop
+// positions and heights (see sprites/tree-trunk-backs/tree-trunk-back-*.js) so the backdrop
 // doesn't read as one repeated trunk. Back 1 is the widest/tallest (runs
 // floor-to-lid); Back 2/4/5 are mid-height; Back 3 is the shortest, still
 // clearing the 1/3-window-height floor.
@@ -165,12 +165,12 @@ const TREE_PLACEMENTS = [
   { sprite: 'tree-trunk-fore-3', x: 3520, layer: 6 },
 ];
 
-// Branches mounted onto a subset of the trees above (see sprites/tree-branch-1.js
+// Branches mounted onto a subset of the trees above (see sprites/tree-branches/tree-branch-1.js
 // / tree-branch-2.js) — kept sparse so the scene doesn't read as cluttered:
 // only 1 of the 5 layer-4 trees (25%, max 3 branches) and 4 of the 9 layer-6
 // trees (~44%, max 4 branches) get them. Each entry's `trunkX` + `layer` must
 // match a TREE_PLACEMENTS entry exactly (that's how drawTreeBranches in
-// game.js finds the trunk to hang off). `attachRow` is the row (0 = top of
+// game/render.js finds the trunk to hang off). `attachRow` is the row (0 = top of
 // the trunk sprite, counting down toward the floor) where the branch's base
 // touches the bark; `side` picks which edge it grows from and whether the
 // branch-1/2 sprite gets flipped. Branches on the same trunk alternate sides
@@ -209,6 +209,86 @@ const BRANCH_PLACEMENTS = [
   { trunkX: 3520, layer: 6, sprite: 'tree-branch-1', attachRow: 95, side: 'left' },
 ];
 
+// Decorative single-knot foliage (tree-plant-2..5, see sprites/tree-plants/)
+// mounted onto a subset of the trees above, excluding the gatekeeper trunk
+// (x550/layer6 — TREE_PLANT_1, the moss variety, is reserved for that trunk's
+// puzzle, tiled by drawGateMoss() in game/render.js, and isn't reused decoratively
+// here). 10 instances total across the other 4 varieties (3/3/2/2 split): 6
+// on layer 4 (the tall x1150 trunk gets two, on opposite sides; the four
+// shorter layer-4 trees get one each) and 4 on layer 6 (spread across trunks
+// that don't already carry a branch, so foliage doesn't stack on top of
+// branches). `trunkX`/`layer` must match a TREE_PLACEMENTS entry exactly
+// (same convention as BRANCH_PLACEMENTS); `attachRow` sits within the middle
+// third of that trunk's height; `side` picks which edge it grows from and
+// whether the sprite gets flipped (the art is drawn bark-contact-on-the-left,
+// so 'left' mounts flip it).
+const TREE_PLANT_PLACEMENTS = [
+  // Layer 4 — Tree Trunk Fore 1 at x1150 (151 tall), the only layer-4 tree
+  // tall enough for two plants; rows kept clear of its branches (25/65/105).
+  { trunkX: 1150, layer: 4, sprite: 'tree-plant-2', attachRow: 55, side: 'left' },
+  { trunkX: 1150, layer: 4, sprite: 'tree-plant-3', attachRow: 95, side: 'right' },
+
+  // Layer 4 — the four Fore 4/5 trees (75 tall, half the terrarium's floor-
+  // to-lid span — see tree-trunk-fore-4.js/tree-trunk-fore-5.js), one plant
+  // each, alternating sides, row 35 (middle third of 75 is rows 25-50).
+  { trunkX: 1250, layer: 4, sprite: 'tree-plant-4', attachRow: 35, side: 'right' },
+  { trunkX: 1750, layer: 4, sprite: 'tree-plant-5', attachRow: 35, side: 'left' },
+  { trunkX: 1850, layer: 4, sprite: 'tree-plant-3', attachRow: 35, side: 'right' },
+  { trunkX: 2150, layer: 4, sprite: 'tree-plant-2', attachRow: 35, side: 'left' },
+
+  // Layer 6 — four trees without branches, one plant each, alternating sides.
+  { trunkX: 320, layer: 6, sprite: 'tree-plant-3', attachRow: 60, side: 'right' },
+  { trunkX: 1080, layer: 6, sprite: 'tree-plant-4', attachRow: 75, side: 'left' },
+  { trunkX: 2020, layer: 6, sprite: 'tree-plant-5', attachRow: 60, side: 'right' },
+  { trunkX: 3280, layer: 6, sprite: 'tree-plant-4', attachRow: 75, side: 'left' },
+];
+
+// Hanging props — anchor at row 0 (top of the sprite) against LID_TOP
+// instead of snapping to the floor, since they dangle from the glass lid
+// rather than standing on the substrate (see sprites/lights/lightbulb.js). The
+// sprite drawn here is resolved at render time (see resolveHangingSprite in
+// game/world-geometry.js) — it swaps 'lightbulb' for 'lightbulb2' once state.lightOn is
+// flipped, rather than needing a second placements entry.
+const HANGING_PLACEMENTS = [
+  { sprite: 'lightbulb', x: 150, layer: 4 },
+
+  // Second, purely decorative bulb between the two rightmost trees (Fore 2
+  // at x3280 and Fore 3 at x3520, both layer 6) — bait to lure the player
+  // into flicking the (distant) real switch faster. Uses lightbulb-3.js, a
+  // pixel-identical copy of the off-state lightbulb.js art under its own
+  // sprite id, so resolveHangingSprite() in game/world-geometry.js (which only swaps ids
+  // matching 'lightbulb') never lights it up. Kept on layer 4, same as the
+  // real bulb, so it shares its depth/tint treatment; drawBackgroundTexture()'s
+  // HANGING_PLACEMENTS.find(sprite === 'lightbulb') still resolves to the
+  // x150 bulb since this entry uses a different sprite id.
+  { sprite: 'lightbulb3', x: 3400, layer: 4 },
+];
+
+// Light switch — mounted on the trunk, near the top, of the second tree from
+// the far right (Tree Trunk Fore 2 at x3280, layer 6 — see TREE_PLACEMENTS
+// above; the rightmost tree is x3520), on the left face of that trunk. Far
+// from the lightbulb/background-texture cluster near x150, and only
+// reachable by climbing (see sprites/lights/light-switch.js for why that distance
+// is deliberate). `trunkX`/`layer` must match a TREE_PLACEMENTS entry
+// exactly (same convention as BRANCH_PLACEMENTS); `attachRow` is the row
+// (0 = top of the trunk sprite) the switch is bolted to; `side` must be
+// 'left' since that's the face it's drawn/interacted from (see
+// nearLightSwitch() in game/world-geometry.js / drawLightSwitch() in
+// game/render.js). Interacting with it while side-climbing that trunk on
+// the left (see handleInteractPress() in game/interactions.js) flips
+// state.lightOn, which swaps the drawn sprite between
+// light-switch.js/light-switch-2.js as well as lightbulb.js/lightbulb-2.js
+// and toggles background-texture.js's visibility.
+const LIGHT_SWITCH_PLACEMENT = { trunkX: 3280, layer: 6, attachRow: 15, side: 'left' };
+
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { PLANT_PLACEMENTS, TREE_PLACEMENTS, BACKGROUND_PLACEMENTS, BRANCH_PLACEMENTS };
+  module.exports = {
+    PLANT_PLACEMENTS,
+    TREE_PLACEMENTS,
+    BACKGROUND_PLACEMENTS,
+    BRANCH_PLACEMENTS,
+    TREE_PLANT_PLACEMENTS,
+    HANGING_PLACEMENTS,
+    LIGHT_SWITCH_PLACEMENT,
+  };
 }
