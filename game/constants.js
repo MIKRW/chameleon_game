@@ -17,8 +17,16 @@ export const CLIMB_JUMP_AWAY_KICK = 2; // horizontal push when jumping off with 
 export const CLIMB_SIDE_PEEK_FRACTION = 0.8; // fraction of player width left visible outside the trunk when side-climbing
 export const TREE_BRANCH_TRUNK_OVERLAP = 2; // grid cells a branch's base sinks into the trunk's edge, both for the visual join and for its physics base point
 export const TREE_PLANT_TRUNK_OVERLAP = 1; // grid cells a decorative trunk plant's base sinks into the trunk's edge, same idea as TREE_BRANCH_TRUNK_OVERLAP
+export const SLIME_TRUNK_OVERLAP = 3; // grid cells the trunk slime's (4-wide) sprite sinks into the trunk's edge — deliberately deeper than TREE_PLANT_TRUNK_OVERLAP so most of the drip sits over the bark and reads as growing on it, not floating beside it
 export const BRANCH_GRAB_MARGIN = 8; // extra px of forgiveness when checking for a branch underside to grab
 export const BRANCH_HANG_BAND = 10; // px of vertical forgiveness below a branch's underside still counted as "reaching" it
+
+// px of forgiveness around the player's actual bounding box when checking
+// whether an E press catches a nearby bug — deliberately tighter than
+// CLIMB_GRAB_MARGIN so catching one takes lining up and timing the press,
+// not just walking/jumping through its space (see collectNearbyBug() in
+// game/interactions.js).
+export const BUG_INTERACT_MARGIN = 4;
 
 // --- World layout: a capped rectangle, not an endless scroller ---
 export const WORLD_WIDTH = 3600;

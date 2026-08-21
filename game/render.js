@@ -8,7 +8,7 @@ import {
   GLASS_SIDE_RENDER_SCALE, GLASS_SIDE_TILE_H, PLAYER_H, FLOOR_Y, GLASS_FRONT_TOP_ALPHA,
   GLASS_FRONT_BOTTOM_ALPHA, TREE_FADE_MIN_ALPHA_LAYER4, TREE_FADE_MAX_ALPHA_LAYER4,
   TERRARIUM_PALETTE_LAYER4_TREES, BACKGROUND_PIXEL_BLOCK, TREE_FADE_MIN_ALPHA, TREE_FADE_MAX_ALPHA,
-  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, TREE_PLANT_TRUNK_OVERLAP,
+  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, TREE_PLANT_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP,
 } from './constants.js';
 import { state, ctx } from './state.js';
 import {
@@ -279,7 +279,7 @@ export function drawSkillSlime(camera) {
   for (const placement of TREE_PLACEMENTS) {
     if (placement.layer !== 6) continue;
     const rect = treeTrunkRect(placement);
-    const screenX = rect.right - TREE_PLANT_TRUNK_OVERLAP * SCALE - camera.x;
+    const screenX = rect.right - SLIME_TRUNK_OVERLAP * SCALE - camera.x;
     for (let y = rect.top; y < rect.bottom; y += tileH) {
       drawSprite(ctx, TREE_PLANT_SLIME.rows, screenX, y - camera.y, SCALE, TERRARIUM_PALETTE);
     }

@@ -100,8 +100,17 @@ const TERRARIUM_PALETTE = {
 
   // Bug (bug-1.js) — small collectible critter, unlocked by the trunk-side-
   // swap skill (puzzle 3) — see BUG_PLACEMENTS in world-props.js
-  'I': '#c0392b', // shell, dark red
-  'O': '#e67e22', // shell, orange eye-spot highlight
+  // Styled after the Australian little black fly: matte black body with a
+  // pale grey/white marking and pale wings.
+  'I': '#262626', // body, matte black
+  'O': '#e8e8e8', // pale grey/white body marking
+
+  // Trunk slime (tree-plant-slime.js) — dull olive-yellow drip, muted down
+  // from the saturated ground-plant-2 yellow (y/Y) so it reads as sickly
+  // coating rather than a bright accent
+  'K': '#8a9a4a', // slime base, muted olive-yellow
+  'W': '#4f5c28', // slime shade, dark olive
+  'X': '#c7d17a', // slime highlight, pale sage-yellow sheen
 };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = TERRARIUM_PALETTE;

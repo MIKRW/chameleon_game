@@ -32,7 +32,7 @@ export const state = {
   skillUnlocked: false,
   gateSolved: false, // the gatekeeper tree's moss puzzle (room 1) — see GATE_TRUNK in game/world-geometry.js
   puzzlesComplete: 0,
-  bugsFound: {}, // index into BUG_GEOMETRIES (game/world-geometry.js) -> true once collected, see updateBugs() in game/interactions.js
+  bugsFound: {}, // index into BUG_GEOMETRIES (game/world-geometry.js) -> true once collected, see collectNearbyBug() in game/interactions.js
   bugsCollectedCount: 0,
   lightOn: false, // flipped by the light switch (LIGHT_SWITCH_PLACEMENT) — see nearLightSwitch()/handleInteractPress()
   lightFlickCount: 0, // times the switch has been flicked since the last bulb reset — see handleInteractPress()
@@ -55,8 +55,20 @@ export function resetGame() {
   state.vy = 0;
   state.vx = 0;
   state.onGround = true;
+  state.facing = 'right';
+  state.keys = {};
   state.climb = null;
   state.branch = null;
   state.recentlyLeftTrunk = null;
   state.branchExitY = null;
+  state.skillUnlocked = false;
+  state.gateSolved = false;
+  state.puzzlesComplete = 0;
+  state.bugsFound = {};
+  state.bugsCollectedCount = 0;
+  state.lightOn = false;
+  state.lightFlickCount = 0;
+  state.bulbBroken = false;
+  state.codeSolved = false;
+  window.CHAMELEON_VISIBLE = false;
 }

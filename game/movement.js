@@ -132,16 +132,23 @@ export function attachToTrunk(placement) {
 }
 
 // Trunk-side-swap skill (puzzle 3 unlock): while side-climbing, shimmy
-// around to the opposite face of the same trunk without detaching, using the
-// same peek-offset math attachToTrunk() uses for its initial approach side.
-// Front-climbing trunks have no side to swap, and the skill has to actually
-// be unlocked (state.skillUnlocked, see setSkillUnlocked() in
-// game/interactions.js) — otherwise this is a no-op.
-export function swapTrunkSide() {
+// around to the trunk face on the given side (-1 left, 1 right) without
+// detaching, using the same peek-offset math attachToTrunk() uses for its
+// initial approach side. Driven by the left/right movement keys themselves
+// (see handleSwapSidePress() in game/interactions.js / game/input.js)
+// rather than a dedicated button — pressing the arrow for the side already
+// gripped is a no-op (there's nothing to swap to), so the same keys that
+// walk on the ground double as the swap input while climbing, and only
+// actually act once they'd change something. Front-climbing trunks have no
+// side to swap, and the skill has to actually be unlocked
+// (state.skillUnlocked, see setSkillUnlocked() in game/interactions.js) —
+// otherwise this is a no-op too.
+export function swapTrunkSide(direction) {
   if (!state.skillUnlocked || !state.climb || state.climb.face !== 'side') return;
+  const newSide = direction < 0 ? 'left' : 'right';
+  if (newSide === state.climb.side) return;
 
   const rect = treeTrunkRect(state.climb.trunk);
-  const newSide = state.climb.side === 'left' ? 'right' : 'left';
   const targetX = newSide === 'left'
     ? rect.left - PLAYER_W * CLIMB_SIDE_PEEK_FRACTION
     : rect.right - PLAYER_W * (1 - CLIMB_SIDE_PEEK_FRACTION);

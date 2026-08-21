@@ -281,8 +281,8 @@ const HANGING_PLACEMENTS = [
 // and toggles background-texture.js's visibility.
 const LIGHT_SWITCH_PLACEMENT = { trunkX: 3280, layer: 6, attachRow: 15, side: 'left' };
 
-// Collectible bugs (see game/interactions.js updateBugs() / game/render.js
-// drawBugs()) — 15 total, sized to the 3600px world (WORLD_WIDTH, see
+// Collectible bugs (see game/interactions.js collectNearbyBug() /
+// game/render.js drawBugs()) — 15 total, sized to the 3600px world (WORLD_WIDTH, see
 // game/constants.js). Three placement modes, all resolved by bugGeometry()
 // in game/world-geometry.js:
 //   `ground` — snaps to the floor at `x`, like PLANT_PLACEMENTS. The 4 here

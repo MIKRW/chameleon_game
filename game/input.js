@@ -1,8 +1,8 @@
 // Keyboard and touch input wiring — keydown/keyup, the on-screen D-pad/jump/
 // interact buttons, and the restart button.
 
-import { state, resetGame } from './state.js';
-import { handleInteractPress, handleJumpPress, handleSwapSidePress, gatePopupOpen, lightPopupOpen, codePopupOpen, completionPopupOpen, skillPopupOpen, closeGatePopup, closeLightPopup, closeCodePopup, closeCompletionPopup, closeSkillPopup } from './interactions.js';
+import { state } from './state.js';
+import { handleInteractPress, handleJumpPress, handleSwapSidePress, gatePopupOpen, lightPopupOpen, codePopupOpen, completionPopupOpen, skillPopupOpen, closeGatePopup, closeLightPopup, closeCodePopup, closeCompletionPopup, closeSkillPopup, fullResetGame } from './interactions.js';
 
 window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
@@ -41,9 +41,12 @@ window.addEventListener('keydown', (e) => {
     handleInteractPress();
   }
 
-  if (key === 'q' && !e.repeat) {
-    e.preventDefault();
-    handleSwapSidePress();
+  // Left/right double as the trunk-side-swap input while side-climbing —
+  // see swapTrunkSide() in game/movement.js for why this is a no-op unless
+  // it actually changes which face is gripped (so it never fights with
+  // normal ground movement's use of the same keys).
+  if ((key === 'arrowleft' || key === 'arrowright') && !e.repeat) {
+    handleSwapSidePress(key === 'arrowleft' ? -1 : 1);
   }
 
   if (key === ' ') {
@@ -56,7 +59,7 @@ window.addEventListener('keyup', (e) => {
   state.keys[e.key.toLowerCase()] = false;
 });
 
-document.getElementById('restart-btn').addEventListener('click', resetGame);
+document.getElementById('restart-btn').addEventListener('click', fullResetGame);
 
 // --- Touch controls ---
 (function () {
@@ -66,6 +69,11 @@ document.getElementById('restart-btn').addEventListener('click', resetGame);
     const press = (e) => {
       e.preventDefault();
       state.keys[key] = true;
+      // Same left/right-doubles-as-swap behavior as the keyboard handler
+      // above — a no-op unless it actually changes the gripped side.
+      if (key === 'arrowleft' || key === 'arrowright') {
+        handleSwapSidePress(key === 'arrowleft' ? -1 : 1);
+      }
     };
     const release = (e) => {
       e.preventDefault();
@@ -87,11 +95,5 @@ document.getElementById('restart-btn').addEventListener('click', resetGame);
   interactBtn.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     handleInteractPress();
-  });
-
-  const swapBtn = document.getElementById('touch-swap-btn');
-  swapBtn.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    handleSwapSidePress();
   });
 })();

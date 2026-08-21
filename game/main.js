@@ -10,12 +10,10 @@
 
 import { update } from './movement.js';
 import { draw } from './render.js';
-import { updateBugs } from './interactions.js';
 import './input.js';
 
 function loop() {
   update();
-  updateBugs();
   draw();
   requestAnimationFrame(loop);
 }

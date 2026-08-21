@@ -3,13 +3,14 @@
 // code) they can open.
 
 import { JUMP_VELOCITY, LIGHT_WARNING_FLICKS, LIGHT_BREAK_FLICKS, TOTAL_PUZZLES, BUGS_REQUIRED } from './constants.js';
-import { state } from './state.js';
-import { nearGate, nearLightSwitch, nearBackgroundTexture, BUG_GEOMETRIES, bugRect, rectsOverlap } from './world-geometry.js';
-import { jumpOffTrunk, jumpOffBranch, passBranchAlongTrunk, swapTrunkSide, playerGrabRect } from './movement.js';
+import { state, resetGame } from './state.js';
+import { nearGate, nearLightSwitch, nearBackgroundTexture, BUG_GEOMETRIES, bugRect, canReachBug, bugInteractRect, rectsOverlap } from './world-geometry.js';
+import { jumpOffTrunk, jumpOffBranch, passBranchAlongTrunk, swapTrunkSide } from './movement.js';
 
 // Edge-triggered (fire once per press, not per repeat/hold) so keyboard
 // and touch buttons can share the same logic.
 export function handleInteractPress() {
+  if (collectNearbyBug()) return;
   if (!state.gateSolved && nearGate()) {
     openGatePopup();
     return;
@@ -33,11 +34,12 @@ export function handleInteractPress() {
 }
 
 // Edge-triggered, same as handleInteractPress/handleJumpPress — shimmies to
-// the opposite face of the trunk currently being side-climbed (see
-// swapTrunkSide in game/movement.js); a no-op off a side-climb or before the
-// skill is unlocked.
-export function handleSwapSidePress() {
-  swapTrunkSide();
+// the trunk face on the given side (-1 left, 1 right) of the trunk currently
+// being side-climbed (see swapTrunkSide in game/movement.js); a no-op if
+// that's already the gripped side, off a side-climb, or before the skill is
+// unlocked.
+export function handleSwapSidePress(direction) {
+  swapTrunkSide(direction);
 }
 
 export function handleJumpPress() {
@@ -110,21 +112,29 @@ export function setPuzzlesComplete(n) {
 // Most bugs sit in the open from the start; the rest are slime-locked behind
 // a trunk's right face until skillUnlocked (see BUG_PLACEMENTS in
 // world-props.js and the attach gating in game/movement.js) — no extra gate
-// is needed here, an uncollectable bug just can't be reached yet. Checked
-// every frame from game/main.js, same as movement/render.
+// is needed here, an uncollectable bug just can't be reached yet. Unlike
+// most props, a bug isn't caught just by touching it — it takes an E press
+// while lined up (see bugInteractRect() in game/world-geometry.js), so
+// catching one is a deliberately timed action rather than an automatic
+// walk/jump-through. Called from handleInteractPress() above, not polled
+// every frame.
 const bugStatusEl = document.getElementById('bug-status');
 bugStatusEl.textContent = `Bugs found: 0 / ${BUGS_REQUIRED}`;
 
-export function updateBugs() {
-  const playerRect = playerGrabRect();
-  BUG_GEOMETRIES.forEach((geo, i) => {
-    if (state.bugsFound[i]) return;
-    if (!rectsOverlap(playerRect, bugRect(geo))) return;
+function collectNearbyBug() {
+  const interactRect = bugInteractRect();
+  for (let i = 0; i < BUG_GEOMETRIES.length; i++) {
+    if (state.bugsFound[i]) continue;
+    const geo = BUG_GEOMETRIES[i];
+    if (!canReachBug(geo)) continue;
+    if (!rectsOverlap(interactRect, bugRect(geo))) continue;
     state.bugsFound[i] = true;
     state.bugsCollectedCount++;
     bugStatusEl.textContent = `Bugs found: ${state.bugsCollectedCount} / ${BUGS_REQUIRED}`;
     maybeShowCompletion();
-  });
+    return true;
+  }
+  return false;
 }
 
 // --- Skill-unlock toast ---
@@ -150,7 +160,7 @@ skillCloseBtn.addEventListener('click', closeSkillPopup);
 
 // The final flag is only revealed once every dev-tool puzzle is solved AND
 // every bug is found — called from both setPuzzlesComplete() and
-// updateBugs() above, since either can be the one that finishes last.
+// collectNearbyBug() above, since either can be the one that finishes last.
 function maybeShowCompletion() {
   if (state.puzzlesComplete !== TOTAL_PUZZLES || state.bugsCollectedCount !== BUGS_REQUIRED) return;
   // getFinalFlag() is a global from puzzles/engine.js (classic script, same
@@ -293,3 +303,19 @@ export function closeCompletionPopup() {
 }
 
 completionCloseBtn.addEventListener('click', closeCompletionPopup);
+
+// --- Full restart (restart button) ---
+// resetGame() (game/state.js) only resets movement/progress flags; this also
+// closes any open popup and puts the status displays back to their initial
+// text, since those aren't derived from state on every frame.
+export function fullResetGame() {
+  resetGame();
+  closeGatePopup();
+  closeLightPopup();
+  closeCodePopup();
+  closeCompletionPopup();
+  closeSkillPopup();
+  skillStatusEl.textContent = 'Skill unlocked: NO';
+  puzzleStatusEl.textContent = `Puzzles complete: 0 / ${TOTAL_PUZZLES}`;
+  bugStatusEl.textContent = `Bugs found: 0 / ${BUGS_REQUIRED}`;
+}

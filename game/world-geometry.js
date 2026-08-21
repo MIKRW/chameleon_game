@@ -5,7 +5,7 @@
 // splitting it further risks the physics and the drawing silently drifting
 // apart.
 
-import { SCALE, GROUND_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE } from './constants.js';
+import { SCALE, GROUND_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE, BUG_INTERACT_MARGIN } from './constants.js';
 import { state } from './state.js';
 
 // "ground-plant-3" -> TERRARIUM_SPRITES.groundPlant[2]
@@ -159,7 +159,7 @@ export function bugGeometry(bp) {
       ? trunkPlacement.x + trunkSprite.width * SCALE - TREE_PLANT_TRUNK_OVERLAP * SCALE
       : trunkPlacement.x - (sprite.width - TREE_PLANT_TRUNK_OVERLAP) * SCALE;
     const originY = trunkTopY + bp.attachRow * SCALE - (sprite.height - 1) * SCALE;
-    return { placement: bp, originX, originY, width: sprite.width * SCALE, height: sprite.height * SCALE };
+    return { placement: bp, trunkPlacement, originX, originY, width: sprite.width * SCALE, height: sprite.height * SCALE };
   }
   if (bp.mode === 'air') {
     const originX = bp.x;
@@ -172,14 +172,42 @@ export function bugGeometry(bp) {
 }
 
 // All bugs, resolved once at load time (BUG_PLACEMENTS is static). Both
-// game/render.js (drawBugs) and game/interactions.js (updateBugs) iterate
-// this same array in the same order, using the array index as the id for
-// state.bugsFound — so this is the single source of truth for "which bug is
-// which".
+// game/render.js (drawBugs) and game/interactions.js (collectNearbyBug)
+// iterate this same array in the same order, using the array index as the id
+// for state.bugsFound — so this is the single source of truth for "which bug
+// is which".
 export const BUG_GEOMETRIES = BUG_PLACEMENTS.map(bugGeometry).filter(Boolean);
 
 export function bugRect(geo) {
   return { left: geo.originX, right: geo.originX + geo.width, top: geo.originY, bottom: geo.originY + geo.height };
+}
+
+// A trunk-mounted bug can only be caught while actually side-climbing the
+// exact trunk face it's mounted on — not just standing/falling somewhere
+// that happens to overlap its (small) hitbox. Without this, a jump that
+// arcs past the trunk's far face — e.g. hopping the gap behind a tree from
+// its left side to its right side and dropping down the other side — could
+// scoop up a right-side bug without ever needing the trunk-side-swap skill
+// that's supposed to gate that face (see attachToTrunk() in
+// game/movement.js). Ground/air bugs have no trunk to grip, so they're
+// always reachable by position alone.
+export function canReachBug(geo) {
+  if (geo.placement.mode !== 'trunk') return true;
+  return !!(state.climb && state.climb.trunk === geo.trunkPlacement && state.climb.side === geo.placement.side);
+}
+
+// Tight bounding box (barely larger than the player's actual sprite) used to
+// check whether an E press catches a nearby bug — see BUG_INTERACT_MARGIN in
+// game/constants.js for why this is deliberately narrower than
+// playerGrabRect() (game/movement.js), which is forgiving on purpose for
+// trunk/branch grabs.
+export function bugInteractRect() {
+  return {
+    left: state.player.x - BUG_INTERACT_MARGIN,
+    right: state.player.x + PLAYER_W + BUG_INTERACT_MARGIN,
+    top: state.player.y - BUG_INTERACT_MARGIN,
+    bottom: state.player.y + PLAYER_H + BUG_INTERACT_MARGIN,
+  };
 }
 
 // The branch's top-surface world y at a given world x — flat for the first

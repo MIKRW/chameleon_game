@@ -591,11 +591,10 @@ body.touch-controls .touch-controls-card {
   font-size: 8px;
 }
 
-/* "Interact"/"Swap" are longer labels than the other single-word/glyph
-   buttons, so they need a smaller size and permission to wrap onto two
-   lines inside the same square footprint. */
-#touch-interact-btn,
-#touch-swap-btn {
+/* "Interact" is a longer label than the other single-word/glyph buttons, so
+   it needs a smaller size and permission to wrap onto two lines inside the
+   same square footprint. */
+#touch-interact-btn {
   font-size: 8px;
   line-height: 1.2;
   white-space: normal;
