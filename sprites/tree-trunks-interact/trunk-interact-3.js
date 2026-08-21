@@ -1,4 +1,4 @@
-// === Tree Trunk Fore 3 - Knotted ===
+// === Trunk Interact 3 - Knotted ===
 // Theme: narrow trunk with a visible knot/scar
 //
 // Uses dirt-dark 'D' as a knot/scar accent that recurs periodically up the
@@ -11,8 +11,8 @@
 // terrarium's full interior span (lid to floor), same as Trunk 1/2.
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
-const TREE_TRUNK_FORE_3 = {
-  name: 'Tree Trunk Fore 3 - Knotted',
+const TREE_TRUNK_INTERACT_3 = {
+  name: 'Trunk Interact 3 - Knotted',
   theme: 'narrow trunk with a visible knot/scar',
   behavior: {
     type: "static",
@@ -177,4 +177,4 @@ const TREE_TRUNK_FORE_3 = {
   ],
 };
 
-if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_FORE_3;
+if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_INTERACT_3;

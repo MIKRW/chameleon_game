@@ -1,18 +1,18 @@
-﻿// === Tree Trunk Back 2 - Thick ===
+﻿// === Trunk BG 2a - Thick ===
 // Theme: wide, sturdy trunk, desaturated for depth
 //
-// Same silhouette as tree-trunk-fore-2, bark recolored to the muted q/Q/p
+// Same silhouette as trunk-interact-2, bark recolored to the muted q/Q/p
 // set for the back-of-scene look. Bark grain is a single-column vertical
 // tick (p) alternating with plain rows down the trunk.
 // Narrowed to 5 cols wide (1/3 skinnier than the original 8-wide version)
-// for silhouette variety against Trunk Back 1/4/5. Stretched to 80 rows
+// for silhouette variety against Trunk BG 1a/4a/5a. Stretched to 80 rows
 // tall, clearing the floor of half the terrarium's max height (the tank's
 // floor-to-lid run is ~152 rows at SCALE 4, so the floor here is ~76 rows).
 // Size: 5x80 (grid units; multiply by render scale)
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
-const TREE_TRUNK_BACK_2 = {
-  name: 'Tree Trunk Back 2 - Thick',
+const TREE_TRUNK_BG_2A = {
+  name: 'Trunk BG 2a - Thick',
   theme: 'wide, sturdy trunk, desaturated for depth',
   behavior: {
     type: "static",
@@ -107,4 +107,4 @@ const TREE_TRUNK_BACK_2 = {
   ],
 };
 
-if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BACK_2;
+if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BG_2A;

@@ -1,9 +1,9 @@
-// === Tree Trunk Fore 5 - Forked ===
+// === Trunk BG 5b - Forked ===
 // Theme: trunk that splits into two branches near the top
 //
 // Two top attach points (rows 0-2, left and right), from the trunk's fork.
 // Size: 8x75 (grid units; multiply by render scale) — height is half the
-// terrarium's floor-to-lid span (see tree-trunk-fore-1's 151-row full span),
+// terrarium's floor-to-lid span (see trunk-interact-1's 151-row full span),
 // so this reads as a real (if smaller) tree rather than a stub: the original
 // 14-row fork crown (rows 0-4) and root flare (last 2 rows before the floor
 // row) are unchanged, with the bark shaft between them repeated out to the
@@ -11,8 +11,8 @@
 // trunks.
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
-const TREE_TRUNK_FORE_5 = {
-  name: 'Tree Trunk Fore 5 - Forked',
+const TREE_TRUNK_BG_5B = {
+  name: 'Trunk BG 5b - Forked',
   theme: 'trunk that splits into two branches near the top',
   behavior: {
     type: "static",
@@ -103,4 +103,4 @@ const TREE_TRUNK_FORE_5 = {
   ],
 };
 
-if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_FORE_5;
+if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BG_5B;

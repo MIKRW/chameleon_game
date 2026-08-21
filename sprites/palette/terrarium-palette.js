@@ -42,17 +42,33 @@ const TERRARIUM_PALETTE = {
   't': '#f8bbd0', // flower petal light
   'T': '#f06292', // flower petal shade
 
-  // bark — lightened/warmed so fore trunks read as closer, up front
-  'r': '#8b6253', // bark
-  'R': '#5a3c35', // bark shade
-  'h': '#b99c92', // bark highlight
+  // bark — layer-7 tier of the depth-layer saturation ladder (see
+  // DEPTH-LAYERS.md): the nearest tree layer, so the richest/most saturated
+  // (~42%) of the tree bark tones. game/constants.js's
+  // TERRARIUM_PALETTE_LAYER5_TREES and TERRARIUM_PALETTE_LAYER3_TREES
+  // override these same keys at lower saturation for their layers.
+  'r': '#a38343', // bark
+  'R': '#624f28', // bark shade
+  'h': '#cbb790', // bark highlight
 
-  // dark-green-tinted bark (tree-trunk-back-*), pulled toward the dark
-  // background green (#16281c) for atmospheric depth — recedes regardless of
-  // which draw layer a trunk sits on
-  'q': '#3c5a46', // back-bark
-  'Q': '#233a2a', // back-bark shade
-  'p': '#4b735a', // back-bark highlight
+  // dark-green-tinted bark (trunk-bg-*a, the muted variant) — layer-2 tier
+  // of the same ladder, the furthest/lowest-saturation tree tier (~18%),
+  // pulled toward the backdrop's green for atmospheric depth.
+  // TERRARIUM_PALETTE_LAYER3_TREES overrides these keys with a step-up
+  // variant for layer 3.
+  'q': '#3d5749', // back-bark
+  'Q': '#26362d', // back-bark shade
+  'p': '#4d6f5d', // back-bark highlight
+
+  // near-black driftwood bark, exclusive to trunk-bg-6a (the big
+  // diagonal feature tree) — deliberately darker/more desaturated than the
+  // regular q/Q/p back-bark so this one silhouette reads as a shadowed
+  // foreground-scale form looming in the background rather than just
+  // another same-toned trunk. Digit keys (unused elsewhere in this palette)
+  // so they can't collide with any existing letter-keyed sprite.
+  '1': '#241a14', // driftwood bark, near-black brown
+  '2': '#120c09', // driftwood bark shade, almost pure black
+  '3': '#4a382c', // driftwood bark highlight, still dark but enough lift to read as texture
 
   // soil / floor
   'd': '#5d4037', // dirt

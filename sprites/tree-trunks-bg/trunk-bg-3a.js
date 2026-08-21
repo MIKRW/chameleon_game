@@ -1,19 +1,19 @@
-﻿// === Tree Trunk Back 3 - Knotted ===
+﻿// === Trunk BG 3a - Knotted ===
 // Theme: narrow trunk with a visible knot/scar, desaturated for depth
 //
-// Same silhouette as tree-trunk-fore-3 (knot/scar still uses dirt-dark 'D'),
+// Same silhouette as trunk-interact-3 (knot/scar still uses dirt-dark 'D'),
 // bark recolored to the muted q/Q/p set for the back-of-scene look.
 // Narrowed to 5 cols wide (1/3 skinnier than the original 8-wide version)
-// for silhouette variety against Trunk Back 1/4/5. The knot detail stays
-// near the top; plain bark (same 4-normal/2-grain cadence as Trunk Back 1)
+// for silhouette variety against Trunk BG 1a/4a/5a. The knot detail stays
+// near the top; plain bark (same 4-normal/2-grain cadence as Trunk BG 1a)
 // fills the rest. Stretched to 90 rows tall, clearing the floor of half
 // the terrarium's max height (the tank's floor-to-lid run is ~152 rows at
 // SCALE 4, so the floor here is ~76 rows).
 // Size: 5x90 (grid units; multiply by render scale)
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
-const TREE_TRUNK_BACK_3 = {
-  name: 'Tree Trunk Back 3 - Knotted',
+const TREE_TRUNK_BG_3A = {
+  name: 'Trunk BG 3a - Knotted',
   theme: 'narrow trunk with a visible knot/scar, desaturated for depth',
   behavior: {
     type: "static",
@@ -118,4 +118,4 @@ const TREE_TRUNK_BACK_3 = {
   ],
 };
 
-if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BACK_3;
+if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BG_3A;

@@ -93,14 +93,14 @@ export function update() {
 
 // Snaps the player onto a trunk and enters climbing state. `face` is decided
 // purely by whichever layer the trunk is already placed on (see world-props.js) —
-// layer 4 trunks paint behind the player (front-climb), layer 6 trunks paint
+// layer 5 trunks paint behind the player (front-climb), layer 7 trunks paint
 // in front of the player (side-climb), so no extra render logic is needed.
 // Returns false (and leaves the player airborne) instead of attaching if the
 // approach side is the trunk's right face and the trunk-side-swap skill
 // isn't unlocked yet — that face stays ungrippable until then.
 export function attachToTrunk(placement) {
   const rect = treeTrunkRect(placement);
-  const face = placement.layer === 4 ? 'front' : 'side';
+  const face = placement.layer === 5 ? 'front' : 'side';
 
   let targetX;
   let side = null;
@@ -286,7 +286,7 @@ export function passBranchAlongTrunk(direction) {
     return;
   }
 
-  const face = trunkPlacement.layer === 4 ? 'front' : 'side';
+  const face = trunkPlacement.layer === 5 ? 'front' : 'side';
   const side = face === 'side' ? geo.placement.side : null;
   if (side === 'right' && !state.skillUnlocked) {
     jumpOffBranch();

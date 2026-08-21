@@ -19,12 +19,16 @@ export function resolveHangingSprite(id) {
   return TERRARIUM_SPRITES[id];
 }
 
-// "tree-trunk-fore-1" -> TERRARIUM_SPRITES.treeTrunk.fore[0]
-// "tree-trunk-back-3" -> TERRARIUM_SPRITES.treeTrunk.back[2]
+// "trunk-bg-4b" -> TERRARIUM_SPRITES.treeTrunk.bg[3].b
+// "trunk-interact-1" -> TERRARIUM_SPRITES.treeTrunk.interact[0]
 export function resolveTreeTrunkSprite(id) {
-  const match = id.match(/^tree-trunk-(fore|back)-(\d+)$/);
-  const [, variant, number] = match;
-  return TERRARIUM_SPRITES.treeTrunk[variant][Number(number) - 1];
+  const bgMatch = id.match(/^trunk-bg-(\d+)([ab])$/);
+  if (bgMatch) {
+    const [, number, variant] = bgMatch;
+    return TERRARIUM_SPRITES.treeTrunk.bg[Number(number) - 1][variant];
+  }
+  const [, number] = id.match(/^trunk-interact-(\d+)$/);
+  return TERRARIUM_SPRITES.treeTrunk.interact[Number(number) - 1];
 }
 
 export function resolveTreeBranchSprite(id) {
@@ -228,7 +232,7 @@ export function branchSurfaceYAt(geo, worldX) {
 // The gatekeeper tree — the first tree right of the player's start position
 // (see TREE_PLACEMENTS in world-props.js) — walled off by red gate moss
 // (TREE_PLANT_1) until room 1's puzzle is solved.
-export const GATE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 550 && p.layer === 6);
+export const GATE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 550 && p.layer === 7);
 
 // The light switch — mounted on the left face of the second tree from the
 // far right (see LIGHT_SWITCH_PLACEMENT, world-props.js).
@@ -237,10 +241,10 @@ export const LIGHT_SWITCH_TRUNK = TREE_PLACEMENTS.find((p) => p.x === LIGHT_SWIT
 // The background-texture binary puzzle — no physical prop, just the lit
 // pixel-digit grid (sprites/background-texture.js) hanging under the
 // lightbulb at x150. Read from the closest climbable tree (Tree Trunk Fore 3
-// at x320, layer 6 — see TREE_PLACEMENTS in world-props.js), side-climbed on
+// at x320, layer 7 — see TREE_PLACEMENTS in world-props.js), side-climbed on
 // its left face so the player is looking back toward the bulb/texture
 // cluster. Same interaction convention as LIGHT_SWITCH_TRUNK above.
-export const CODE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 320 && p.layer === 6);
+export const CODE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 320 && p.layer === 7);
 
 // True while the player is close enough to the gatekeeper tree — standing on
 // the ground within reach, or gripping that exact trunk — to press E and

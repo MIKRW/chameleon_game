@@ -1,18 +1,18 @@
-﻿// === Tree Trunk Back 5 - Forked ===
+﻿// === Trunk BG 5a - Forked ===
 // Theme: trunk that splits into two branches near the top, desaturated for depth
 //
-// Same silhouette as tree-trunk-fore-5, bark recolored to the muted q/Q/p
+// Same silhouette as trunk-bg-5b, bark recolored to the muted q/Q/p
 // set for the back-of-scene look.
 // Stretched to 100 rows tall — the fork detail stays in the first 5 rows,
-// with plain bark (same grain cadence as Trunk Back 1/3) filling the rest
+// with plain bark (same grain cadence as Trunk BG 1a/3a) filling the rest
 // of the height down to the floor. Clears the floor of half the
 // terrarium's max height (the tank's floor-to-lid run is ~152 rows at
 // SCALE 4, so the floor here is ~76 rows).
 // Size: 8x100 (grid units; multiply by render scale)
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
-const TREE_TRUNK_BACK_5 = {
-  name: 'Tree Trunk Back 5 - Forked',
+const TREE_TRUNK_BG_5A = {
+  name: 'Trunk BG 5a - Forked',
   theme: 'trunk that splits into two branches near the top, desaturated for depth',
   behavior: {
     type: "static",
@@ -128,4 +128,4 @@ const TREE_TRUNK_BACK_5 = {
   ],
 };
 
-if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BACK_5;
+if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BG_5A;

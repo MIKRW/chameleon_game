@@ -1,7 +1,7 @@
-﻿// === Tree Trunk Back 4 - Curved Lean ===
+﻿// === Trunk BG 4a - Curved Lean ===
 // Theme: trunk that leans/curves to one side, desaturated for depth
 //
-// Same silhouette as tree-trunk-fore-4, bark recolored to the muted q/Q/p
+// Same silhouette as trunk-bg-4b, bark recolored to the muted q/Q/p
 // set for the back-of-scene look.
 // Stretched to 110 rows tall — the curve resolves to a fully left-leaning
 // trunk within the first 7 rows, then plain left-leaning bark repeats down
@@ -11,8 +11,8 @@
 // Size: 8x110 (grid units; multiply by render scale)
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
-const TREE_TRUNK_BACK_4 = {
-  name: 'Tree Trunk Back 4 - Curved Lean',
+const TREE_TRUNK_BG_4A = {
+  name: 'Trunk BG 4a - Curved Lean',
   theme: 'trunk that leans/curves to one side, desaturated for depth',
   behavior: {
     type: "static",
@@ -137,4 +137,4 @@ const TREE_TRUNK_BACK_4 = {
   ],
 };
 
-if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BACK_4;
+if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BG_4A;

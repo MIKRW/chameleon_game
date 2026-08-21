@@ -1,9 +1,9 @@
-// === Tree Trunk Fore 4 - Curved Lean ===
+// === Trunk BG 4b - Curved Lean ===
 // Theme: trunk that leans/curves to one side
 //
 // Top attach point drifts left across rows, for a windswept look.
 // Size: 8x75 (grid units; multiply by render scale) — height is half the
-// terrarium's floor-to-lid span (see tree-trunk-fore-1's 151-row full span),
+// terrarium's floor-to-lid span (see trunk-interact-1's 151-row full span),
 // so this reads as a real (if smaller) tree rather than a stub: the original
 // 14-row curved crown (rows 0-6) and root flare (last 2 rows before the
 // floor row) are unchanged, with the bark shaft between them repeated out to
@@ -11,8 +11,8 @@
 // trunks.
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
-const TREE_TRUNK_FORE_4 = {
-  name: 'Tree Trunk Fore 4 - Curved Lean',
+const TREE_TRUNK_BG_4B = {
+  name: 'Trunk BG 4b - Curved Lean',
   theme: 'trunk that leans/curves to one side',
   behavior: {
     type: "static",
@@ -102,4 +102,4 @@ const TREE_TRUNK_FORE_4 = {
   ],
 };
 
-if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_FORE_4;
+if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_BG_4B;

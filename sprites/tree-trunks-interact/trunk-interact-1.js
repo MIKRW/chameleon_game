@@ -1,4 +1,4 @@
-// === Tree Trunk Fore 1 - Straight Slim ===
+// === Trunk Interact 1 - Straight Slim ===
 // Theme: plain straight trunk, narrow
 //
 // Plain trunk, open at the top row (row 0). Bark grain is a
@@ -11,8 +11,8 @@
 // Size: 11x151 (grid units; multiply by render scale) — height matches the terrarium's full interior span (lid to floor); width bumped a third wider (8 -> 11) than the standard trunk gauge.
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
-const TREE_TRUNK_FORE_1 = {
-  name: 'Tree Trunk Fore 1 - Straight Slim',
+const TREE_TRUNK_INTERACT_1 = {
+  name: 'Trunk Interact 1 - Straight Slim',
   theme: 'plain straight trunk, narrow',
   behavior: {
     type: "static",
@@ -178,4 +178,4 @@ const TREE_TRUNK_FORE_1 = {
   ],
 };
 
-if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_FORE_1;
+if (typeof module !== 'undefined' && module.exports) module.exports = TREE_TRUNK_INTERACT_1;

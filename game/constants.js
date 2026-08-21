@@ -6,10 +6,10 @@
 export const CANVAS_W = 720;
 export const CANVAS_H = 480;
 export const SCALE = 4; // sprite pixel scale
-export const PLAYER_SPEED = 5;
+export const PLAYER_SPEED = 6;
 export const GRAVITY = 0.7;
 export const JUMP_VELOCITY = -12;
-export const CLIMB_SPEED = 3;
+export const CLIMB_SPEED = 2;
 export const CLIMB_GRAB_MARGIN = 6; // extra px of forgiveness when checking for a trunk to grab
 export const CLIMB_MIN_AIR_HEIGHT = 16; // min px the player must have jumped above the floor line before a trunk can grab them — keeps a low hop near a trunk's base (where ground plants often sit) from snapping onto the trunk and reading as "stuck" on the plants
 export const CLIMB_JUMP_KICK = 4; // horizontal push when jumping off a trunk toward a direction
@@ -89,23 +89,41 @@ export const BRANCH_SPEED = 4;
 export const GLASS_FRONT_TOP_ALPHA = 0.05; // near-clear at the top, even at the floor
 export const GLASS_FRONT_BOTTOM_ALPHA = 0.5; // hazy near the bottom, even at the floor
 
-// Layer-4 trunks (behind the player) get the same top-to-bottom vertical
-// fade as the layer-3 background trunks (see TREE_FADE_MIN_ALPHA below),
-// just much less dramatic — still clearly readable as trees, just a touch
-// hazier than the fully-opaque layer-6 trunks in front of the player so
-// depth still reads between the two.
-export const TREE_FADE_MIN_ALPHA_LAYER4 = 0.45;
-export const TREE_FADE_MAX_ALPHA_LAYER4 = 1;
+// Depth-layer saturation ladder (see DEPTH-LAYERS.md for the full rationale
+// and measured baseline). Layers 5 and 7 (the interactive trunks) are fully
+// opaque, crisp, and never alpha-faded — that vertical crown-fade is
+// reserved for the purely cosmetic layer-2/3 background decor (see
+// TREE_FADE_MIN_ALPHA below) so climbable trunks always read as clean and
+// separate from scenery, regardless of camera position. Depth between
+// layers 2/3/5/7 is instead carried entirely by saturation + lightness,
+// each layer's bark palette getting progressively richer as it sits closer
+// to the camera: layer 2 (~18% sat, TERRARIUM_PALETTE's q/Q/p) < layer 3
+// (~24%) < layer 5 (~32%) < layer 7 (~42%, TERRARIUM_PALETTE's r/R/h).
 
-// Layer-4 trunks also get a slightly darkened bark palette (on top of the
-// alpha fade above) so they read as further back even where the fade is at
-// its least dramatic (near the bottom, maxAlpha) — same 'r'/'R'/'h' bark
-// keys as TERRARIUM_PALETTE, just ~15% darker.
-export const TERRARIUM_PALETTE_LAYER4_TREES = {
+// Layer-5 trunks (behind the player): a step below layer 7's r/R/h on the
+// saturation ladder, same warm bark hue, so depth between the two reads
+// purely from richness/lightness rather than an alpha fade.
+export const TERRARIUM_PALETTE_LAYER5_TREES = {
   ...TERRARIUM_PALETTE,
-  'r': '#765347', // bark, darkened
-  'R': '#4d332d', // bark shade, darkened
-  'h': '#9d857c', // bark highlight, darkened
+  'r': '#805442', // bark
+  'R': '#4a3126', // bark shade
+  'h': '#b68e7c', // bark highlight
+};
+
+// Layer-3 background decor (new — see BACKGROUND_LAYER3_PLACEMENTS in
+// world-props.js): reuses the same trunk-bg-* sprite variety as layer 2,
+// just placed differently, so it needs its own palette override to sit a
+// step above layer 2 on the ladder (both the q/Q/p muted-bark keys used by
+// the *a silhouettes, and the r/R/h keys used by the *b silhouettes that
+// were moved into background decor).
+export const TERRARIUM_PALETTE_LAYER3_TREES = {
+  ...TERRARIUM_PALETTE,
+  'q': '#3e6550', // back-bark
+  'Q': '#273f32', // back-bark shade
+  'p': '#4f8267', // back-bark highlight
+  'r': '#775140', // bark
+  'R': '#462f25', // bark shade
+  'h': '#ac8372', // bark highlight
 };
 
 // Background decor pixel block size — sampling every Nth row/col (nearest
@@ -114,8 +132,35 @@ export const TERRARIUM_PALETTE_LAYER4_TREES = {
 // fore/near-layer sprites, reinforcing that it's further away.
 export const BACKGROUND_PIXEL_BLOCK = 2;
 
-// Background trunks fade from barely-visible at the crown (TREE_FADE_MIN_ALPHA)
-// up to fully opaque at the floor (TREE_FADE_MAX_ALPHA), so only the tops of
-// the tallest trunks peek out of the haze rather than looming solidly overhead.
+// Fraction of camera.x the background-fill texture scrolls by (see
+// drawBackgroundSprite() in game/render.js) — far below 1 so it drifts slowly
+// under the foreground instead of tracking the camera 1:1, the cue that
+// reads as "distant" rather than "stuck to the screen". background-fill.js
+// is generated wide enough (CHUNKS_W margin) to cover CAMERA_X_MAX *
+// BACKGROUND_PARALLAX of scroll without running out of image at either edge.
+export const BACKGROUND_PARALLAX = 0.15;
+
+// Fraction of camera.x the layer-2/3 background-decor trunks scroll by (see
+// drawBackgroundDecor() in game/render.js) — each faster than
+// BACKGROUND_PARALLAX (the layer-1 backdrop) but still well under 1:1, so
+// the three layers visibly separate as the camera pans: 1 (0.15) < 2 (0.4)
+// < 3 (0.55) < layers 5/7/player (1:1). Kept low enough that background
+// motion doesn't outrun the depth illusion even at PLAYER_SPEED's higher
+// value — a layer's absolute on-screen speed is this fraction of however
+// fast the camera is panning, so a faster player raises every layer's
+// real px/sec too; these factors were pulled down accordingly. See
+// DEPTH-LAYERS.md. BACKGROUND_PLACEMENTS/BACKGROUND_LAYER3_PLACEMENTS
+// (world-props.js) place their trunks within the screen-x range each
+// factor can actually reach (CAMERA_X_MAX * factor + CANVAS_W) rather than
+// across the full world width, so nothing sits permanently out of view.
+export const BACKGROUND_DECOR_PARALLAX_LAYER2 = 0.4;
+export const BACKGROUND_DECOR_PARALLAX_LAYER3 = 0.55;
+
+// Background/decor trunks (layers 2 and 3 only — see above) fade from
+// barely-visible at the crown (TREE_FADE_MIN_ALPHA) up to fully opaque at
+// the floor (TREE_FADE_MAX_ALPHA), so only the tops of the tallest trunks
+// peek out of the haze rather than looming solidly overhead. One shared
+// range for both layers — the layers themselves are told apart by
+// saturation/parallax speed, not by each having its own fade range.
 export const TREE_FADE_MIN_ALPHA = 0.12;
 export const TREE_FADE_MAX_ALPHA = 1;
