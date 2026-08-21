@@ -34,15 +34,6 @@ const PLANT_PLACEMENTS = [
   { sprite: 'ground-plant-1', x: 700, layer: 4 },
   { sprite: 'ground-plant-1', x: 1290, layer: 4 },
   { sprite: 'ground-plant-1', x: 3000, layer: 4 },
-  { sprite: 'ground-plant-2', x: 550, layer: 4 },
-  { sprite: 'ground-plant-2', x: 650, layer: 4 },
-  { sprite: 'ground-plant-2', x: 800, layer: 4 },
-  { sprite: 'ground-plant-2', x: 2000, layer: 4 },
-  { sprite: 'ground-plant-2', x: 2050, layer: 4 },
-  { sprite: 'ground-plant-2', x: 2500, layer: 4 },
-  { sprite: 'ground-plant-2', x: 3200, layer: 4 },
-  { sprite: 'ground-plant-2', x: 3300, layer: 4 },
-  { sprite: 'ground-plant-2', x: 3350, layer: 4 },
   { sprite: 'ground-plant-3', x: 950, layer: 4 },
   { sprite: 'ground-plant-4', x: 1650, layer: 4 },
   { sprite: 'ground-plant-5', x: 2250, layer: 4 },
@@ -51,40 +42,29 @@ const PLANT_PLACEMENTS = [
   // a first pass for floor density, adjust/remove freely.
   { sprite: 'ground-plant-3', x: 230, layer: 4 },
   { sprite: 'ground-plant-5', x: 350, layer: 4 },
-  { sprite: 'ground-plant-2', x: 420, layer: 4 },
   { sprite: 'ground-plant-3', x: 860, layer: 4 },
   { sprite: 'ground-plant-5', x: 910, layer: 4 },
-  { sprite: 'ground-plant-2', x: 1030, layer: 4 },
   { sprite: 'ground-plant-4', x: 1100, layer: 4 },
   { sprite: 'ground-plant-5', x: 1170, layer: 4 },
   { sprite: 'ground-plant-3', x: 1240, layer: 4 },
-  { sprite: 'ground-plant-2', x: 1360, layer: 4 },
   { sprite: 'ground-plant-5', x: 1420, layer: 4 },
   { sprite: 'ground-plant-3', x: 1480, layer: 4 },
   { sprite: 'ground-plant-4', x: 1540, layer: 4 },
-  { sprite: 'ground-plant-2', x: 1600, layer: 4 },
   { sprite: 'ground-plant-3', x: 1720, layer: 4 },
   { sprite: 'ground-plant-5', x: 1780, layer: 4 },
-  { sprite: 'ground-plant-2', x: 1840, layer: 4 },
   { sprite: 'ground-plant-4', x: 1900, layer: 4 },
   { sprite: 'ground-plant-3', x: 1960, layer: 4 },
   { sprite: 'ground-plant-5', x: 2100, layer: 4 },
-  { sprite: 'ground-plant-2', x: 2150, layer: 4 },
   { sprite: 'ground-plant-4', x: 2200, layer: 4 },
-  { sprite: 'ground-plant-2', x: 2320, layer: 4 },
   { sprite: 'ground-plant-4', x: 2380, layer: 4 },
   { sprite: 'ground-plant-3', x: 2440, layer: 4 },
-  { sprite: 'ground-plant-2', x: 2560, layer: 4 },
   { sprite: 'ground-plant-5', x: 2620, layer: 4 },
   { sprite: 'ground-plant-1', x: 2680, layer: 4 },
   { sprite: 'ground-plant-3', x: 2760, layer: 4 },
   { sprite: 'ground-plant-4', x: 2820, layer: 4 },
-  { sprite: 'ground-plant-2', x: 2880, layer: 4 },
   { sprite: 'ground-plant-5', x: 2940, layer: 4 },
-  { sprite: 'ground-plant-2', x: 3060, layer: 4 },
   { sprite: 'ground-plant-4', x: 3120, layer: 4 },
   { sprite: 'ground-plant-3', x: 3170, layer: 4 },
-  { sprite: 'ground-plant-2', x: 3400, layer: 4 },
   { sprite: 'ground-plant-5', x: 3450, layer: 4 },
   { sprite: 'ground-plant-3', x: 3500, layer: 4 },
   { sprite: 'ground-plant-4', x: 3550, layer: 4 },
@@ -282,47 +262,11 @@ const HANGING_PLACEMENTS = [
 const LIGHT_SWITCH_PLACEMENT = { trunkX: 3280, layer: 6, attachRow: 15, side: 'left' };
 
 // Collectible bugs (see game/interactions.js collectNearbyBug() /
-// game/render.js drawBugs()) — 15 total, sized to the 3600px world (WORLD_WIDTH, see
-// game/constants.js). Three placement modes, all resolved by bugGeometry()
-// in game/world-geometry.js:
-//   `ground` — snaps to the floor at `x`, like PLANT_PLACEMENTS. The 4 here
-//     sit right on top of an existing ground-plant cluster (see
-//     PLANT_PLACEMENTS above) so they read as hiding in the foliage rather
-//     than sitting bare on open floor.
-//   `trunk` — mounts onto a trunk's side at `attachRow`, same convention as
-//     TREE_PLANT_PLACEMENTS (`trunkX`/`layer` must match a TREE_PLACEMENTS
-//     entry exactly, `attachRow` picked clear of that trunk's existing
-//     branch/tree-plant rows). `side: 'right'` sits behind the yellow slime
-//     coating (tree-plant-slime.js) that blocks that face until the
-//     trunk-side-swap skill (puzzle 3) is unlocked (see
-//     attachToTrunk()/passBranchAlongTrunk() in game/movement.js); `side:
-//     'left'` needs no skill at all, just ordinary climbing. Three of the
-//     seven right-side bugs sit on trunks the puzzles already teach players
-//     to side-climb on the left (GATE_TRUNK, CODE_TRUNK,
-//     LIGHT_SWITCH_TRUNK — see game/world-geometry.js), so the slime hiding
-//     them is a visible clue there's more to find.
-//   `air` — floats at a fixed `x`/`heightAboveFloor` in an open gap between
-//     trees, no prop underneath, reachable with a plain standing jump (the
-//     2 here sit at 80px, comfortably under a jump's ~103px apex — see
-//     JUMP_VELOCITY/GRAVITY in game/constants.js) — the "jump tree to tree
-//     through open space" traversal already used to cross between trunks.
-const BUG_PLACEMENTS = [
-  { mode: 'ground', sprite: 'bug-1', x: 270, layer: 4 }, // beside ground-plant-1 (270) / ground-plant-3 (230)
-  { mode: 'ground', sprite: 'bug-1', x: 910, layer: 4 }, // beside ground-plant-5 (910) / ground-plant-3 (860)
-  { mode: 'ground', sprite: 'bug-1', x: 1600, layer: 4 }, // beside ground-plant-2 (1600), between the 1480/1720 plant-3 cluster
-  { mode: 'ground', sprite: 'bug-1', x: 2380, layer: 4 }, // beside ground-plant-4 (2380/2200) / ground-plant-3 (2440)
-  { mode: 'trunk', sprite: 'bug-1', trunkX: 2020, layer: 6, side: 'left', attachRow: 30 },
-  { mode: 'trunk', sprite: 'bug-1', trunkX: 3520, layer: 6, side: 'left', attachRow: 65 },
-  { mode: 'air', sprite: 'bug-1', x: 1350, layer: 6, heightAboveFloor: 80 }, // open gap between the x1080 and x1540 trunks
-  { mode: 'air', sprite: 'bug-1', x: 2850, layer: 6, heightAboveFloor: 80 }, // open gap between the x2610 and x3280 trunks
-  { mode: 'trunk', sprite: 'bug-1', trunkX: 320, layer: 6, side: 'right', attachRow: 20 },
-  { mode: 'trunk', sprite: 'bug-1', trunkX: 550, layer: 6, side: 'right', attachRow: 70 },
-  { mode: 'trunk', sprite: 'bug-1', trunkX: 930, layer: 6, side: 'right', attachRow: 40 },
-  { mode: 'trunk', sprite: 'bug-1', trunkX: 1080, layer: 6, side: 'right', attachRow: 50 },
-  { mode: 'trunk', sprite: 'bug-1', trunkX: 2020, layer: 6, side: 'right', attachRow: 20 },
-  { mode: 'trunk', sprite: 'bug-1', trunkX: 2610, layer: 6, side: 'right', attachRow: 90 },
-  { mode: 'trunk', sprite: 'bug-1', trunkX: 3280, layer: 6, side: 'right', attachRow: 30 },
-];
+// game/render.js drawBugs()), resolved by bugGeometry() in
+// game/world-geometry.js. Empty for now — the bug/fly sprite has been
+// pulled — so BUGS_REQUIRED (game/constants.js) is 0 and bug collection is
+// trivially satisfied without affecting the completion condition.
+const BUG_PLACEMENTS = [];
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {

@@ -8,7 +8,7 @@ import {
   GLASS_SIDE_RENDER_SCALE, GLASS_SIDE_TILE_H, PLAYER_H, FLOOR_Y, GLASS_FRONT_TOP_ALPHA,
   GLASS_FRONT_BOTTOM_ALPHA, TREE_FADE_MIN_ALPHA_LAYER4, TREE_FADE_MAX_ALPHA_LAYER4,
   TERRARIUM_PALETTE_LAYER4_TREES, BACKGROUND_PIXEL_BLOCK, TREE_FADE_MIN_ALPHA, TREE_FADE_MAX_ALPHA,
-  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, TREE_PLANT_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP,
+  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, TREE_PLANT_TRUNK_OVERLAP,
 } from './constants.js';
 import { state, ctx } from './state.js';
 import {
@@ -252,11 +252,9 @@ export function drawTreePlants(camera, layer) {
   }
 }
 
-// Bugs from BUG_GEOMETRIES (game/world-geometry.js) — ground ones stand in
-// the open the whole game, trunk ones sit past the slime coating
-// (drawSkillSlime below) until skillUnlocked. Drawn regardless of that flag
-// (a slime-locked bug is meant to be visible-but-unreachable, a teaser); a
-// collected bug (state.bugsFound[i]) just stops being drawn.
+// Bugs from BUG_GEOMETRIES (game/world-geometry.js) — currently empty, the
+// bug/fly sprite has been pulled (see BUG_PLACEMENTS in world-props.js), so
+// this is a no-op until placements are added back.
 export function drawBugs(camera, layer) {
   BUG_GEOMETRIES.forEach((geo, i) => {
     if (geo.placement.layer !== layer || state.bugsFound[i]) return;
@@ -265,25 +263,6 @@ export function drawBugs(camera, layer) {
     const screenY = geo.originY - camera.y;
     drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, TERRARIUM_PALETTE);
   });
-}
-
-// Yellow slime (tree-plant-slime.js) tiled down the right-hand edge of every
-// side-climbable trunk (layer 6 — layer-4 trunks are front-climb only, no
-// side to lock) while the trunk-side-swap skill is still locked. Removed the
-// moment skillUnlocked flips, same as drawGateMoss() removing the gate moss
-// once state.gateSolved flips. See the attach gating in game/movement.js for
-// the actual movement restriction this is signaling.
-export function drawSkillSlime(camera) {
-  if (state.skillUnlocked) return;
-  const tileH = TREE_PLANT_SLIME.height * SCALE;
-  for (const placement of TREE_PLACEMENTS) {
-    if (placement.layer !== 6) continue;
-    const rect = treeTrunkRect(placement);
-    const screenX = rect.right - SLIME_TRUNK_OVERLAP * SCALE - camera.x;
-    for (let y = rect.top; y < rect.bottom; y += tileH) {
-      drawSprite(ctx, TREE_PLANT_SLIME.rows, screenX, y - camera.y, SCALE, TERRARIUM_PALETTE);
-    }
-  }
 }
 
 // `fade`, when given, fades rows from `minAlpha` (top, row 0) up to
@@ -386,7 +365,6 @@ export function draw() {
   drawBugs(camera, 6);
   drawTreeTrunks(camera, 6);
   drawGateMoss(camera);
-  drawSkillSlime(camera);
   drawTreeBranches(camera, 6);
   drawTreePlants(camera, 6);
 

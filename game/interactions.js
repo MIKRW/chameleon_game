@@ -74,9 +74,8 @@ export function setSkillUnlocked(unlocked) {
   state.skillUnlocked = unlocked;
   skillStatusEl.textContent = `Skill unlocked: ${unlocked ? 'YES' : 'NO'}`;
   if (unlocked) {
-    // The right-hand side of every side-climbable trunk (and any bug sitting
-    // past it, see BUG_PLACEMENTS in world-props.js) was slime-locked until
-    // now — see attachToTrunk()/passBranchAlongTrunk() in game/movement.js.
+    // The right-hand side of every side-climbable trunk was locked until now
+    // — see attachToTrunk()/passBranchAlongTrunk() in game/movement.js.
     openSkillPopup('Wow, this new skill will make it easier to find bugs!');
   }
 }
@@ -109,15 +108,14 @@ export function setPuzzlesComplete(n) {
 }
 
 // --- Bug collection (a fourth, non-devtools puzzle) ---
-// Most bugs sit in the open from the start; the rest are slime-locked behind
-// a trunk's right face until skillUnlocked (see BUG_PLACEMENTS in
-// world-props.js and the attach gating in game/movement.js) — no extra gate
-// is needed here, an uncollectable bug just can't be reached yet. Unlike
-// most props, a bug isn't caught just by touching it — it takes an E press
-// while lined up (see bugInteractRect() in game/world-geometry.js), so
-// catching one is a deliberately timed action rather than an automatic
-// walk/jump-through. Called from handleInteractPress() above, not polled
-// every frame.
+// Currently empty (see BUG_PLACEMENTS in world-props.js — the bug/fly sprite
+// has been pulled for now), so BUGS_REQUIRED is 0 and this is trivially
+// satisfied without affecting maybeShowCompletion() below. Left in place so
+// bug placements can be reintroduced later. Unlike most props, a bug isn't
+// caught just by touching it — it takes an E press while lined up (see
+// bugInteractRect() in game/world-geometry.js), so catching one is a
+// deliberately timed action rather than an automatic walk/jump-through.
+// Called from handleInteractPress() above, not polled every frame.
 const bugStatusEl = document.getElementById('bug-status');
 bugStatusEl.textContent = `Bugs found: 0 / ${BUGS_REQUIRED}`;
 

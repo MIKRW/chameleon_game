@@ -97,8 +97,7 @@ export function update() {
 // in front of the player (side-climb), so no extra render logic is needed.
 // Returns false (and leaves the player airborne) instead of attaching if the
 // approach side is the trunk's right face and the trunk-side-swap skill
-// isn't unlocked yet — that face is coated in slime (see drawSkillSlime() in
-// game/render.js) until then, too slick to grip.
+// isn't unlocked yet — that face stays ungrippable until then.
 export function attachToTrunk(placement) {
   const rect = treeTrunkRect(placement);
   const face = placement.layer === 4 ? 'front' : 'side';
@@ -277,8 +276,8 @@ export function updateClimbing(dx) {
 // A branch can be reached directly (falling onto it, reaching up into it)
 // without ever side-climbing its trunk first, so a branch rooted on a
 // trunk's right face is gated the same way attachToTrunk() gates a direct
-// grab of that face — otherwise it'd be a free bypass of the slime-locked
-// side before the trunk-side-swap skill is unlocked.
+// grab of that face — otherwise it'd be a free bypass of the locked side
+// before the trunk-side-swap skill is unlocked.
 export function passBranchAlongTrunk(direction) {
   const { geo } = state.branch;
   const trunkPlacement = TREE_PLACEMENTS.find((p) => p.layer === geo.placement.layer && p.x === geo.placement.trunkX);
