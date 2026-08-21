@@ -41,12 +41,12 @@ window.addEventListener('keydown', (e) => {
     handleInteractPress();
   }
 
-  // Left/right double as the trunk-side-swap input while side-climbing —
+  // Left/right (arrows or A/D) double as the trunk-side-swap input while side-climbing —
   // see swapTrunkSide() in game/movement.js for why this is a no-op unless
   // it actually changes which face is gripped (so it never fights with
   // normal ground movement's use of the same keys).
-  if ((key === 'arrowleft' || key === 'arrowright') && !e.repeat) {
-    handleSwapSidePress(key === 'arrowleft' ? -1 : 1);
+  if ((key === 'arrowleft' || key === 'arrowright' || key === 'a' || key === 'd') && !e.repeat) {
+    handleSwapSidePress(key === 'arrowleft' || key === 'a' ? -1 : 1);
   }
 
   if (key === ' ') {
