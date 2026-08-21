@@ -32,7 +32,19 @@
 
 // Cleared for a trees/layers readjustment pass — re-add placements once the
 // new layout is settled.
-const PLANT_PLACEMENTS = [];
+const PLANT_PLACEMENTS = [
+  { sprite: 'ground-plant-1', x: 15, layer: 5 },
+  { sprite: 'ground-plant-1', x: 400, layer: 5 },
+  { sprite: 'ground-plant-1', x: 800, layer: 5 },
+  { sprite: 'ground-plant-1', x: 1200, layer: 5 },
+  { sprite: 'ground-plant-1', x: 3050, layer: 5 },
+  { sprite: 'ground-plant-6', x: 90, layer: 7 },
+  { sprite: 'ground-plant-6', x: 530, layer: 7 },
+  { sprite: 'ground-plant-4', x: 760, layer: 7 },
+  { sprite: 'ground-plant-4', x: 890, layer: 7 },
+  { sprite: 'ground-plant-4', x: 3450, layer: 7 },
+  { sprite: 'ground-plant-4', x: 80, layer: 7 },
+];
 
 // Purely cosmetic background scenery — furthest back, painted before the
 // far-plants layer, never occluding or interacting with the player.
@@ -222,7 +234,12 @@ const BRANCH_PLACEMENTS = [
 // so 'left' mounts flip it).
 // Cleared for a trees/layers readjustment pass — re-add placements once the
 // new layout is settled.
-const TREE_PLANT_PLACEMENTS = [];
+const TREE_PLANT_PLACEMENTS = [
+  // Layer 7 — Trunk Interact 2 at x3550, the rightmost tree placement.
+  // Shares the left face with that trunk's existing branch-3 at attachRow
+  // 110 (see BRANCH_PLACEMENTS); this foliage sits higher up the trunk.
+  { trunkX: 3550, layer: 7, sprite: 'tree-plant-2', attachRow: 21, side: 'left' },
+];
 
 // Hanging props — anchor at row 0 (top of the sprite) against LID_TOP
 // instead of snapping to the floor, since they dangle from the glass lid

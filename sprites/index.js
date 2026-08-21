@@ -10,7 +10,7 @@ const TERRARIUM_SPRITES = {
   // resolveGroundPlantSprite() in game/world-geometry.js, which maps
   // "ground-plant-N" to index N-1, so the gap must stay to keep
   // ground-plant-3/4/5's ids resolving to the right sprite.
-  groundPlant: [GROUND_PLANT_1, undefined, GROUND_PLANT_3, GROUND_PLANT_4, GROUND_PLANT_5, GROUND_PLANT_1A],
+  groundPlant: [GROUND_PLANT_1, undefined, GROUND_PLANT_3, GROUND_PLANT_4, GROUND_PLANT_5, GROUND_PLANT_6],
   treePlant: [TREE_PLANT_1, TREE_PLANT_2, TREE_PLANT_3, TREE_PLANT_4, TREE_PLANT_5],
   bug: [],
   vine: [VINE_1, VINE_2],
