@@ -47,9 +47,16 @@ const TERRARIUM_PALETTE = {
   // (~42%) of the tree bark tones. game/constants.js's
   // TERRARIUM_PALETTE_LAYER5_TREES and TERRARIUM_PALETTE_LAYER3_TREES
   // override these same keys at lower saturation for their layers.
-  'r': '#a38343', // bark
-  'R': '#624f28', // bark shade
-  'h': '#cbb790', // bark highlight
+  'r': '#8f6f3d', // bark
+  'R': '#57421f', // bark shade
+  'h': '#bd9d7a', // bark highlight
+
+  // walnut bark, exclusive to trunk-interact-3 (the knotted layer-7 trunk)
+  // — richer/redder-brown than the shared r/R/h bark so this trunk reads as
+  // its own distinct wood tone rather than sharing Trunk 1's palette.
+  '4': '#7d5a30', // walnut bark
+  '5': '#4c3618', // walnut bark shade
+  '6': '#af8a65', // walnut bark highlight
 
   // dark-green-tinted bark (trunk-bg-*a, the muted variant) — layer-2 tier
   // of the same ladder, the furthest/lowest-saturation tree tier (~18%),
@@ -109,6 +116,12 @@ const TERRARIUM_PALETTE = {
   // Light switch (light-switch.js / light-switch-2.js) — solid black plate
   // (k) with a small lever that moves between the off/down and on/up rows
   's': '#c0c8c6', // lever, off/down — pale metal so it reads against the black plate
+
+  // Light switch, on state (light-switch-2.js) — ruby plate with a sapphire
+  // facet glint, distinct from the shared z/Z moss red so recoloring the
+  // switch never touches tree-plant-1's gate moss
+  '7': '#8a1322', // switch head, lit ruby (dark blood red)
+  '8': '#1c3fa8', // switch head, lit sapphire facet glint
 
   // Oyster mushroom shelf fungi (tree-plant-4) — pale ivory caps on bark
   'P': '#ece0c8', // mushroom cap, pale cream highlight

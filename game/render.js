@@ -9,13 +9,13 @@ import {
   GLASS_FRONT_BOTTOM_ALPHA, TERRARIUM_PALETTE_LAYER5_TREES, TERRARIUM_PALETTE_LAYER3_TREES,
   BACKGROUND_PIXEL_BLOCK, BACKGROUND_PARALLAX, BACKGROUND_DECOR_PARALLAX_LAYER2, BACKGROUND_DECOR_PARALLAX_LAYER3,
   TREE_FADE_MIN_ALPHA, TREE_FADE_MAX_ALPHA,
-  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, TREE_PLANT_TRUNK_OVERLAP,
+  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, TREE_PLANT_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP,
 } from './constants.js';
 import { state, ctx } from './state.js';
 import {
   resolveGroundPlantSprite, resolveHangingSprite, resolveTreeTrunkSprite, resolveTreeBranchSprite,
   resolveTreePlantSprite, resolveBugSprite, byAscendingZ, BRANCH_GEOMETRIES, TREE_PLANT_GEOMETRIES,
-  BUG_GEOMETRIES, GATE_TRUNK, treeTrunkRect, lightSwitchOrigin,
+  BUG_GEOMETRIES, GATE_TRUNK, LIGHT_SWITCH_TRUNK, treeTrunkRect, lightSwitchOrigin,
 } from './world-geometry.js';
 import { playerCenter } from './movement.js';
 
@@ -41,9 +41,9 @@ export function drawTankFraming(camera) {
   drawGlassEdgeSide(camera, GLASS_EDGE_RIGHT, rightX);
 
   const lidY = LID_TOP - camera.y;
-  if (lidY > -20 && lidY < CANVAS_H) {
-    ctx.fillStyle = 'rgba(200, 220, 180, 0.6)';
-    ctx.fillRect(0, lidY, CANVAS_W, 4);
+  if (lidY > -3 && lidY < CANVAS_H) {
+    ctx.fillStyle = '#c8dcb4';
+    ctx.fillRect(0, lidY, CANVAS_W, 3);
   }
 }
 
@@ -173,6 +173,7 @@ export function drawBackgroundTexture(camera) {
 // on a trunk rather than standing on the floor, swapping art between
 // light-switch.js/light-switch-2.js based on state.lightOn.
 export function drawLightSwitch(camera) {
+  if (!LIGHT_SWITCH_TRUNK) return;
   const sprite = state.lightOn ? TERRARIUM_SPRITES.lightSwitch2 : TERRARIUM_SPRITES.lightSwitch;
   const origin = lightSwitchOrigin();
   const screenX = origin.x - camera.x;
@@ -266,6 +267,12 @@ export function drawBugs(camera, layer) {
 // `maxAlpha` (bottom, last row) so a tall background trunk reads as
 // vanishing into haze near its top instead of cutting off sharply.
 export function drawSpriteBlocky(ctx, spriteRows, x, y, scale, palette, block, fade) {
+  // Rounded to whole pixels — fractional x/y here (e.g. from parallax
+  // offsets like camera.x * BACKGROUND_PARALLAX) makes the canvas
+  // anti-alias each cell's fillRect independently, leaving faint seams
+  // between adjacent cells that shimmer into visible lines while panning.
+  x = Math.round(x);
+  y = Math.round(y);
   const cell = scale * block;
   const lastRow = spriteRows.length - 1;
   for (let row = 0; row <= lastRow; row += block) {
@@ -282,6 +289,25 @@ export function drawSpriteBlocky(ctx, spriteRows, x, y, scale, palette, block, f
     }
   }
   if (fade) ctx.globalAlpha = 1;
+}
+
+// Yellow slime (tree-plant-slime.js) tiled down the right-hand edge of every
+// side-climbable trunk (layer 7 — layer-5 trunks are front-climb only, no
+// side to lock) while the trunk-side-swap skill is still locked. Removed the
+// moment skillUnlocked flips, same as drawGateMoss() removing the gate moss
+// once state.gateSolved flips. See the attach gating in game/movement.js for
+// the actual movement restriction this is signaling.
+export function drawSkillSlime(camera) {
+  if (state.skillUnlocked) return;
+  const tileH = TREE_PLANT_SLIME.height * SCALE;
+  for (const placement of TREE_PLACEMENTS) {
+    if (placement.layer !== 7) continue;
+    const rect = treeTrunkRect(placement);
+    const screenX = rect.right - SLIME_TRUNK_OVERLAP * SCALE - camera.x;
+    for (let y = rect.top; y < rect.bottom; y += tileH) {
+      drawSprite(ctx, TREE_PLANT_SLIME.rows, screenX, y - camera.y, SCALE, TERRARIUM_PALETTE);
+    }
+  }
 }
 
 // Tiles the gate moss sprite (TREE_PLANT_1) down the gatekeeper tree's full
@@ -353,6 +379,25 @@ export function draw() {
     y: Math.round(Math.max(0, Math.min(CAMERA_Y_MAX, p.y - CANVAS_H / 2))),
   };
 
+  // Nothing else here clears the canvas — every layer used to paint the
+  // full frame unconditionally, so stale pixels never showed. Now that the
+  // clip below can leave the strip above the lid unpainted on any given
+  // frame, that strip needs a real clear or it keeps whatever was drawn
+  // there before the clip started excluding it (e.g. earlier frames where
+  // the camera was low enough that the clip rect covered the whole canvas).
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+
+  // Clip everything below (backdrop, decor, trunks, hanging props, player,
+  // ...) to below the lid line so nothing can ever poke out above it — the
+  // glass walls (drawTankFraming, layer 8) are drawn afterward, unclipped,
+  // since their own top edge is the true top of the tank and sits above the
+  // lid on purpose.
+  const lidY = LID_TOP - camera.y;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, Math.max(0, lidY), CANVAS_W, CANVAS_H);
+  ctx.clip();
+
   // layer 1: terrarium backdrop texture
   drawBackgroundSprite(camera);
 
@@ -369,13 +414,14 @@ export function draw() {
   drawGlassEdgeBottom(camera);
 
   // layer 5: far plants and tree trunks, behind the player
-  // trunks paint first so they sit behind the ground plants, not on top of them
+  // hanging props paint first so they sit behind the tree trunks, not on top
+  // of them; trunks paint next so they sit behind the ground plants
+  drawHangingProps(camera, 5);
   drawTreeTrunks(camera, 5);
   drawTreeBranches(camera, 5);
   drawTreePlants(camera, 5);
   drawGroundPlants(camera, 5);
   drawBugs(camera, 5);
-  drawHangingProps(camera, 5);
 
   // layer 6: player — invisible until CHAMELEON_VISIBLE is flipped on (see game/state.js)
   // TEMP: forced on while working on plant/player sprites — restore `window.CHAMELEON_VISIBLE` check when done
@@ -391,6 +437,7 @@ export function draw() {
   drawBugs(camera, 7);
   drawTreeTrunks(camera, 7);
   // drawGateMoss(camera); // TEMP: disabled while working on plant/player sprites
+  // drawSkillSlime(camera); // TEMP: disabled, not applied to any trunks right now
   drawTreeBranches(camera, 7);
   drawTreePlants(camera, 7);
 
@@ -402,6 +449,8 @@ export function draw() {
   // world-props.js), drawn last so it always sits on top of that trunk's
   // bark and any layer-5/7 foliage near it.
   drawLightSwitch(camera);
+
+  ctx.restore();
 
   // layer 8: glass edges (tank framing)
   drawTankFraming(camera);

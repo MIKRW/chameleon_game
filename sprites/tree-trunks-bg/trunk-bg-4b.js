@@ -1,14 +1,14 @@
-// === Trunk BG 4b - Curved Lean ===
+﻿// === Trunk BG 4b - Curved Lean ===
 // Theme: trunk that leans/curves to one side
 //
 // Top attach point drifts left across rows, for a windswept look.
-// Size: 8x75 (grid units; multiply by render scale) — height is half the
-// terrarium's floor-to-lid span (see trunk-interact-1's 151-row full span),
-// so this reads as a real (if smaller) tree rather than a stub: the original
-// 14-row curved crown (rows 0-6) and root flare (last 2 rows before the
-// floor row) are unchanged, with the bark shaft between them repeated out to
-// the new height using the same plain/highlight-grain cadence as the other
-// trunks.
+// Size: 8x152 (grid units; multiply by render scale) — stretched to run
+// floor-to-lid, matching the other full-height trunks (was half height;
+// bumped to full to test whether the shorter trunks read better tall).
+// The original 14-row curved crown (rows 0-6) and root flare (last 3 rows
+// before the floor row) are unchanged, with the bark shaft between them
+// repeated out to the new height using the same plain/highlight-grain
+// cadence as the other trunks.
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
 const TREE_TRUNK_BG_4B = {
@@ -22,7 +22,7 @@ const TREE_TRUNK_BG_4B = {
     animated: false
   },
   width: 8,
-  height: 75,
+  height: 152,
   rows: [
     '....rrrr',
     '...rRrrR',
@@ -96,6 +96,83 @@ const TREE_TRUNK_BG_4B = {
     'rRrrRr..',
     'rRrrRr..',
     'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRhhRr..',
+    'rRhhRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
+    'rRrrRr..',
     'rrRrrRr.',
     'rrRrrRr.',
     'kkkkkkkk'

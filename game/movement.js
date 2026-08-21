@@ -21,7 +21,7 @@ export function playerCenter() {
 // the gate trunk anyway since it's the trunk being climbed.
 export function clampPlayerX(nx) {
   let clamped = Math.max(GLASS_SIDE_THICKNESS, Math.min(WORLD_WIDTH - GLASS_SIDE_THICKNESS - PLAYER_W, nx));
-  if (!state.gateSolved) {
+  if (!state.gateSolved && GATE_TRUNK) {
     const gateRect = treeTrunkRect(GATE_TRUNK);
     clamped = Math.min(clamped, gateRect.left - PLAYER_W);
   }

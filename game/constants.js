@@ -17,6 +17,7 @@ export const CLIMB_JUMP_AWAY_KICK = 2; // horizontal push when jumping off with 
 export const CLIMB_SIDE_PEEK_FRACTION = 0.8; // fraction of player width left visible outside the trunk when side-climbing
 export const TREE_BRANCH_TRUNK_OVERLAP = 2; // grid cells a branch's base sinks into the trunk's edge, both for the visual join and for its physics base point
 export const TREE_PLANT_TRUNK_OVERLAP = 1; // grid cells a decorative trunk plant's base sinks into the trunk's edge, same idea as TREE_BRANCH_TRUNK_OVERLAP
+export const SLIME_TRUNK_OVERLAP = 3; // grid cells the trunk slime's (4-wide) sprite sinks into the trunk's edge — deliberately deeper than TREE_PLANT_TRUNK_OVERLAP so most of the drip sits over the bark and reads as growing on it, not floating beside it
 export const BRANCH_GRAB_MARGIN = 8; // extra px of forgiveness when checking for a branch underside to grab
 export const BRANCH_HANG_BAND = 10; // px of vertical forgiveness below a branch's underside still counted as "reaching" it
 
@@ -35,7 +36,7 @@ export const CAMERA_Y_MAX = WORLD_HEIGHT - CANVAS_H;
 
 export const GROUND_BAND = 14; // thickness of the mossy floor strip
 export const GROUND_TOP = WORLD_HEIGHT - GROUND_BAND; // world y where moss starts
-export const LID_TOP = 20; // where the tank lid sits, just under the top of the world
+export const LID_TOP = 8; // where the tank lid sits, just under the top of the world (the wall's own top edge)
 
 // Bottom glass rim is rendered at double sprite scale so each tile spans
 // more of the tank width — fewer repeats, fewer visible seams/joins.

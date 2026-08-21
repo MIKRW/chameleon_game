@@ -250,6 +250,7 @@ export const CODE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 320 && p.layer ===
 // the ground within reach, or gripping that exact trunk — to press E and
 // open its keypad popup.
 export function nearGate() {
+  if (!GATE_TRUNK) return false;
   const rect = treeTrunkRect(GATE_TRUNK);
   const centerX = state.player.x + PLAYER_W / 2;
   const inRange = centerX >= rect.left - GATE_INTERACT_RANGE && centerX <= rect.right + GATE_INTERACT_RANGE;

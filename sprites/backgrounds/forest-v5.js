@@ -56,7 +56,7 @@ const BACKGROUND_FOREST_V5 = (function build() {
     'a': '#64877b', // leaf, bright jade
     'b': '#344640', // leaf, jade shade
   };
-  const BRIGHTNESS = 0.72; // currently "one shade darker" than BASE_COLORS
+  const BRIGHTNESS = 0.62; // currently "one shade darker" than BASE_COLORS
 
   function scaleColor(hex, factor) {
     const r = parseInt(hex.slice(1, 3), 16);

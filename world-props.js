@@ -63,27 +63,15 @@ const BACKGROUND_PLACEMENTS = [
   { sprite: 'trunk-bg-1a', x: 1664, layer: 2 },
   { sprite: 'trunk-bg-5a', x: 1794, layer: 2 },
 
-  // Moved off TREE_PLACEMENTS (was layer 5) — these were the shorter,
-  // half-height, vivid-bark BG 4b/5b trunks with the layer-5 fade+darkened-
-  // bark treatment; now purely cosmetic background decor, no climb/interaction.
-  { sprite: 'trunk-bg-4b', x: 650, layer: 2 },
-  { sprite: 'trunk-bg-4b', x: 910, layer: 2 },
-  { sprite: 'trunk-bg-5b', x: 962, layer: 2 },
-  { sprite: 'trunk-bg-5b', x: 1118, layer: 2 },
-
-  // BG 6a — the feature tree: a dramatic diagonal sweep from the floor,
-  // crossing most of the terrarium's width and hooking back near the crown,
-  // with three baked-in branches (130 wide x 151 tall). Moved here rather
-  // than TREE_PLACEMENTS specifically so it's *not* climbable — findClimbableTrunk()
-  // (game/movement.js) treats every TREE_PLACEMENTS entry as climbable
-  // regardless of its sprite's own behavior.collision flag, so a prop this
-  // size needs to live in the cosmetic-only layer-2 pass to actually stay
-  // non-interactive. Near-black driftwood bark (see sprites/tree-trunks-bg/trunk-bg-6a.js)
-  // plus the blocky/faded background render treatment reads as a big,
-  // shadowed form looming behind the interactive trees. Kept exclusive to
-  // layer 2 (not reused on layer 3) so it stays a one-off landmark.
-  { sprite: 'trunk-bg-6a', x: 1430, layer: 2 },
+  // trunk-bg-4b/5b (non-green r/R/h bark) placements removed from this
+  // layer — kept only green q/Q/p trunk-bg-*a silhouettes here. Sprites
+  // themselves are untouched; re-add a placement entry to bring them back.
 ];
+
+// BG 6a ('Angled Knotty', sprites/tree-trunks-bg/trunk-bg-6a.js) — a dramatic
+// diagonal feature tree, currently unplaced. Was at x: 1430, layer: 2 in the
+// list above; pull it back out and re-add a placement entry when it gets a
+// new spot.
 
 // Second cosmetic background band, painted between layer 2 and the dirt/
 // glass line (see draw() in game/render.js) — same trunk-bg-*a/*b variety
@@ -101,10 +89,8 @@ const BACKGROUND_LAYER3_PLACEMENTS = [
   { sprite: 'trunk-bg-1a', x: 533, layer: 3 },
   { sprite: 'trunk-bg-5a', x: 747, layer: 3 },
   { sprite: 'trunk-bg-3a', x: 945, layer: 3 },
-  { sprite: 'trunk-bg-4b', x: 1128, layer: 3 },
   { sprite: 'trunk-bg-1a', x: 1310, layer: 3 },
   { sprite: 'trunk-bg-2a', x: 1516, layer: 3 },
-  { sprite: 'trunk-bg-5b', x: 1722, layer: 3 },
   { sprite: 'trunk-bg-4a', x: 1935, layer: 3 },
   // Moved from BACKGROUND_PLACEMENTS (layer 2, x:1508) — was crossing
   // directly through BG 6a's diagonal sweep, reading as a green trunk
@@ -115,39 +101,21 @@ const BACKGROUND_LAYER3_PLACEMENTS = [
   { sprite: 'trunk-bg-3a', x: 2149, layer: 3 },
 ];
 
+// Cleared for a trees/layers readjustment pass — re-add placements once the
+// new layout is settled. BRANCH_PLACEMENTS and LIGHT_SWITCH_PLACEMENT below
+// still reference trunkX values from the old layout (550, 1540, 2610, 3280,
+// 3520) and are orphaned until those trunks are re-added.
 const TREE_PLACEMENTS = [
-  { sprite: 'trunk-interact-3', x: 550, layer: 7 },
-
-  // Trunk Interact 2 (thick) instances, scattered in front of the player
-  // (layer 7), kept well clear of the trunks above.
-  { sprite: 'trunk-interact-2', x: 1080, layer: 7 },
-  { sprite: 'trunk-interact-2', x: 1540, layer: 7 },
-  { sprite: 'trunk-interact-2', x: 2020, layer: 7 },
-  { sprite: 'trunk-interact-2', x: 2610, layer: 7 },
-  { sprite: 'trunk-interact-2', x: 3280, layer: 7 },
-
-  // Two extra Trunk Interact 3 (knotted, now 11 wide x 151 tall) instances
-  // on layer 7, dropped into open floor gaps that clear every other trunk's
-  // footprint on every layer (checked against BACKGROUND_PLACEMENTS'
-  // layer-2 silhouettes too, so nothing here lines up in front of a bg
-  // trunk either): x320 sits between Interact 1 (200-244) and BG 5a (480-512);
-  // x930 sits between BG 1a (800-848) and BG 4a (1050-1082).
-  { sprite: 'trunk-interact-3', x: 320, layer: 7 },
-  { sprite: 'trunk-interact-3', x: 930, layer: 7 },
-
-  // Extra layer-5 trunk (behind the player): one more Trunk Interact 1 (11 wide).
-  // Checked against every existing trunk on layers 2/5/7 for clearance:
-  // x1150 sits between Interact 2 (1080-1096) and BG 2a (1400-1405).
-  // (The BG 4b/5b trunks that used to sit alongside this one at
-  // 1250/1750/1850/2150 have moved to BACKGROUND_PLACEMENTS, layer 2 —
-  // background decor only, not climbable.)
+  { sprite: 'trunk-interact-3', x: 300, layer: 5 },
   { sprite: 'trunk-interact-1', x: 1150, layer: 5 },
-
-  // One more Trunk Interact 3 on the right-hand side of the terrarium (layer 7):
-  // x3520 clears BG 5a's last instance (3450-3482) and Interact 2's last
-  // instance (3280-3344), and stays inside the glass wall (world width
-  // 3600, 16px glass thickness, so usable floor ends at x3584).
-  { sprite: 'trunk-interact-3', x: 3520, layer: 7 },
+  { sprite: 'trunk-interact-3', x: 2000, layer: 5 },
+  { sprite: 'trunk-interact-3', x: 1580, layer: 5 },
+  { sprite: 'trunk-interact-3', x: 2700, layer: 5 },
+  { sprite: 'trunk-interact-2', x: 2350, layer: 7 },
+  { sprite: 'trunk-interact-2', x: 2900, layer: 7 },
+  { sprite: 'trunk-interact-2', x: 720, layer: 7 },
+  { sprite: 'trunk-interact-3', x: 3200, layer: 5 },
+  { sprite: 'trunk-interact-2', x: 3550, layer: 7 },
 ];
 
 // Branches mounted onto a subset of the trees above (see sprites/tree-branches/tree-branch-1.js
@@ -168,6 +136,25 @@ const TREE_PLACEMENTS = [
 // layer-5/7 branch is free to visually run in front of a layer-2 trunk
 // without that being a bug.
 const BRANCH_PLACEMENTS = [
+  // Layer 5 — Trunk Interact 3 at x300 (11 wide x157 tall: branch-1).
+  { trunkX: 300, layer: 5, sprite: 'tree-branch-1', attachRow: 78, side: 'left' },
+
+  // Layer 5 — Trunk Interact 3 at x2000 (11 wide x157 tall), one long
+  // branch-2 plus two short branch-1s, alternating sides.
+  { trunkX: 2000, layer: 5, sprite: 'tree-branch-2', attachRow: 30, side: 'right' },
+  { trunkX: 2000, layer: 5, sprite: 'tree-branch-1', attachRow: 70, side: 'left' },
+  { trunkX: 2000, layer: 5, sprite: 'tree-branch-1', attachRow: 110, side: 'right' },
+
+  // Layer 5 — Trunk Interact 3 at x2700 (11 wide x157 tall), two short
+  // branch-1s, alternating sides.
+  { trunkX: 2700, layer: 5, sprite: 'tree-branch-1', attachRow: 60, side: 'left' },
+  { trunkX: 2700, layer: 5, sprite: 'tree-branch-1', attachRow: 100, side: 'right' },
+
+  // Layer 5 — Trunk Interact 3 at x3200 (11 wide x157 tall), two long
+  // branch-2s, alternating sides.
+  { trunkX: 3200, layer: 5, sprite: 'tree-branch-2', attachRow: 30, side: 'right' },
+  { trunkX: 3200, layer: 5, sprite: 'tree-branch-2', attachRow: 90, side: 'left' },
+
   // Layer 5 — Trunk Interact 1 at x1150 (11 wide x151 tall), the only
   // layer-5 tree with room for a full branch, using the longer branch-2.
   { trunkX: 1150, layer: 5, sprite: 'tree-branch-2', attachRow: 25, side: 'right' },
@@ -194,6 +181,30 @@ const BRANCH_PLACEMENTS = [
   // Layer 7 — Trunk Interact 3 at x3520 (narrow trunk: branch-1).
   { trunkX: 3520, layer: 7, sprite: 'tree-branch-1', attachRow: 40, side: 'right' },
   { trunkX: 3520, layer: 7, sprite: 'tree-branch-1', attachRow: 95, side: 'left' },
+
+  // Layer 7 — Trunk Interact 2 at x2350 (16 wide, thick trunk, recolored to
+  // driftwood bark: branch-3, the driftwood-toned variant of branch-2), this
+  // being the rightmost of the three trunk-interact-2 placements. Only 2
+  // branches (down from 3) at rows chosen to clear the layer-5 Trunk
+  // Interact 3 neighbors on both sides (x2000 reaches right via branches at
+  // rows 30/110; x2700 reaches left via a branch at row 60) — branch-3's
+  // ~184px reach doesn't touch either neighbor's trunk directly (both are
+  // >380px away), but the original rows 30/70/110 lined up in height with
+  // those neighbors' reaching branches and visually crossed them. Row 60/100
+  // sit clear of both neighbors' occupied row-bands.
+  { trunkX: 2350, layer: 7, sprite: 'tree-branch-3', attachRow: 60, side: 'left' },
+  { trunkX: 2350, layer: 7, sprite: 'tree-branch-3', attachRow: 100, side: 'right' },
+
+  // Layer 7 — Trunk Interact 2 at x720 (16 wide, thick trunk, recolored to
+  // driftwood bark: branch-3). Three branches, right/left/right reading from
+  // the bottom (attachRow 110) up to the top (attachRow 30).
+  { trunkX: 720, layer: 7, sprite: 'tree-branch-3', attachRow: 30, side: 'right' },
+  { trunkX: 720, layer: 7, sprite: 'tree-branch-3', attachRow: 70, side: 'left' },
+  { trunkX: 720, layer: 7, sprite: 'tree-branch-3', attachRow: 110, side: 'right' },
+
+  // Layer 7 — Trunk Interact 2 at x3550 (16 wide, thick trunk, recolored to
+  // driftwood bark: branch-3). One branch in the lower half.
+  { trunkX: 3550, layer: 7, sprite: 'tree-branch-3', attachRow: 110, side: 'left' },
 ];
 
 // Decorative single-knot foliage (tree-plant-2..5, see sprites/tree-plants/)

@@ -1,14 +1,14 @@
-// === Trunk BG 5b - Forked ===
+﻿// === Trunk BG 5b - Forked ===
 // Theme: trunk that splits into two branches near the top
 //
 // Two top attach points (rows 0-2, left and right), from the trunk's fork.
-// Size: 8x75 (grid units; multiply by render scale) — height is half the
-// terrarium's floor-to-lid span (see trunk-interact-1's 151-row full span),
-// so this reads as a real (if smaller) tree rather than a stub: the original
-// 14-row fork crown (rows 0-4) and root flare (last 2 rows before the floor
-// row) are unchanged, with the bark shaft between them repeated out to the
-// new height using the same plain/highlight-grain cadence as the other
-// trunks.
+// Size: 8x152 (grid units; multiply by render scale) — stretched to run
+// floor-to-lid, matching the other full-height trunks (was half height;
+// bumped to full to test whether the shorter trunks read better tall).
+// The original 14-row fork crown (rows 0-4) and root flare (last 3 rows
+// before the floor row) are unchanged, with the bark shaft between them
+// repeated out to the new height using the same plain/highlight-grain
+// cadence as the other trunks.
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
 const TREE_TRUNK_BG_5B = {
@@ -23,7 +23,7 @@ const TREE_TRUNK_BG_5B = {
     attach_points: "two, left and right at top"
   },
   width: 8,
-  height: 75,
+  height: 152,
   rows: [
     'rr....rr',
     'Rr....rR',
@@ -97,6 +97,83 @@ const TREE_TRUNK_BG_5B = {
     '.rRrrRr.',
     '.rRhhRr.',
     '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
+    '.rRrrRr.',
+    '.rRrrRr.',
+    '.rRhhRr.',
     'rrRrrRrr',
     'rrRrrRrr',
     'kkkkkkkk'
