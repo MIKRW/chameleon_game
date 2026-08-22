@@ -197,7 +197,7 @@ export function drawGroundPlants(camera, layer) {
   }
 }
 
-// Layer 8 — hidden pixel-digit backdrop (sprites/background-texture.js),
+// Layer 8 — hidden pixel-digit backdrop (sprites/backgrounds/background-texture.js),
 // painted alongside the light switch (same point in the draw order as
 // drawLightSwitch, right before tank framing) rather than with the rest of
 // the background scenery. Only drawn while the light is on; at rest its
@@ -556,7 +556,7 @@ export function draw() {
 
   // Clip everything below (backdrop, decor, trunks, hanging props, player,
   // ...) to below the lid line so nothing can ever poke out above it — the
-  // glass walls (drawTankFraming, layer 8) are drawn afterward, unclipped,
+  // glass walls (drawTankFraming, layer 9) are drawn afterward, unclipped,
   // since their own top edge is the true top of the tank and sits above the
   // lid on purpose.
   const lidY = LID_TOP - camera.y;
@@ -601,8 +601,7 @@ export function draw() {
   drawBugs(camera, 6);
 
   // layer 7: player — invisible until CHAMELEON_VISIBLE is flipped on (see game/state.js)
-  // TEMP: forced on while working on plant/player sprites — restore `window.CHAMELEON_VISIBLE` check when done
-  if (true) {
+  if (window.CHAMELEON_VISIBLE) {
     const playerSprite = playerSpriteForState();
     const hanging = state.branch && state.branch.mode === 'hang';
     const flipDefaultPose = !state.climb && state.facing === 'left';

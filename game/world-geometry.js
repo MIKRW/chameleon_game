@@ -361,7 +361,7 @@ export function nearLightSwitch() {
   return false;
 }
 
-// World-space position of the background-texture grid (sprites/background-texture.js)
+// World-space position of the background-texture grid (sprites/backgrounds/background-texture.js)
 // — no physical prop, just the pixel-digit backdrop hanging under the
 // lightbulb (HANGING_PLACEMENTS) at LID_TOP + the bulb's height. Same
 // centering math drawBackgroundTexture() (game/render.js) uses to place it

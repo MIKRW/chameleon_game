@@ -1,6 +1,6 @@
 // === Tree Plant Slime - Trunk Coating ===
 // Theme: dull olive-yellow slime, tiled down both edges of every layer-8
-// trunk (see TREE_PLACEMENTS in world-props.js) as purely decorative
+// trunk (see TREE_PLACEMENTS in game/world-props.js) as purely decorative
 // coating — not gated by Cling to Sides or any other puzzle state. Uses its
 // own muted K/W/X keys (see TERRARIUM_PALETTE) rather than the bright
 // ground-plant-2 y/Y, so it reads as a sickly coating instead of a

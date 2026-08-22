@@ -7,7 +7,7 @@
 //
 // Every non-digit cell is left transparent ('.') rather than painted with an
 // explicit fill — that's deliberate: this sprite draws on layer 2
-// (world-props.js / game/render.js scene stack), directly on top of the flat
+// (game/world-props.js / game/render.js scene stack), directly on top of the flat
 // layer-1 backdrop fill (#132218, see draw() in game/render.js), so the two colors
 // already match without duplicating the hex here. The digit strokes ('j'/'J'
 // in palette/terrarium-palette.js) are bright warm tones against that dark backdrop, so the

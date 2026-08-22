@@ -89,11 +89,6 @@ const PLANT_PLACEMENTS = [
 // themselves are untouched; re-add placement entries to bring trees back.
 const BACKGROUND_PLACEMENTS = [];
 
-// BG 6a ('Angled Knotty', sprites/tree-trunks-bg/trunk-bg-6a.js) — a dramatic
-// diagonal feature tree, currently unplaced. Was at x: 1430, layer: 2 in the
-// list above; pull it back out and re-add a placement entry when it gets a
-// new spot.
-
 // Second cosmetic background band, painted between layer 2 and the dirt/
 // glass line (see draw() in game/render.js) — same trunk-bg-*a/*b variety
 // as BACKGROUND_PLACEMENTS above (layer 6a excluded, kept a layer-2-only

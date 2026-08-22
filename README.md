@@ -69,7 +69,3 @@ its own) and requests fullscreen so the panel has real room to work with.
 Its Elements/Resources/Console tabs cover the same ground a desktop
 player's devtools would.
 
-## Design notes
-
-- **No secrets in the repo.** Anything sensitive to gameplay is verified
-  without being stored in plaintext anywhere in the source.

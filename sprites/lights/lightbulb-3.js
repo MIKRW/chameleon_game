@@ -3,7 +3,7 @@
 // longer cord — used for the decoy bulb near x3400 in HANGING_PLACEMENTS,
 // which hangs from the lid down past the branch on the rightmost tree
 // (trunk-interact-3 at x3200, layer 5 — see BRANCH_PLACEMENTS in
-// world-props.js, the tree-branch-2 at attachRow 30/side 'right'), so the
+// game/world-props.js, the tree-branch-2 at attachRow 30/side 'right'), so the
 // glass/filament reads below the branch instead of overlapping it. Has no
 // switch of its own and must never swap to the lit sprite the way
 // 'lightbulb' does via resolveHangingSprite() in game/world-geometry.js.

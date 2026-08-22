@@ -28,10 +28,10 @@ files stay at the top level.
 | `tree-branches/tree-branch-1.js`, `tree-branch-2.js`, `tree-branch-3.js` | Branches mounted onto trunks (branch-3 is branch-2's shape recolored to driftwood bark, for trunk-interact-2/trunk-bg-6a/6b) | varies | background |
 | `lights/lightbulb.js` | Hanging Edison bulb, brass socket, off (dark/grey) glass | 10x18 | foreground, hangs from above |
 | `lights/lightbulb-2.js` | Same fixture, lit — warm glass/filament + faint glow halo | 12x18 | foreground, hangs from above |
-| `background-texture.js` | Hidden pixel-digit grid grown into the backdrop like vine blight; legible only once lit | 35x51 | background (layer 2), backdrop |
+| `backgrounds/background-texture.js` | Hidden pixel-digit grid grown into the backdrop; legible only once lit | 35x51 | background (layer 2), backdrop |
 | `lights/light-switch.js` | Weathered rocker switch bolted to bark, off (nub down) | 5x8 | foreground, mounted on a trunk |
 | `lights/light-switch-2.js` | Same switch, on (nub up, amber indicator lit) | 5x8 | foreground, mounted on a trunk |
-| `floor.js` | Substrate ground tile | 24x4 | background, tiles horizontally |
+| `backgrounds/floor.js` | Substrate ground tile | 24x4 | background, tiles horizontally |
 | `glass-edges/glass-edge-1.js` … `glass-edge-4.js` | Terrarium glass frame (top/bottom/left/right) | varies | foreground, tiles along its edge |
 | `index.js` | Aggregates everything into `TERRARIUM_SPRITES` | — | — |
 
@@ -75,7 +75,7 @@ two themes can evolve independently.
   is a bark-tone variant within it — `a` muted (`q`/`Q`/`p`) for atmospheric
   depth, `b` full-saturation (`r`/`R`/`h`). `interact-N` trunks are numbered
   on their own track, unrelated to the bg family numbers. None of this says
-  anything about which world-props.js `layer` (2, 5, or 7) or `z` a given
+  anything about which game/world-props.js `layer` (2, 5, or 7) or `z` a given
   instance is placed on — bg trunks are cosmetic-only by convention, not by
   the sprite id itself.
 - **Tileable props** (`floor.js`, `glass-edge-*.js`) declare

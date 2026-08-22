@@ -2,7 +2,7 @@
 
 Design rule for how the terrarium's parallax layers should read as distance,
 agreed on before implementing the layer-3 background pass. Applies to
-`game/render.js` (draw order + fade logic) and `world-props.js` (placements),
+`game/render.js` (draw order + fade logic) and `game/world-props.js` (placements),
 plus the palettes in `sprites/palette/`.
 
 ## The problem
@@ -10,7 +10,7 @@ plus the palettes in `sprites/palette/`.
 Depth was previously sold by an ad-hoc mix of alpha fade, hand-picked muted
 colors, and blocky rendering, each tuned per layer independently with no
 shared rule. Measuring the actual hex values showed some of it working
-backwards — e.g. the layer-1 backdrop (`sprites/backgrounds/forest-v5.js`)
+backwards — e.g. the layer-1 backdrop (`sprites/backgrounds/forest-v6.js`)
 measured *more* saturated (~50-56%) than the tree bark it's supposed to sit
 behind (~20-25%), because `BRIGHTNESS` there only scales lightness, not
 saturation (see "Brightness vs saturation" below).
@@ -23,7 +23,7 @@ specific job, not reused as a second depth signal:
 
 | Layer | Role | Saturation | Alpha fade | Parallax |
 |---|---|---|---|---|
-| 1 | backdrop (`sprites/backgrounds/forest-v5.js`) | **~15%** | own system (baked into the generated noise), not the shared trunk fade | 0.15 (`BACKGROUND_PARALLAX`) |
+| 1 | backdrop (`sprites/backgrounds/forest-v6.js`) | **~15%** | own system (baked into the generated noise), not the shared trunk fade | 0.15 (`BACKGROUND_PARALLAX`) |
 | 2 | bg decor, non-interactive (`BACKGROUND_PLACEMENTS`) | **~18%** (`q`/`Q`/`p`) | shared vertical crown→floor range, `TREE_FADE_MIN/MAX_ALPHA` (0.12→1) | **0.4** (`BACKGROUND_DECOR_PARALLAX_LAYER2`) |
 | 3 | bg decor, non-interactive (`BACKGROUND_LAYER3_PLACEMENTS`, same sprite variety as layer 2, different placements) | **~24%** (`TERRARIUM_PALETTE_LAYER3_TREES`) | same shared range as layer 2 | **0.55** (`BACKGROUND_DECOR_PARALLAX_LAYER3`) |
 | 5 | interactive trunk, behind player (`TERRARIUM_PALETTE_LAYER5_TREES`) | **~32%** | **none — fully opaque** | 1:1 with camera (moves with player) |
@@ -60,7 +60,7 @@ whichever layers use it (2 and 3), not a per-layer range.
 - **Lightness/brightness**: how close a color sits to black/white,
   independent of vividness.
 
-`BRIGHTNESS` scalars (e.g. in `forest-v5.js`) only multiply RGB channels
+`BRIGHTNESS` scalars (e.g. in `forest-v6.js`) only multiply RGB channels
 toward zero — they dim a color without graying it. True atmospheric-distance
 desaturation needs to also pull saturation down toward neutral, which a
 brightness-only scalar can't do. This is why the backdrop currently reads as
@@ -71,7 +71,7 @@ brightness-only scalar can't do. This is why the backdrop currently reads as
 For reference when picking new numbers — approximate HSL saturation of what
 existed going into this change:
 
-- Layer 1 backdrop (forest-v5 `BASE_COLORS`, post `BRIGHTNESS`): ~50-56%
+- Layer 1 backdrop (forest-v6 `BASE_COLORS`, post `BRIGHTNESS`): ~50-56%
 - Layer 2 bg decor bark (`q`/`Q`/`p`): ~20%
 - Layer 5 trunk bark (darkened `r`/`R`/`h`): ~25%
 - Layer 8 trunk bark (`r`/`R`/`h`): ~25%
@@ -108,6 +108,6 @@ change; 0.4/0.55 accounts for it, and also widens the separation from the
 
 Implemented — see `sprites/palette/terrarium-palette.js`, `game/constants.js`
 (`TERRARIUM_PALETTE_LAYER5_TREES`, `TERRARIUM_PALETTE_LAYER3_TREES`,
-`BACKGROUND_DECOR_PARALLAX_LAYER2/3`), `sprites/backgrounds/forest-v5.js`,
-`world-props.js` (`BACKGROUND_LAYER3_PLACEMENTS`), and `game/render.js`
+`BACKGROUND_DECOR_PARALLAX_LAYER2/3`), `sprites/backgrounds/forest-v6.js`,
+`game/world-props.js` (`BACKGROUND_LAYER3_PLACEMENTS`), and `game/render.js`
 (`drawBackgroundDecor`, `drawTreeTrunks`/`drawTreeBranches`/`drawTreePlants`).

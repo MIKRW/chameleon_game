@@ -332,8 +332,8 @@ body.touch-controls .devtools-btn {
 }
 
 .status-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
   align-items: center;
   gap: 12px;
   width: 100%;
@@ -657,17 +657,13 @@ body.touch-controls .controls-hint {
     font-size: 8.5px;
   }
 
-  .status-row {
-    gap: 12px;
-  }
-
-  /* The post-start stats normally stay on one continuous line (see
-     .status-row-line above), but at mobile widths there isn't room for
-     all three — let them wrap onto two or three lines instead of
+  /* At mobile widths there isn't room for all three hints/stats on one
+     line — let them wrap onto two or three lines instead of
      squeezing/overflowing. Each individual stat still keeps its own
      nowrap from .controls-hint, so a wrap only ever happens between
      stats, never mid-stat. */
-  .status-row-line {
+  .status-row {
+    gap: 12px;
     flex-wrap: wrap;
     row-gap: 4px;
   }

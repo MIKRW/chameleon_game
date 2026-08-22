@@ -1,6 +1,6 @@
 // === Bug 1 - Collectible Critter ===
 // Theme: small matte-black beetle-like bug with a pale back marking, used as
-// a collectible (see BUG_PLACEMENTS in world-props.js, collectNearbyBug() in
+// a collectible (see BUG_PLACEMENTS in game/world-props.js, collectNearbyBug() in
 // game/interactions.js). Deliberately tiny relative to the player so
 // catching one takes lining up rather than just walking into a big hitbox.
 // Size: 5x4 (grid units; multiply by SCALE, see sprites/README.md)

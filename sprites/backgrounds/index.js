@@ -4,12 +4,13 @@
 // TERRARIUM_SPRITES, backgrounds don't share TERRARIUM_PALETTE, so tweaking
 // one variant's colors never affects another.
 //
-// forest-v1.js through forest-v4.js (earlier iterations, kept for
-// reference/reverting) live in background-alternative/. forest-v5.js (the
-// current pick) lives alongside this file.
+// forest-v1.js through forest-v5.js, forest-v7.js, and solid-dark-emerald.js
+// (earlier iterations and unused alternates, kept for reference/reverting)
+// live in background-alternative/. forest-v6.js (the current pick) lives
+// alongside this file.
 //
 // To swap: change ACTIVE_BACKGROUND_KEY to any key in BACKGROUND_VARIANTS
-// below. To add a new variant: copy forest-v5.js, load the new file before
+// below. To add a new variant: copy forest-v6.js, load the new file before
 // this one in index.html, and add it to BACKGROUND_VARIANTS.
 
 const BACKGROUND_VARIANTS = {

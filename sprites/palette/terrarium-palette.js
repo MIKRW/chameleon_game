@@ -191,7 +191,7 @@ const TERRARIUM_PALETTE = {
 
   // === bug-1 — collectible critter bug ===
   // matte black body, pale marking
-  // see sprites/bugs/bug-1.js; placed via BUG_PLACEMENTS in world-props.js
+  // see sprites/bugs/bug-1.js; placed via BUG_PLACEMENTS in game/world-props.js
   'bug-1': {
     'I': '#262626',
     'O': '#e8e8e8',
@@ -261,7 +261,7 @@ const TERRARIUM_PALETTE = {
 
   // === trunk-bg-4b / 5b — vivid bark, flat (not ladder-driven) ===
   // bark/shade/highlight
-  // currently unplaced in world-props.js — flat single tone, no layer variation needed unless/until placed
+  // currently unplaced in game/world-props.js — flat single tone, no layer variation needed unless/until placed
   'trunk-bg-4b': {
     'k': '#1a1a1a',
     'r': '#8f6f3d',

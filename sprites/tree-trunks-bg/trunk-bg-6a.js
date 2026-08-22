@@ -5,7 +5,7 @@
 // height, with three baked-in branch offshoots along the way.
 //
 // This is the terrarium's big background anchor, not a climbable prop: it's
-// only ever placed via BACKGROUND_PLACEMENTS (world-props.js), the purely
+// only ever placed via BACKGROUND_PLACEMENTS (game/world-props.js), the purely
 // cosmetic layer-2 pass drawn with drawBackgroundDecor() — no floor
 // occlusion/interaction logic touches it (see the comment above
 // BACKGROUND_PLACEMENTS), and that same draw path renders it blocky (2x2

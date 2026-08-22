@@ -1,7 +1,7 @@
 // === Light Switch (off) ===
 // Theme: a brass-framed square switch head on a narrow brass mounting arm,
 // bolted into the bark near the top of a trunk — currently the last/
-// rightmost reachable tree (see LIGHT_SWITCH_PLACEMENT, world-props.js) —
+// rightmost reachable tree (see LIGHT_SWITCH_PLACEMENT, game/world-props.js) —
 // deliberately so flipping it means climbing across the tank and up, rather
 // than something reachable by just poking around near the bulb/background-
 // texture. Toggling it (see

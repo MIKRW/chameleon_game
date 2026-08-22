@@ -140,7 +140,7 @@
   <script src="sprites/glass-edges/glass-edge-2.js"></script>
   <script src="sprites/glass-edges/glass-edge-3.js"></script>
   <script src="sprites/glass-edges/glass-edge-4.js"></script>
-  <script src="sprites/floor.js"></script>
+  <script src="sprites/backgrounds/floor.js"></script>
   <script src="sprites/ground-plants/ground-plant-1.js"></script>
   <script src="sprites/ground-plants/ground-plant-1b.js"></script>
   <script src="sprites/ground-plants/ground-plant-6.js"></script>
@@ -179,16 +179,16 @@
   <script src="sprites/backgrounds/background-alternative/forest-v2.js"></script>
   <script src="sprites/backgrounds/background-alternative/forest-v3.js"></script>
   <script src="sprites/backgrounds/background-alternative/forest-v4.js"></script>
-  <script src="sprites/backgrounds/forest-v5.js"></script>
+  <script src="sprites/backgrounds/background-alternative/forest-v5.js"></script>
   <script src="sprites/backgrounds/forest-v6.js"></script>
-  <script src="sprites/backgrounds/forest-v7.js"></script>
+  <script src="sprites/backgrounds/background-alternative/forest-v7.js"></script>
   <script src="sprites/backgrounds/background-alternative/solid-dark-emerald.js"></script>
   <script src="sprites/backgrounds/index.js"></script>
-  <script src="sprites/background-texture.js"></script>
+  <script src="sprites/backgrounds/background-texture.js"></script>
   <script src="sprites/lights/light-switch.js"></script>
   <script src="sprites/lights/light-switch-2.js"></script>
   <script src="sprites/index.js"></script>
-  <script src="world-props.js"></script>
+  <script src="game/world-props.js"></script>
   <script src="puzzles/engine.js"></script>
   <script src="puzzles/puzzle-1.js"></script>
   <script src="puzzles/puzzle-2.js"></script>
@@ -206,6 +206,13 @@
         preStartInfo.classList.add('hidden');
         postStartInfo.classList.remove('hidden');
         restartBtn.classList.remove('hidden');
+      });
+
+      restartBtn.addEventListener('click', function () {
+        startScreen.classList.remove('hidden');
+        preStartInfo.classList.remove('hidden');
+        postStartInfo.classList.add('hidden');
+        restartBtn.classList.add('hidden');
       });
     })();
 
