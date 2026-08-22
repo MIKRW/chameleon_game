@@ -13,7 +13,7 @@ export function playerCenter() {
   return { x: state.player.x + PLAYER_W / 2, y: state.player.y + PLAYER_H / 2 };
 }
 
-// While the gatekeeper tree's moss puzzle is unsolved, its trunk acts as a
+// While the Moss Tree's moss puzzle is unsolved, its trunk acts as a
 // solid wall for ground/air horizontal movement, same as the world's glass
 // walls — the player can still climb it (climbing moves y, not x, see
 // updateClimbing) but can't walk or arc past it. Only applied to the main

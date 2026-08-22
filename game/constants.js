@@ -98,6 +98,11 @@ export const GATE_INTERACT_RANGE = 60; // px of horizontal slack on either side 
 export const SWITCH_TRUNK_OVERLAP = 1; // grid cells the switch sinks into the trunk's edge, same idea as TREE_BRANCH_TRUNK_OVERLAP
 export const LIGHT_SWITCH_INTERACT_RANGE = 40; // px of vertical slack above/below the switch's mounted row that still counts as "at" it
 
+// px of slack around the background-texture grid's center that still counts
+// as "at" it — no trunk to grip, so just plain x/y proximity to the sprite.
+export const BACKGROUND_TEXTURE_INTERACT_RANGE_X = 72;
+export const BACKGROUND_TEXTURE_INTERACT_RANGE_Y = 54;
+
 // px of clearance put between the player and a branch's contact line
 // (top surface when passing up, underside when passing down) after
 // passBranchAlongTrunk repositions them back onto the trunk — just enough

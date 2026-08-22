@@ -55,6 +55,9 @@ const PLANT_PLACEMENTS = [
   { sprite: 'ground-plant-7', x: 360, layer: 8 },
   { sprite: 'ground-plant-1', x: 560, layer: 8, scaleMultiplier: 0.6 },
   { sprite: 'ground-plant-1', x: 770, layer: 5, scaleMultiplier: 0.6 },
+  { sprite: 'ground-plant-4', x: 1300, layer: 5, scaleMultiplier: 0.75 },
+  { sprite: 'ground-plant-5', x: 1200, layer: 8 },
+  { sprite: 'ground-plant-5', x: 1530, layer: 5 },
   { sprite: 'ground-plant-7', x: 1760, layer: 5 },
   { sprite: 'ground-plant-7', x: 1900, layer: 5 },
   { sprite: 'ground-plant-4', x: 2100, layer: 5 },
@@ -235,7 +238,7 @@ const BRANCH_PLACEMENTS = [
 // Decorative single-knot foliage (tree-plant-2..5, see sprites/tree-plants/)
 // mounted onto a subset of the trees above, excluding the Moss Tree
 // (x720/layer8 — TREE_PLANT_1, the moss variety, is reserved for that
-// gatekeeper trunk's puzzle, tiled by drawGateMoss() in game/render.js, and
+// Moss Tree's puzzle, tiled by drawGateMoss() in game/render.js, and
 // isn't reused decoratively here). 10 instances total across the other 4
 // varieties (3/3/2/2 split): 6
 // on layer 5 (the tall x1150 trunk gets two, on opposite sides; the four
@@ -385,31 +388,44 @@ const LIGHT_SWITCH_PLACEMENT = { trunkX: 2350, layer: 8, attachRow: 70, side: 'r
 // before that puzzle — array order is significant here, not just x position.
 // Interleaved by x across the map (rather than clustered at one end) so both
 // halves read as scattered throughout, not "first half of the level then
-// second half". All ground-mode, drawn on their own dedicated layer (6,
+// second half". Mostly ground-mode, with a handful of `path`-mode bugs
+// drifting through open air; all drawn on their own dedicated layer (6,
 // between the layer-5/8 far/near plant passes).
+// `path`-mode entries (see bugGeometry() in game/world-geometry.js and
+// game/bug-motion.js) drift around `x`/`heightAboveFloor` along a repeating
+// shape instead of sitting still — used for bugs that are deliberately not
+// resting on the ground, a plant, or a trunk. `pathSpeed` is loops/second,
+// `pathPhase` (0-1) staggers bugs sharing a shape so they don't move in
+// lockstep.
 const BUG_PLACEMENTS = [
   // Always visible (indices 0-9)
-  { sprite: 'bug-1', x: 100, layer: 6 },
-  { sprite: 'bug-1', x: 363, layer: 6 },
-  { sprite: 'bug-1', x: 626, layer: 6 },
-  { sprite: 'bug-1', x: 890, layer: 6 },
+  { sprite: 'bug-1', x: 532, layer: 6 },
+  // Mounted on the x300 trunk's left face, just below its branch (attachRow
+  // 88, side 'left' — see BRANCH_PLACEMENTS), reading as clinging beneath it.
+  // Layer 5 (front-climb, not Cling to Sides), so `side` is cosmetic only —
+  // any front-climb on this trunk can reach it (see canReachBug(),
+  // game/world-geometry.js). Scaled up 20% and nudged onto the bark via the
+  // trunk-overlap so it reads as gripping the trunk rather than floating off it.
+  { sprite: 'bug-1', mode: 'trunk', trunkX: 300, layer: 5, attachRow: 95, side: 'left', scaleMultiplier: 1.2 },
+  { sprite: 'bug-1', x: 626, layer: 6, mode: 'path', pathType: 'squiggle-diamond', heightAboveFloor: 100, pathSize: 24, pathSpeed: 0.09 },
+  { sprite: 'bug-1', x: 890, layer: 6, mode: 'path', pathType: 'figure-eight', heightAboveFloor: 370, pathSize: 22, pathSpeed: 0.1, pathPhase: 0.6 },
   { sprite: 'bug-1', x: 1153, layer: 6 },
-  { sprite: 'bug-1', x: 1416, layer: 6 },
+  { sprite: 'bug-1', x: 1416, layer: 6, mode: 'path', pathType: 'circle', heightAboveFloor: 60, pathSize: 26, pathSpeed: 0.11, pathPhase: 0.3 },
   { sprite: 'bug-1', x: 1679, layer: 6 },
   { sprite: 'bug-1', x: 1942, layer: 6 },
-  { sprite: 'bug-1', x: 2205, layer: 6 },
+  { sprite: 'bug-1', x: 2205, layer: 6, mode: 'path', pathType: 'figure-eight', heightAboveFloor: 60, pathSize: 28, pathSpeed: 0.08, pathPhase: 0.6 },
   { sprite: 'bug-1', x: 2468, layer: 6 },
   // Hidden until Cling to Sides is unlocked (indices 10-19)
   { sprite: 'bug-1', x: 232, layer: 6 },
   { sprite: 'bug-1', x: 495, layer: 6 },
   { sprite: 'bug-1', x: 758, layer: 6 },
-  { sprite: 'bug-1', x: 1021, layer: 6 },
+  { sprite: 'bug-1', x: 1021, layer: 6, mode: 'path', pathType: 'circle', heightAboveFloor: 55, pathSize: 22, pathSpeed: 0.1 },
   { sprite: 'bug-1', x: 1284, layer: 6 },
   { sprite: 'bug-1', x: 1547, layer: 6 },
-  { sprite: 'bug-1', x: 1811, layer: 6 },
+  { sprite: 'bug-1', x: 1811, layer: 6, mode: 'path', pathType: 'squiggle-diamond', heightAboveFloor: 55, pathSize: 24, pathSpeed: 0.1, pathPhase: 0.5 },
   { sprite: 'bug-1', x: 2074, layer: 6 },
   { sprite: 'bug-1', x: 2337, layer: 6 },
-  { sprite: 'bug-1', x: 2600, layer: 6 },
+  { sprite: 'bug-1', x: 2600, layer: 6, mode: 'path', pathType: 'figure-eight', heightAboveFloor: 55, pathSize: 26, pathSpeed: 0.09, pathPhase: 0.2 },
 ];
 
 if (typeof module !== 'undefined' && module.exports) {

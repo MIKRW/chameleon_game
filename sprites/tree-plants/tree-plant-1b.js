@@ -2,7 +2,7 @@
 // Theme: same red lichen-moss as TREE_PLANT_1 (Gate Moss), but a much
 // shorter clump — a leftover scrap rather than a full climbing strip.
 //
-// Left behind on the gatekeeper trunk once state.gateSolved flips and the
+// Left behind on the Moss Tree trunk once state.gateSolved flips and the
 // full moss (TREE_PLANT_1) is removed — see drawGateMossRemnant() in
 // game/render.js, which places one or two of these at fixed spots instead
 // of tiling top-to-bottom the way the solved puzzle's moss did.

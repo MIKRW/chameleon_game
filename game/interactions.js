@@ -1,5 +1,5 @@
 // Interact/jump input handling, the skill/puzzle status displays, and the
-// three popups (gatekeeper keypad, light-switch warning, background-texture
+// three popups (Moss Tree keypad, light-switch warning, background-texture
 // code) they can open.
 
 import { JUMP_VELOCITY, LIGHT_WARNING_FLICKS, LIGHT_BREAK_FLICKS, TOTAL_PUZZLES, BUGS_REQUIRED } from './constants.js';
@@ -160,7 +160,7 @@ function maybeShowCompletion() {
   if (flag) openCompletionPopup(flag);
 }
 
-// --- Gatekeeper tree popup (room 1) ---
+// --- Moss Tree popup (room 1) ---
 // Styled and structured the same as #start-screen (see index.html/style.css:
 // .popup-overlay/.popup-content), plus the input/feedback markup already
 // defined in style.css for puzzle dialogs (.dialog-form/.dialog-feedback).
@@ -226,9 +226,9 @@ lightCloseBtn.addEventListener('click', closeLightPopup);
 // --- Background-texture binary puzzle (room 2) ---
 // Styled the same as #gate-popup, but a wrong guess doesn't just show
 // feedback and let the player retry inline — it closes the popup outright
-// and kills the light (see nearBackgroundTexture()/CODE_TRUNK in
-// game/world-geometry.js), so brute-forcing the code means climbing back to
-// the switch and cycling it off/on for every attempt.
+// and kills the light (see nearBackgroundTexture() in game/world-geometry.js),
+// so brute-forcing the code means climbing back to the switch and cycling it
+// off/on for every attempt.
 const codePopupEl = document.getElementById('code-popup');
 const codePopupTextEl = document.getElementById('code-popup-text');
 const codeFormEl = document.getElementById('code-form');

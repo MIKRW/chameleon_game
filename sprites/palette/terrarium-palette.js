@@ -112,7 +112,7 @@ const TERRARIUM_PALETTE = {
 
   // === tree-plant-1 — Gate Moss ===
   // bright/dark red lichen
-  // no 'k' outline — the moss art itself is the outline; tiled by drawGateMoss() in game/render.js down the gatekeeper trunk until state.gateSolved
+  // no 'k' outline — the moss art itself is the outline; tiled by drawGateMoss() in game/render.js down the Moss Tree trunk until state.gateSolved
   'tree-plant-1': {
     'z': '#ff5252',
     'Z': '#7a1414',
@@ -120,7 +120,7 @@ const TERRARIUM_PALETTE = {
 
   // === tree-plant-1b — Gate Moss Remnant ===
   // same red lichen tones as tree-plant-1 — a small leftover scrap left on the
-  // gatekeeper trunk after state.gateSolved, drawn by drawGateMossRemnant() in game/render.js
+  // Moss Tree trunk after state.gateSolved, drawn by drawGateMossRemnant() in game/render.js
   'tree-plant-1b': {
     'z': '#ff5252',
     'Z': '#7a1414',
@@ -398,8 +398,8 @@ const TERRARIUM_PALETTE = {
   // === background-texture.js — hidden pixel-digit code ===
   // digit stroke shades 1/2 (warm highlight/amber)
   'backgroundTexture': {
-    'j': '#f4e6b8',
-    'J': '#d9a441',
+    'j': '#6b2605',
+    'J': '#4d1804',
   },
 
   // Leftover/unreferenced keys from the old flat palette — no sprite file

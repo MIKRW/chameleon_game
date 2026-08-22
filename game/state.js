@@ -31,14 +31,14 @@ export const state = {
   // found and submitted from the console. Until true, only the left face of
   // a layer-8 trunk is grippable — see attachToTrunk() in game/movement.js.
   clingToSidesUnlocked: false,
-  gateSolved: false, // the gatekeeper tree's moss puzzle (room 1) — see GATE_TRUNK in game/world-geometry.js
+  gateSolved: false, // the Moss Tree's moss puzzle (room 1) — see GATE_TRUNK in game/world-geometry.js
   puzzlesComplete: 0,
   bugsFound: {}, // index into BUG_GEOMETRIES (game/world-geometry.js) -> true once collected, see collectNearbyBug() in game/interactions.js
   bugsCollectedCount: 0,
   lightOn: false, // flipped by the light switch (LIGHT_SWITCH_PLACEMENT) — see nearLightSwitch()/handleInteractPress()
   lightFlickCount: 0, // times the switch has been flicked since the last bulb reset — see handleInteractPress()
   bulbBroken: false, // true once lightFlickCount hits LIGHT_BREAK_FLICKS; blocks the switch until resetLightbulb() clears it
-  codeSolved: false, // the background-texture binary puzzle (room 2) — see CODE_TRUNK in game/world-geometry.js
+  codeSolved: false, // the background-texture binary puzzle (room 2) — see nearBackgroundTexture() in game/world-geometry.js
   camera: null, // { x, y } eased camera position, lazily snapped to the initial target on the first draw() call — see CAMERA_EASE, game/constants.js
 };
 

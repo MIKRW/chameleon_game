@@ -333,7 +333,13 @@ export function drawTreePlants(camera, layer) {
 // Bugs from BUG_GEOMETRIES (game/world-geometry.js) — the last
 // BUG_LOCKED_START_INDEX-and-later bugs (game/constants.js) stay undrawn
 // until Cling to Sides is unlocked (see isBugUnlocked()), so they can't be
-// spotted, let alone caught, before that puzzle is solved.
+// spotted, let alone caught, before that puzzle is solved. `layer` here is
+// the bug's own placement.layer: ground/air/path bugs use the dedicated
+// layer 6 (drawn once, between the far/near plant passes below); trunk-mode
+// bugs instead carry their host trunk's layer (5 or 8, to match the
+// TREE_PLACEMENTS lookup in bugGeometry()) and are drawn from that layer's
+// own call, right after that layer's drawTreeTrunks, so they paint on top of
+// the bark instead of underneath it.
 export function drawBugs(camera, layer) {
   BUG_GEOMETRIES.forEach((geo, i) => {
     if (geo.placement.layer !== layer || state.bugsFound[i] || !isBugUnlocked(i)) return;
@@ -341,7 +347,8 @@ export function drawBugs(camera, layer) {
     const palette = resolveSpritePalette(geo.placement.sprite);
     const screenX = geo.originX - camera.x;
     const screenY = geo.originY - camera.y;
-    drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, palette);
+    const scale = SCALE * (geo.placement.scaleMultiplier || 1);
+    drawSprite(ctx, sprite.rows, screenX, screenY, scale, palette);
   });
 }
 
@@ -582,12 +589,15 @@ export function draw() {
   // of them; trunks paint next so they sit behind the ground plants
   drawHangingProps(camera, 5);
   drawTreeTrunks(camera, 5);
+  // trunk-mounted bugs on a layer-5 trunk (see BUG_PLACEMENTS, world-props.js)
+  // paint right after that trunk so they sit on top of the bark, not behind it
+  drawBugs(camera, 5);
   drawTreeBranches(camera, 5);
   drawTreePlants(camera, 5);
   drawGroundPlants(camera, 5);
 
-  // layer 6: bugs — own layer between the far/near plant passes so a bug
-  // never gets buried under foliage or the player
+  // layer 6: ground/air/path bugs — own layer between the far/near plant
+  // passes so a bug never gets buried under foliage or the player
   drawBugs(camera, 6);
 
   // layer 7: player — invisible until CHAMELEON_VISIBLE is flipped on (see game/state.js)
@@ -602,7 +612,10 @@ export function draw() {
   // layer 8: near plants and tree trunks, in front of the player
   drawGroundPlants(camera, 8);
   drawTreeTrunks(camera, 8);
-  drawGateMoss(camera); // Moss Tree (GATE_TRUNK, x720) — gatekeeper puzzle
+  // trunk-mounted bugs on a layer-8 (Cling to Sides) trunk, same reasoning as
+  // the layer-5 call above — paint right after that trunk so they're on top
+  drawBugs(camera, 8);
+  drawGateMoss(camera); // Moss Tree (GATE_TRUNK, x720) — Moss Tree puzzle
   drawGateMossRemnant(camera); // leftover moss scraps once state.gateSolved
   // drawTrunkSlime(camera); // disabled, not applied to any trunks right now
   drawTreeBranches(camera, 8);
