@@ -196,7 +196,7 @@ const TERRARIUM_PALETTE = {
   // authored at its native layer 7 (richest/closest tier); also appears at layer 5 — see .layers, built by buildBarkLayers() in ./bark-ladder.js
   'trunk-interact-1': {
     'k': '#1a1a1a',
-    layers: buildBarkLayers({ r: '#8f6f3d', R: '#57421f', h: '#bd9d7a' }, 7, [5, 7]),
+    layers: buildBarkLayers({ r: '#8f623d', R: '#75561f', h: '#836c53' }, 7, [5, 7]),
   },
 
   // === trunk-interact-2 — Thick, driftwood, flat (not ladder-driven) ===
@@ -214,7 +214,7 @@ const TERRARIUM_PALETTE = {
   // same r/R/h family and native layer-7 tier as trunk-interact-1 (both read from the same shared bark today), now independently tunable; also appears at layer 5
   'trunk-interact-3': {
     'k': '#1a1a1a',
-    layers: buildBarkLayers({ r: '#8f6f3d', R: '#57421f', h: '#bd9d7a' }, 7, [5, 7]),
+    layers: buildBarkLayers({ r: '#795024', R: '#614220', h: '#8f683f' }, 7, [5, 7]),
   },
 
   // === trunk-bg-1a / 2a / 3a / 4a / 5a — muted back-bark family ===
