@@ -1,20 +1,20 @@
 :root {
-  --bg: #1a120c;
+  --bg: #0c1011;
   --panel: #241a12;
-  --accent: #e3603a;
-  --emerald: #ea7141;
-  --emerald-border: #e3603a;
+  --accent: #7a1414;
+  --emerald: #7a1414;
+  --emerald-border: #7a1414;
   --text: #f3e9dc;
   --muted: #bda488;
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
-    --bg: #f3f6f4;
+    --bg: #e8e8e8;
     --panel: #ffffff;
-    --accent: #2e9e5b;
-    --emerald: #0d9668;
-    --emerald-border: #17a374;
+    --accent: #464702;
+    --emerald: #464702;
+    --emerald-border: #464702;
     --text: #1b1f23;
     --muted: #5b6470;
   }
@@ -22,43 +22,53 @@
 
 /* Manual theme toggle — wins over the OS-level prefers-color-scheme. */
 :root[data-theme='light'] {
-  --bg: #f3f6f4;
+  --bg: #e8e8e8;
   --panel: #ffffff;
-  --accent: #2e9e5b;
-  --emerald: #0d9668;
-  --emerald-border: #17a374;
+  --accent: #464702;
+  --emerald: #464702;
+  --emerald-border: #464702;
   --text: #1b1f23;
   --muted: #5b6470;
 }
 
 :root[data-theme='dark'] {
-  --bg: #1a120c;
+  --bg: #0c1011;
   --panel: #241a12;
-  --accent: #e3603a;
-  --emerald: #ea7141;
-  --emerald-border: #e3603a;
+  --accent: #7a1414;
+  --emerald: #7a1414;
+  --emerald-border: #7a1414;
   --text: #f3e9dc;
   --muted: #bda488;
 }
 
 .theme-toggle-btn {
   position: absolute;
-  top: 19px;
-  left: 10px;
-  font-family: 'Space Grotesk', 'Courier New', monospace;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 6px 10px;
-  background: var(--panel);
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: clamp(30px, 9cqw, 44px);
+  height: clamp(30px, 9cqw, 44px);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(14px, 4.5cqw, 20px);
+  line-height: 1;
+  background: var(--accent);
   color: var(--text);
-  border: 2px solid var(--emerald-border);
-  border-radius: 6px;
+  border: none;
+  border-radius: 50%;
   cursor: pointer;
+  opacity: 0.75;
   z-index: 20;
 }
 
 .theme-toggle-btn:hover {
-  opacity: 0.85;
+  opacity: 1;
+}
+
+.theme-toggle-btn:focus:not(:focus-visible) {
+  outline: none;
 }
 
 * {
@@ -83,6 +93,7 @@ body {
   position: relative;
   width: 100%;
   max-width: 900px;
+  container-type: inline-size;
   /* Flex items default to min-width:auto, which for a container holding
      the canvas (a replaced element with an intrinsic 720x480 size) locks
      the shrink floor to roughly that size — the card stops scaling down
@@ -93,9 +104,12 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 18px;
-  padding: 30px;
+  /* Bottom padding is sized for the playing state (restart button +
+     longer post-start status text) from the start, so the card doesn't
+     resize/shift when Start is pressed. */
+  padding: 30px 30px 56px;
   background: var(--bg);
-  border: 3px solid var(--emerald-border);
+  border: 5px solid var(--emerald-border);
   border-radius: 10px;
 }
 
@@ -171,6 +185,7 @@ body.touch-controls .devtools-btn {
      embed width — the canvas can be 300px in a narrow portfolio card
      or 900px full-size, and the overlay content needs to track it. */
   container-type: inline-size;
+  margin-bottom: 36px;
 }
 
 #game-canvas {
@@ -265,7 +280,7 @@ body.touch-controls .devtools-btn {
   padding: clamp(8px, 3cqw, 14px) clamp(14px, 6cqw, 26px);
   margin-top: clamp(8px, 3cqw, 30px);
   background: var(--accent);
-  color: #0a0a0a;
+  color: var(--text);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -275,11 +290,29 @@ body.touch-controls .devtools-btn {
   opacity: 0.9;
 }
 
+/* Start/restart labels match the "Escape the Terrarium" heading's
+   readable Space Grotesk font instead of the pixel font used elsewhere,
+   since these are the two buttons players most need to read at a glance. */
+#start-btn,
+#restart-btn {
+  font-family: 'Space Grotesk', 'Courier New', monospace;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Matches the popup heading/text above it, which is pinned to this cream-white
+   regardless of the light/dark theme toggle (see .popup-content h2 above). */
+#start-btn {
+  color: #f3e9dc;
+}
+
 .controls-hint {
-  font-size: 11px;
-  color: var(--muted);
+  font-size: 12.5px;
+  color: var(--text);
   text-align: center;
-  line-height: 1.8;
+  line-height: 2.1;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
   /* Also used for the two status-row lines — without this, the default
      <p> margin stacks on top of game-wrap's flex gap and doubles the
      vertical spacing between every line below the canvas. */
@@ -287,10 +320,52 @@ body.touch-controls .devtools-btn {
 }
 
 .status-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 420px;
+  /* Reserves room so the pre-start row's single-line hints don't leave
+     the card shorter and cause it to jump in height when Start is
+     pressed and the rows swap. */
+  min-height: 40px;
+}
+
+/* Post-start status row: all three stats read as one continuous line
+   instead of separate grid columns, so nothing wraps mid-stat. */
+.status-row-line {
   display: flex;
   justify-content: center;
-  gap: 32px;
-  flex-wrap: wrap;
+  max-width: none;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.status-row-line .controls-hint::after,
+.status-row .controls-hint::after {
+  content: '\00a0\00b7\00a0';
+}
+
+.status-row-line .controls-hint:last-child::after,
+.status-row .controls-hint:last-child::after {
+  content: '';
+}
+
+#post-start-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+#post-start-info.hidden {
+  display: none;
+}
+
+#pre-start-info.hidden {
+  display: none;
 }
 
 .dialog {
@@ -364,15 +439,40 @@ body.touch-controls .devtools-btn {
   margin-top: 14px;
 }
 
+/* Text color is pinned (not var(--text)) since the popup overlay behind it
+   is always dark regardless of the light/dark theme toggle. */
 .dialog-form input {
   flex: 1;
   font-family: inherit;
   font-size: 13px;
   padding: 11px;
-  background: #1b130a;
-  border: 2px solid #4a3a24;
-  color: var(--text);
+  background: transparent;
+  border: 2px solid #7a1414;
+  color: #f3e9dc;
   border-radius: 4px;
+  outline: none;
+}
+
+/* Light theme only: swap the moss-red input border for the same green
+   used by .popup-content's border (--emerald-border), and match every
+   dialog-form button's text (Moss Tree's "Remove Moss", the binary-code
+   popup's "Submit", etc.) to the popup heading/text's pinned cream. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .dialog-form input {
+    border-color: var(--emerald-border);
+  }
+
+  :root:not([data-theme]) .dialog-form .dialog-form-btn {
+    color: #f3e9dc;
+  }
+}
+
+:root[data-theme='light'] .dialog-form input {
+  border-color: var(--emerald-border);
+}
+
+:root[data-theme='light'] .dialog-form .dialog-form-btn {
+  color: #f3e9dc;
 }
 
 .dialog-form button,
@@ -382,7 +482,7 @@ body.touch-controls .devtools-btn {
   line-height: 1;
   padding: 11px 14px;
   background: var(--accent);
-  color: #0a0a0a;
+  color: var(--text);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -394,11 +494,36 @@ body.touch-controls .devtools-btn {
 }
 
 .restart-btn {
-  font-size: 11px;
-  padding: 9px 14px;
+  position: absolute;
+  /* 30px matches .game-wrap's horizontal padding, so the button's right
+     edge lines up with the canvas's right edge rather than the card's. */
+  right: 30px;
+  /* Anchors to the vertical center of the post-start status row (56px
+     padding-bottom + half its 40px min-height), then translateY(50%)
+     re-centers the button on that point regardless of its own clamped
+     height — doesn't touch the text's own layout, which stays centered. */
+  bottom: 76px;
+  transform: translateY(50%);
+  width: clamp(30px, 9cqw, 44px);
+  height: clamp(30px, 9cqw, 44px);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(14px, 4.5cqw, 20px);
+  line-height: 1;
+  background: var(--accent);
+  color: var(--text);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
   opacity: 0.75;
+  z-index: 5;
 }
 
+.restart-btn.hidden {
+  display: none;
+}
 
 .restart-btn:hover {
   opacity: 1;
@@ -450,20 +575,13 @@ body.touch-controls .controls-hint {
     gap: 8px;
   }
 
-  .theme-toggle-btn {
-    top: 8px;
-    left: 8px;
-    font-size: 10px;
-    padding: 4px 8px;
-  }
-
   .game-header h1 {
     font-size: 16px;
     margin: 0;
   }
 
   .controls-hint {
-    font-size: 7px;
+    font-size: 8.5px;
   }
 
   .status-row {
@@ -583,7 +701,7 @@ body.touch-controls .touch-controls-card {
 
 .touch-btn:active {
   background: var(--accent);
-  color: #0a0a0a;
+  color: var(--text);
 }
 
 .touch-btn.jump-btn {
