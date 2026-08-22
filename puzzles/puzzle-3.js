@@ -1,4 +1,4 @@
-// Puzzle 3: the trunk-side-swap skill unlock. See ../README.md.
+// Puzzle 3: the both-sides tree climbing skill unlock. See ../README.md.
 // No in-world trigger — the passcode lives in localStorage (see
 // game/state.js), findable via the Application/Storage devtools panel, and
 // is submitted through the console via skillUnlockPasscode() (see

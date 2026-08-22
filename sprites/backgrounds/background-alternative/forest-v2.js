@@ -52,18 +52,18 @@ const BACKGROUND_FOREST_V2 = (function build() {
     '.': null,
     // Backdrop wash — dark, muted, low-contrast family. No bright/light
     // entries on purpose: everything here should recede, not pop forward.
-    '1': '#101f16', // backdrop base, dark green
-    '2': '#142720', // backdrop, dark green-blue (teal) shift
-    '3': '#0a150d', // backdrop, deepest shadow
-    '4': '#0d2a2a', // dark teal, cooler blue-green
-    '5': '#221d12', // dark green-brown (olive), warmer shift
-    '9': '#0c1f14', // deep pine shadow, between base and deepest shadow
+    '1': '#0c2315', // backdrop base, dark green
+    '2': '#0f2c21', // backdrop, dark green-blue (teal) shift
+    '3': '#07180c', // backdrop, deepest shadow
+    '4': '#0a2d2d', // dark teal, cooler blue-green
+    '5': '#261f0e', // dark green-brown (olive), warmer shift
+    '9': '#082313', // deep pine shadow, between base and deepest shadow
     // Foliage accents — still muted/dark, just enough lift to read as
     // leaf shapes against the wash without turning bright
-    '6': '#20402a', // leaf, muted green
-    '7': '#132818', // leaf, muted green shade
-    'a': '#2c3a1e', // leaf, muted olive-green
-    'b': '#132d28', // leaf, muted teal-green
+    '6': '#184827', // leaf, muted green
+    '7': '#0e2d15', // leaf, muted green shade
+    'a': '#2c4117', // leaf, muted olive-green
+    'b': '#0d332c', // leaf, muted teal-green
   };
 
   // Deterministic pseudo-random in [0, 1) — same hash shape used for

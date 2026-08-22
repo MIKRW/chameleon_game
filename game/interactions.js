@@ -5,7 +5,7 @@
 import { JUMP_VELOCITY, LIGHT_WARNING_FLICKS, LIGHT_BREAK_FLICKS, TOTAL_PUZZLES, BUGS_REQUIRED } from './constants.js';
 import { state, resetGame } from './state.js';
 import { nearGate, nearLightSwitch, nearBackgroundTexture, BUG_GEOMETRIES, bugRect, canReachBug, bugInteractRect, rectsOverlap } from './world-geometry.js';
-import { jumpOffTrunk, jumpOffBranch, passBranchAlongTrunk, swapTrunkSide } from './movement.js';
+import { jumpOffTrunk, jumpOffBranch, passBranchAlongTrunk } from './movement.js';
 
 // Edge-triggered (fire once per press, not per repeat/hold) so keyboard
 // and touch buttons can share the same logic.
@@ -31,15 +31,6 @@ export function handleInteractPress() {
   if (!state.codeSolved && state.lightOn && nearBackgroundTexture()) {
     openCodePopup();
   }
-}
-
-// Edge-triggered, same as handleInteractPress/handleJumpPress — shimmies to
-// the trunk face on the given side (-1 left, 1 right) of the trunk currently
-// being side-climbed (see swapTrunkSide in game/movement.js); a no-op if
-// that's already the gripped side, off a side-climb, or before the skill is
-// unlocked.
-export function handleSwapSidePress(direction) {
-  swapTrunkSide(direction);
 }
 
 export function handleJumpPress() {
@@ -72,15 +63,15 @@ const skillStatusEl = document.getElementById('skill-status');
 // `window` for the console to call.
 export function setSkillUnlocked(unlocked) {
   state.skillUnlocked = unlocked;
-  skillStatusEl.textContent = `Skill unlocked: ${unlocked ? 'YES' : 'NO'}`;
+  skillStatusEl.textContent = `Side climb: ${unlocked ? 'Yes' : 'No'}`;
   if (unlocked) {
-    // The right-hand side of every side-climbable trunk was locked until now
-    // — see attachToTrunk()/passBranchAlongTrunk() in game/movement.js.
+    // The right-hand side of every side-climbable (layer-7) trunk was locked
+    // until now — see attachToTrunk() in game/movement.js.
     openSkillPopup('Wow, this new skill will make it easier to find bugs!');
   }
 }
 
-// --- Trunk-side-swap skill unlock (puzzle 3) ---
+// --- Side-climb skill unlock (puzzle 3) ---
 // No popup — the passcode lives in localStorage (see game/state.js) rather
 // than anywhere on screen, so it's submitted straight from the console.
 window.skillUnlockPasscode = async function (guess) {
@@ -92,7 +83,7 @@ window.skillUnlockPasscode = async function (guess) {
   if (correct) {
     setSkillUnlocked(true);
     setPuzzlesComplete(state.puzzlesComplete + 1);
-    console.log('Skill unlocked: trunk-side traversal.');
+    console.log('Skill unlocked: both-sides tree climbing.');
   } else {
     console.log('Incorrect passcode.');
   }
@@ -313,7 +304,7 @@ export function fullResetGame() {
   closeCodePopup();
   closeCompletionPopup();
   closeSkillPopup();
-  skillStatusEl.textContent = 'Skill unlocked: NO';
+  skillStatusEl.textContent = 'Side climb: No';
   puzzleStatusEl.textContent = `Puzzles complete: 0 / ${TOTAL_PUZZLES}`;
   bugStatusEl.textContent = `Bugs found: 0 / ${BUGS_REQUIRED}`;
 }

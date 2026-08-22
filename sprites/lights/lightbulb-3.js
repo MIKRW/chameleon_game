@@ -8,7 +8,7 @@
 // switch of its own and must never swap to the lit sprite the way
 // 'lightbulb' does via resolveHangingSprite() in game/world-geometry.js.
 //
-// Anchors at row 0 (the cord), same convention as vine-1.js/vine-2.js,
+// Anchors at row 0 (the cord), the standard convention for hanging props,
 // since it hangs from above rather than sitting on the floor.
 // Size: 10x34 (grid units; multiply by render scale) — cord lengthened from
 // lightbulb.js's 8 rows to 24 so the bulb clears that branch.

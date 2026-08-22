@@ -18,9 +18,12 @@ const BACKGROUND_VARIANTS = {
   forestV3: BACKGROUND_FOREST_V3,
   forestV4: BACKGROUND_FOREST_V4,
   forestV5: BACKGROUND_FOREST_V5,
+  forestV6: BACKGROUND_FOREST_V6,
+  forestV7: BACKGROUND_FOREST_V7,
+  solidDarkEmerald: BACKGROUND_SOLID_DARK_EMERALD,
 };
 
-const ACTIVE_BACKGROUND_KEY = 'forestV5';
+const ACTIVE_BACKGROUND_KEY = 'forestV6';
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { BACKGROUND_VARIANTS, ACTIVE_BACKGROUND_KEY };

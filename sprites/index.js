@@ -10,14 +10,17 @@ const TERRARIUM_SPRITES = {
   // resolveGroundPlantSprite() in game/world-geometry.js, which maps
   // "ground-plant-N" to index N-1, so the gap must stay to keep
   // ground-plant-3/4/5's ids resolving to the right sprite.
-  groundPlant: [GROUND_PLANT_1, undefined, GROUND_PLANT_3, GROUND_PLANT_4, GROUND_PLANT_5, GROUND_PLANT_6],
+  groundPlant: [GROUND_PLANT_1, undefined, GROUND_PLANT_3, GROUND_PLANT_4, GROUND_PLANT_5, GROUND_PLANT_6, GROUND_PLANT_7],
+  // Lettered size/angle variants, keyed by full id — see
+  // resolveGroundPlantSprite() in game/world-geometry.js, which checks this
+  // map before falling back to the numbered array above.
+  groundPlantVariants: { 'ground-plant-1b': GROUND_PLANT_1B },
   treePlant: [TREE_PLANT_1, TREE_PLANT_2, TREE_PLANT_3, TREE_PLANT_4, TREE_PLANT_5],
   // Lettered size variants, keyed by full id — see resolveTreePlantSprite()
   // in game/world-geometry.js, which checks this map before falling back to
   // the numbered array above.
-  treePlantVariants: { 'tree-plant-2b': TREE_PLANT_2B },
+  treePlantVariants: { 'tree-plant-1b': TREE_PLANT_1B, 'tree-plant-2b': TREE_PLANT_2B, 'tree-plant-slime': TREE_PLANT_SLIME },
   bug: [],
-  vine: [VINE_1, VINE_2],
   treeTrunk: {
     // Background-only decor (layer 2, cosmetic, never climbable) — indexed by
     // silhouette family (1-6), each holding whichever bark variants exist for

@@ -1,5 +1,5 @@
-// Per-sprite palette table for the terrarium sprite set (plants, vines,
-// trunks, floor, glass edges). Unlike ./player-palette.js (one flat
+// Per-sprite palette table for the terrarium sprite set (plants, trunks,
+// floor, glass edges). Unlike ./player-palette.js (one flat
 // character-key map shared by the whole player sprite set), each terrarium
 // sprite id here gets its OWN nested `{ key: hex, ... }` object — a single
 // flat table used to mean two sprites that happened to share a palette
@@ -43,6 +43,26 @@ const TERRARIUM_PALETTE = {
     'k': '#1a1a1a',
     'l': '#66bb6a',
     'L': '#2e7d32',
+  },
+
+  // === ground-plant-1b — Split-Leaf Philodendron (Side-View, Three-Leaf) ===
+  // leaf light/dark + shared outline, same tones as ground-plant-1, plus a
+  // pale rim highlight at each leaf tip (ground-plant-6's f, own copy) and a
+  // brighter vein-line accent running down each leaf's tapered body
+  'ground-plant-1b': {
+    'k': '#1a1a1a',
+    'l': '#66bb6a',
+    'L': '#2e7d32',
+    'f': '#c8e6c9',
+    'v': '#a5d6a7',
+  },
+
+  // === ground-plant-7 — Split-Leaf Philodendron (Small Olive Variant) ===
+  // same shape as ground-plant-1, own independent palette shifted olive
+  'ground-plant-7': {
+    'k': '#1a1a1a',
+    'l': '#8a9a46',
+    'L': '#556b2f',
   },
 
   // === ground-plant-3 — Tall Grass Tuft ===
@@ -94,6 +114,14 @@ const TERRARIUM_PALETTE = {
   // bright/dark red lichen
   // no 'k' outline — the moss art itself is the outline; tiled by drawGateMoss() in game/render.js down the gatekeeper trunk until state.gateSolved
   'tree-plant-1': {
+    'z': '#ff5252',
+    'Z': '#7a1414',
+  },
+
+  // === tree-plant-1b — Gate Moss Remnant ===
+  // same red lichen tones as tree-plant-1 — a small leftover scrap left on the
+  // gatekeeper trunk after state.gateSolved, drawn by drawGateMossRemnant() in game/render.js
+  'tree-plant-1b': {
     'z': '#ff5252',
     'Z': '#7a1414',
   },
@@ -150,23 +178,6 @@ const TERRARIUM_PALETTE = {
     'K': '#8a9a4a',
     'W': '#4f5c28',
     'X': '#c7d17a',
-  },
-
-  // === vine-1 — Bare Hanging Vine ===
-  // vine green light/shade
-  // no 'k' outline
-  'vine-1': {
-    'n': '#558b2f',
-    'N': '#33691e',
-  },
-
-  // === vine-2 — Leafy Hanging Vine ===
-  // vine green light/shade + small leaf tuft
-  // 'l' leaf-tuft tone started matching ground-plant-1's leaf light in the old flat palette (shared key, same accidental-coupling risk); now its own independent copy
-  'vine-2': {
-    'n': '#558b2f',
-    'N': '#33691e',
-    'l': '#66bb6a',
   },
 
   // === bug-1 — collectible critter bug ===

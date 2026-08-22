@@ -7,6 +7,13 @@ export const CANVAS_W = 720;
 export const CANVAS_H = 480;
 export const SCALE = 4; // sprite pixel scale
 export const PLAYER_SPEED = 7;
+// Fraction of the gap to the target camera position closed per frame —
+// makes the camera ease toward the player instead of snapping 1:1, so
+// world scenery (esp. layer 5/7 trunks, which must stay pixel-exact with
+// their collision geometry and so can't get their own slower parallax)
+// slides by more gently. World positions/collision are untouched — this
+// only smooths the camera.x/y used at render time (see draw(), game/render.js).
+export const CAMERA_EASE = 0.12;
 export const GRAVITY = 0.7;
 export const JUMP_VELOCITY = -12;
 export const CLIMB_SPEED = 2;
@@ -80,6 +87,7 @@ export const TOTAL_PUZZLES = 3; // one per PUZZLES entry in puzzles/puzzle-N.js
 export const BUGS_REQUIRED = BUG_PLACEMENTS.length; // see world-props.js
 
 export const GATE_MOSS_FINGER_MARGIN = 2 * SCALE; // TREE_PLANT_1's 2 leftmost columns are finger tips, not bark overlay
+export const GATE_MOSS_BOTTOM_GAP = 10 * SCALE; // keep the lowest moss tile from touching the glass floor line
 export const GATE_INTERACT_RANGE = 60; // px of horizontal slack on either side of the gate trunk that still counts as "at" it
 
 export const SWITCH_TRUNK_OVERLAP = 1; // grid cells the switch sinks into the trunk's edge, same idea as TREE_BRANCH_TRUNK_OVERLAP
@@ -127,23 +135,23 @@ export const BACKGROUND_PIXEL_BLOCK = 2;
 // reads as "distant" rather than "stuck to the screen". background-fill.js
 // is generated wide enough (CHUNKS_W margin) to cover CAMERA_X_MAX *
 // BACKGROUND_PARALLAX of scroll without running out of image at either edge.
-export const BACKGROUND_PARALLAX = 0.1;
+export const BACKGROUND_PARALLAX = 0.06;
 
-// Fraction of camera.x the layer-2/3 background-decor trunks scroll by (see
-// drawBackgroundDecor() in game/render.js) — each faster than
-// BACKGROUND_PARALLAX (the layer-1 backdrop) but still well under 1:1, so
-// the three layers visibly separate as the camera pans: 1 (0.15) < 2 (0.4)
-// < 3 (0.55) < layers 5/7/player (1:1). Kept low enough that background
-// motion doesn't outrun the depth illusion even at PLAYER_SPEED's higher
-// value — a layer's absolute on-screen speed is this fraction of however
-// fast the camera is panning, so a faster player raises every layer's
-// real px/sec too; these factors were pulled down accordingly. See
-// DEPTH-LAYERS.md. BACKGROUND_PLACEMENTS/BACKGROUND_LAYER3_PLACEMENTS
-// (world-props.js) place their trunks within the screen-x range each
+// Fraction of camera.x the layer-2/3 background-decor trunks (and, for
+// layer 3, ground-plant-1 — see drawGroundPlants(), game/render.js) scroll
+// by — each faster than BACKGROUND_PARALLAX (the layer-1 backdrop) but
+// still under 1:1, so the layers visibly separate as the camera pans:
+// 1 (0.06) < 2 (0.45) < 3 (0.6) < layers 5/7/player (1:1). Raised closer to
+// 1:1 than earlier passes — at the previous lower values, a layer-3 ground
+// plant visibly drifted away from its layer-7 neighbor too fast as the
+// camera panned; keeping this nearer 1:1 makes that separation read as
+// subtle depth instead of a jarring speed mismatch. BACKGROUND_PLACEMENTS/
+// BACKGROUND_LAYER3_PLACEMENTS (world-props.js) place their trunks within
+// the screen-x range each
 // factor can actually reach (CAMERA_X_MAX * factor + CANVAS_W) rather than
 // across the full world width, so nothing sits permanently out of view.
-export const BACKGROUND_DECOR_PARALLAX_LAYER2 = 0.27;
-export const BACKGROUND_DECOR_PARALLAX_LAYER3 = 0.37;
+export const BACKGROUND_DECOR_PARALLAX_LAYER2 = 0.72;
+export const BACKGROUND_DECOR_PARALLAX_LAYER3 = 0.85;
 
 // Background/decor trunks (layers 2 and 3 only — see above) fade from
 // barely-visible at the crown (TREE_FADE_MIN_ALPHA) up to fully opaque at

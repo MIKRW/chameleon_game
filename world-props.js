@@ -33,13 +33,16 @@
 // Cleared for a trees/layers readjustment pass — re-add placements once the
 // new layout is settled.
 const PLANT_PLACEMENTS = [
+  { sprite: 'ground-plant-1b', x: 120, layer: 2 },
   { sprite: 'ground-plant-1', x: 15, layer: 3 },
   { sprite: 'ground-plant-1', x: 400, layer: 3 },
   { sprite: 'ground-plant-1', x: 800, layer: 3 },
   { sprite: 'ground-plant-1', x: 1200, layer: 3 },
   { sprite: 'ground-plant-1', x: 3050, layer: 3 },
-  { sprite: 'ground-plant-6', x: 90, layer: 7 },
-  { sprite: 'ground-plant-6', x: 530, layer: 7 },
+  { sprite: 'ground-plant-7', x: 100, layer: 7 },
+  { sprite: 'ground-plant-7', x: 360, layer: 7 },
+  { sprite: 'ground-plant-7', x: 900, layer: 7 },
+  { sprite: 'ground-plant-7', x: 1450, layer: 7 },
 ];
 
 // Purely cosmetic background scenery — furthest back, painted before the
@@ -59,22 +62,9 @@ const PLANT_PLACEMENTS = [
 // enough to drag it onscreen. Scaling every x down keeps the original
 // relative order/spacing while fitting the whole set inside the screen-x
 // range this parallax rate can actually reach.
-const BACKGROUND_PLACEMENTS = [
-  { sprite: 'trunk-bg-3a', x: 78, layer: 2 },
-  { sprite: 'trunk-bg-5a', x: 249, layer: 2 },
-  { sprite: 'trunk-bg-1a', x: 416, layer: 2 },
-  { sprite: 'trunk-bg-4a', x: 546, layer: 2 },
-  { sprite: 'trunk-bg-2a', x: 728, layer: 2 },
-  { sprite: 'trunk-bg-1a', x: 884, layer: 2 },
-  { sprite: 'trunk-bg-5a', x: 1040, layer: 2 },
-  { sprite: 'trunk-bg-3a', x: 1196, layer: 2 },
-  { sprite: 'trunk-bg-1a', x: 1664, layer: 2 },
-  { sprite: 'trunk-bg-5a', x: 1794, layer: 2 },
-
-  // trunk-bg-4b/5b (non-green r/R/h bark) placements removed from this
-  // layer — kept only green q/Q/p trunk-bg-*a silhouettes here. Sprites
-  // themselves are untouched; re-add a placement entry to bring them back.
-];
+// All layer-2 trunk placements cleared at the user's request. Sprites
+// themselves are untouched; re-add placement entries to bring trees back.
+const BACKGROUND_PLACEMENTS = [];
 
 // BG 6a ('Angled Knotty', sprites/tree-trunks-bg/trunk-bg-6a.js) — a dramatic
 // diagonal feature tree, currently unplaced. Was at x: 1430, layer: 2 in the
@@ -118,13 +108,16 @@ const TREE_PLACEMENTS = [
   { sprite: 'trunk-interact-3', x: 300, layer: 5 },
   { sprite: 'trunk-interact-1', x: 1150, layer: 5 },
   { sprite: 'trunk-interact-3', x: 2000, layer: 5 },
-  { sprite: 'trunk-interact-3', x: 1580, layer: 5 },
   { sprite: 'trunk-interact-3', x: 2700, layer: 5 },
   { sprite: 'trunk-interact-2', x: 2350, layer: 7 },
   { sprite: 'trunk-interact-2', x: 2900, layer: 7 },
   { sprite: 'trunk-interact-2', x: 720, layer: 7 },
   { sprite: 'trunk-interact-3', x: 3200, layer: 5 },
   { sprite: 'trunk-interact-2', x: 3550, layer: 7 },
+  // Moved from layer 5 (branchless trunk-interact-3) to layer 7, same x,
+  // still branchless — brings a layer-7 (closer/interactive) tree into this
+  // gap instead of a background one.
+  { sprite: 'trunk-interact-2', x: 1580, layer: 7 },
 ];
 
 // Branches mounted onto a subset of the trees above (see sprites/tree-branches/tree-branch-1.js
@@ -146,7 +139,7 @@ const TREE_PLACEMENTS = [
 // without that being a bug.
 const BRANCH_PLACEMENTS = [
   // Layer 5 — Trunk Interact 3 at x300 (11 wide x157 tall: branch-1).
-  { trunkX: 300, layer: 5, sprite: 'tree-branch-1', attachRow: 78, side: 'left' },
+  { trunkX: 300, layer: 5, sprite: 'tree-branch-1', attachRow: 88, side: 'left' },
 
   // Layer 5 — Trunk Interact 3 at x2000 (11 wide x157 tall), one long
   // branch-2 plus two short branch-1s, alternating sides.
@@ -220,10 +213,11 @@ const BRANCH_PLACEMENTS = [
 ];
 
 // Decorative single-knot foliage (tree-plant-2..5, see sprites/tree-plants/)
-// mounted onto a subset of the trees above, excluding the gatekeeper trunk
-// (x550/layer7 — TREE_PLANT_1, the moss variety, is reserved for that trunk's
-// puzzle, tiled by drawGateMoss() in game/render.js, and isn't reused decoratively
-// here). 10 instances total across the other 4 varieties (3/3/2/2 split): 6
+// mounted onto a subset of the trees above, excluding the Moss Tree
+// (x720/layer7 — TREE_PLANT_1, the moss variety, is reserved for that
+// gatekeeper trunk's puzzle, tiled by drawGateMoss() in game/render.js, and
+// isn't reused decoratively here). 10 instances total across the other 4
+// varieties (3/3/2/2 split): 6
 // on layer 5 (the tall x1150 trunk gets two, on opposite sides; the four
 // shorter layer-5 trees get one each) and 4 on layer 7 (spread across trunks
 // that don't already carry a branch, so foliage doesn't stack on top of
@@ -262,15 +256,16 @@ const TREE_PLANT_PLACEMENTS = [
   { trunkX: 1150, layer: 5, sprite: 'tree-plant-2', attachRow: 118, side: 'right' },
   { trunkX: 1150, layer: 5, sprite: 'tree-plant-2b', attachRow: 140, side: 'left' },
 
-];
+  // Layer 7 — Trunk Interact 2 at x2350, the light-switch tree (branches at
+  // attachRow 60/left, 100/right — see BRANCH_PLACEMENTS; switch itself at
+  // attachRow 70/right). A right-side drip below the lower (right) branch,
+  // a left-side drip further up the trunk clear of the left branch, and a
+  // second left-side drip just below the left branch (attachRow 60) reading
+  // as slime seeping out from under it.
+  { trunkX: 2350, layer: 7, sprite: 'tree-plant-slime', attachRow: 125, side: 'right' },
+  { trunkX: 2350, layer: 7, sprite: 'tree-plant-slime', attachRow: 25, side: 'left' },
+  { trunkX: 2350, layer: 7, sprite: 'tree-plant-slime', attachRow: 82, side: 'left' },
 
-// Hanging vines (sprites/vines/vine-1.js / vine-2.js) — dangle from a
-// branch's tip rather than mounting on trunk bark. `trunkX`/`layer` pick the
-// tree the same way BRANCH_PLACEMENTS does; `branchAttachRow` must match the
-// `attachRow` of one of that tree's BRANCH_PLACEMENTS entries exactly (that's
-// how vineGeometry in game/world-geometry.js finds which branch to hang
-// from).
-const VINE_PLACEMENTS = [
 ];
 
 // Hanging props — anchor at row 0 (top of the sprite) against LID_TOP
@@ -282,34 +277,44 @@ const VINE_PLACEMENTS = [
 const HANGING_PLACEMENTS = [
   { sprite: 'lightbulb', x: 150, layer: 5 },
 
-  // Second, purely decorative bulb between the two rightmost trees (Interact 2
-  // at x3280 and Interact 3 at x3520, both layer 7) — bait to lure the player
-  // into flicking the (distant) real switch faster. Uses lightbulb-3.js, a
-  // pixel-identical copy of the off-state lightbulb.js art under its own
-  // sprite id, so resolveHangingSprite() in game/world-geometry.js (which only swaps ids
-  // matching 'lightbulb') never lights it up. Kept on layer 5, same as the
-  // real bulb, so it shares its depth/tint treatment; drawBackgroundTexture()'s
-  // HANGING_PLACEMENTS.find(sprite === 'lightbulb') still resolves to the
-  // x150 bulb since this entry uses a different sprite id.
+  // Original decorative bulb between the two rightmost trees (Interact 2 at
+  // x3280 and Interact 3 at x3520, both layer 7) — bait to lure the player
+  // into flicking the (distant) real switch faster. Left in place even
+  // though WORLD_WIDTH (game/constants.js) was later shortened to 2650,
+  // pushing it (and those two trees) past the camera clamp/canvas clip and
+  // out of reach — restoring the old width brings it back for free.
   { sprite: 'lightbulb3', x: 3400, layer: 5 },
+
+  // Second decorative bulb, added for the current shortened world so a bait
+  // bulb is actually reachable/visible again: sits just past the x2350
+  // trunk-interact-2 (layer 7, the real light switch's tree), playing the
+  // same "lure the player toward the switch" role the x3400 bulb used to,
+  // comfortably inside CAMERA_X_MAX's reach (2650) with room before the
+  // right wall. Also uses lightbulb-3.js (never lights up) for the same
+  // reason as above — resolveHangingSprite() in game/world-geometry.js only
+  // swaps sprite ids matching 'lightbulb'.
+  { sprite: 'lightbulb3', x: 2500, layer: 5 },
 ];
 
-// Light switch — mounted on the trunk, near the top, of the second tree from
-// the far right (Trunk Interact 2 at x3280, layer 7 — see TREE_PLACEMENTS
-// above; the rightmost tree is x3520), on the left face of that trunk. Far
-// from the lightbulb/background-texture cluster near x150, and only
-// reachable by climbing (see sprites/lights/light-switch.js for why that distance
-// is deliberate). `trunkX`/`layer` must match a TREE_PLACEMENTS entry
-// exactly (same convention as BRANCH_PLACEMENTS); `attachRow` is the row
-// (0 = top of the trunk sprite) the switch is bolted to; `side` must be
-// 'left' since that's the face it's drawn/interacted from (see
-// nearLightSwitch() in game/world-geometry.js / drawLightSwitch() in
-// game/render.js). Interacting with it while side-climbing that trunk on
-// the left (see handleInteractPress() in game/interactions.js) flips
-// state.lightOn, which swaps the drawn sprite between
-// light-switch.js/light-switch-2.js as well as lightbulb.js/lightbulb-2.js
-// and toggles background-texture.js's visibility.
-const LIGHT_SWITCH_PLACEMENT = { trunkX: 3280, layer: 7, attachRow: 15, side: 'left' };
+// Light switch — mounted on the trunk of x2350 (Trunk Interact 2, layer 7),
+// currently the last/rightmost reachable tree given WORLD_WIDTH's temporary
+// 2650 shortening (see the GATE_TRUNK comment in game/world-geometry.js).
+// Sits on the right face of that trunk, between its two branches (see
+// BRANCH_PLACEMENTS above: attachRow 60/left, attachRow 100/right) —
+// attachRow 70 sits a bit above the midpoint between them. Only reachable by
+// climbing (see sprites/lights/light-switch.js for why that distance is
+// deliberate). `trunkX`/`layer` must match a TREE_PLACEMENTS entry exactly
+// (same convention as BRANCH_PLACEMENTS); `attachRow` is the row (0 = top of
+// the trunk sprite) the switch is bolted to; `side` picks which face it's
+// drawn/interacted from (see lightSwitchOrigin()/nearLightSwitch() in
+// game/world-geometry.js / drawLightSwitch() in game/render.js — the sprite
+// mirrors when side is 'right'). Interacting with it while side-climbing
+// that trunk on the matching side (see handleInteractPress() in
+// game/interactions.js) flips state.lightOn, which swaps the drawn sprite
+// between light-switch.js/light-switch-2.js as well as
+// lightbulb.js/lightbulb-2.js and toggles background-texture.js's
+// visibility.
+const LIGHT_SWITCH_PLACEMENT = { trunkX: 2350, layer: 7, attachRow: 70, side: 'right' };
 
 // Collectible bugs (see game/interactions.js collectNearbyBug() /
 // game/render.js drawBugs()), resolved by bugGeometry() in

@@ -9,9 +9,9 @@ import { START_POS } from './constants.js';
 // No in-game hint points at this yet; that'll be added later.
 window.CHAMELEON_VISIBLE = false;
 
-// Puzzle 3 (trunk-side-swap skill unlock) has no in-world trigger — its
-// passcode lives here in localStorage, next to the theme preference, for a
-// player to find via the Application/Storage devtools panel, then submit
+// Puzzle 3 (both-sides tree climbing skill unlock) has no in-world trigger —
+// its passcode lives here in localStorage, next to the theme preference, for
+// a player to find via the Application/Storage devtools panel, then submit
 // via skillUnlockPasscode() (see game/interactions.js) from the console.
 localStorage.setItem('terrarium-skill-hint', 'heartwood');
 
@@ -26,9 +26,11 @@ export const state = {
   branch: null, // { geo: <BRANCH_GEOMETRIES entry>, mode: 'stand' | 'hang' } while on/under a branch
   recentlyLeftTrunk: null, // trunk just jumped off of, ignored by findClimbableTrunk() until cleared
   branchExitY: null, // player.y at the moment they walked off a branch's end (not jumped) — findClimbableTrunk() stays blind to every trunk until they've fallen CLIMB_MIN_AIR_HEIGHT clear of it
-  // Trunk-side-swap skill flag, flipped by skillUnlockPasscode() (puzzle 3,
-  // see game/interactions.js) once its localStorage passcode is found and
-  // submitted from the console. Gates swapTrunkSide() in game/movement.js.
+  // Both-sides tree climbing skill flag, flipped by skillUnlockPasscode()
+  // (puzzle 3, see game/interactions.js) once its localStorage passcode is
+  // found and submitted from the console. Until true, only the left face of
+  // a layer-7 (side-climb) trunk is grippable — see attachToTrunk() in
+  // game/movement.js.
   skillUnlocked: false,
   gateSolved: false, // the gatekeeper tree's moss puzzle (room 1) — see GATE_TRUNK in game/world-geometry.js
   puzzlesComplete: 0,
@@ -38,6 +40,7 @@ export const state = {
   lightFlickCount: 0, // times the switch has been flicked since the last bulb reset — see handleInteractPress()
   bulbBroken: false, // true once lightFlickCount hits LIGHT_BREAK_FLICKS; blocks the switch until resetLightbulb() clears it
   codeSolved: false, // the background-texture binary puzzle (room 2) — see CODE_TRUNK in game/world-geometry.js
+  camera: null, // { x, y } eased camera position, lazily snapped to the initial target on the first draw() call — see CAMERA_EASE, game/constants.js
 };
 
 window.resetLightbulb = function () {
@@ -70,5 +73,6 @@ export function resetGame() {
   state.lightFlickCount = 0;
   state.bulbBroken = false;
   state.codeSolved = false;
+  state.camera = null;
   window.CHAMELEON_VISIBLE = false;
 }

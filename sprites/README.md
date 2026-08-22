@@ -23,7 +23,6 @@ files stay at the top level.
 | `user/player/index.js` | Aggregates the poses into `SPRITES` | — | — |
 | `ground-plants/ground-plant-1.js` … `ground-plant-5.js` | Ground foliage variants | 12x10 (ground-plant-3 is 12x20, green-mauve) | mid-ground, on floor |
 | `tree-plants/tree-plant-1.js` … `tree-plant-5.js` | Trunk-mounted foliage variants | 8x8 | background, mounts to a trunk knot row |
-| `vines/vine-1.js`, `vine-2.js` | Hanging vines | 6x16 | foreground, hangs from above |
 | `tree-trunks-interact/trunk-interact-1.js` … `trunk-interact-3.js` | Climbable trunk variants (silhouettes 1-3), full-saturation bark | 8x14 (interact-1 is 11x151, full floor-to-lid height) | climbable, on floor |
 | `tree-trunks-bg/trunk-bg-1a.js` … `trunk-bg-6b.js` | Non-interactive background-decor trunks, one entry per silhouette family (1-6) x bark variant (a = muted, b = vivid, not every family has both); bg-6b angles out from the floor and twists/knobbles as it rises instead of running straight up | 12x152 (bg-1a, widened + floor-to-lid), 5x80/90 (bg-2a/3a, narrowed), 8x110/100 (bg-4a/5a), 17x151 (bg-6a/6b) — all ≥ half the terrarium's max (floor-to-lid) height | background, on floor |
 | `tree-branches/tree-branch-1.js`, `tree-branch-2.js`, `tree-branch-3.js` | Branches mounted onto trunks (branch-3 is branch-2's shape recolored to driftwood bark, for trunk-interact-2/trunk-bg-6a/6b) | varies | background |
@@ -67,8 +66,8 @@ two themes can evolve independently.
 - **Ground props** (plants, trunks, floor) put their floor-contact row last,
   often marked with an all-`k` row, so they can be snapped to the same
   ground line without per-sprite offset math.
-- **Hanging props** (vines) anchor at row 0 (top) instead, since they attach
-  to the ceiling rather than the floor.
+- **Hanging props** (lightbulbs) anchor at row 0 (top) instead, since they
+  attach to the ceiling rather than the floor.
 - Trunks with an off-center or multi-branch top (`trunk-bg-4a.js`/`4b.js`,
   `trunk-bg-5a.js`/`5b.js`) note their attach point(s) in `behavior`.
 - **Trunk naming** (`trunk-bg-Na`/`Nb`, `trunk-interact-N`) splits on two
@@ -83,7 +82,7 @@ two themes can evolve independently.
   `behavior.tileable: 'horizontal' | 'vertical'` — repeat them edge-to-edge
   rather than stretching.
 - Everything here is currently `animated: false`. If a prop later needs
-  motion (e.g. a vine sway), add an `animated: true` sprite page with a
+  motion (e.g. a hanging prop's sway), add an `animated: true` sprite page with a
   `frames` array instead of `rows`, rather than overloading this format.
 
 ## Using these to populate the terrarium

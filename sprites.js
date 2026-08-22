@@ -22,12 +22,21 @@ function drawSprite(ctx, spriteRows, x, y, scale, palette, fade, flipX, flipY) {
       ctx.globalAlpha = fade.minAlpha + (fade.maxAlpha - fade.minAlpha) * t;
     }
     const drawRow = flipY ? lastRow - row : row;
+    // Each cell's screen-space bounds are rounded independently (rather than
+    // rounding x/y once and reusing a fixed `scale` width/height) so a
+    // fractional scale (e.g. a sprite's renderScale — see drawGroundPlants
+    // in game/render.js) still tiles with no sub-pixel gaps between cells:
+    // adjacent cells' rounded edges always coincide.
+    const rowTop = y + Math.round(drawRow * scale);
+    const rowBottom = y + Math.round((drawRow + 1) * scale);
     for (let col = 0; col < line.length; col++) {
       const color = palette[line[col]];
       if (!color) continue;
       ctx.fillStyle = color;
       const drawCol = flipX ? line.length - 1 - col : col;
-      ctx.fillRect(x + drawCol * scale, y + drawRow * scale, scale, scale);
+      const colLeft = x + Math.round(drawCol * scale);
+      const colRight = x + Math.round((drawCol + 1) * scale);
+      ctx.fillRect(colLeft, rowTop, colRight - colLeft, rowBottom - rowTop);
     }
   }
   if (fade) ctx.globalAlpha = 1;

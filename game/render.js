@@ -9,13 +9,14 @@ import {
   GLASS_FRONT_BOTTOM_ALPHA,
   BACKGROUND_PIXEL_BLOCK, BACKGROUND_PARALLAX, BACKGROUND_DECOR_PARALLAX_LAYER2, BACKGROUND_DECOR_PARALLAX_LAYER3,
   TREE_FADE_MIN_ALPHA, TREE_FADE_MAX_ALPHA,
-  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, TREE_PLANT_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP,
+  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, GATE_MOSS_BOTTOM_GAP, TREE_PLANT_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP,
+  CAMERA_EASE,
 } from './constants.js';
 import { state, ctx } from './state.js';
 import {
   resolveGroundPlantSprite, resolveHangingSprite, resolveTreeTrunkSprite, resolveTreeBranchSprite,
-  resolveTreePlantSprite, resolveVineSprite, resolveBugSprite, byAscendingZ, BRANCH_GEOMETRIES, TREE_PLANT_GEOMETRIES,
-  VINE_GEOMETRIES, BUG_GEOMETRIES, GATE_TRUNK, LIGHT_SWITCH_TRUNK, treeTrunkRect, lightSwitchOrigin,
+  resolveTreePlantSprite, resolveBugSprite, byAscendingZ, BRANCH_GEOMETRIES, TREE_PLANT_GEOMETRIES,
+  BUG_GEOMETRIES, GATE_TRUNK, LIGHT_SWITCH_TRUNK, treeTrunkRect, lightSwitchOrigin,
 } from './world-geometry.js';
 import { playerCenter } from './movement.js';
 
@@ -159,27 +160,33 @@ export function drawGlassEdgeBottom(camera) {
 
 // Ground-floor foliage placed from PLANT_PLACEMENTS (world-props.js), split
 // across layer 5 (behind the player) and layer 7 (in front of the player)
-// so plants can occlude the chameleon as it walks past. Layer 3 is a third,
-// non-interactive option — cosmetic background foliage that shares the
-// layer-3 background-decor band's treatment (BACKGROUND_DECOR_PARALLAX_LAYER3,
-// the same crown-fade as drawBackgroundDecor) instead of the opaque 1:1
-// rendering layers 5/7 get — see DEPTH-LAYERS.md. Ground plants have no bark
-// keys, so unlike drawBackgroundDecor's trunks this layer doesn't need
-// resolveBarkPalette/a saturation step — each plant's own palette entry is
-// used as-is regardless of which layer it's drawn on.
+// so plants can occlude the chameleon as it walks past. Layers 2/3 are two
+// further, non-interactive options — cosmetic background foliage that
+// shares the layer-2/3 background-decor bands' treatment (their own
+// BACKGROUND_DECOR_PARALLAX_LAYER2/3, the same crown-fade as
+// drawBackgroundDecor) instead of the opaque 1:1 rendering layers 5/7 get —
+// see DEPTH-LAYERS.md. Ground plants have no bark keys, so unlike
+// drawBackgroundDecor's trunks this layer doesn't need resolveBarkPalette/a
+// saturation step — each plant's own palette entry is used as-is regardless
+// of which layer it's drawn on.
 export function drawGroundPlants(camera, layer) {
-  const isBackgroundLayer = layer === 3;
+  const isBackgroundLayer = layer === 2 || layer === 3;
+  const parallax = layer === 2 ? BACKGROUND_DECOR_PARALLAX_LAYER2 : BACKGROUND_DECOR_PARALLAX_LAYER3;
   const placements = PLANT_PLACEMENTS.filter((p) => p.layer === layer).sort(byAscendingZ);
   for (const placement of placements) {
     const sprite = resolveGroundPlantSprite(placement.sprite);
     const palette = resolveSpritePalette(placement.sprite);
     const scale = SCALE * (sprite.renderScale || 1);
     const screenX = isBackgroundLayer
-      ? placement.x - camera.x * BACKGROUND_DECOR_PARALLAX_LAYER3
+      ? placement.x - camera.x * parallax
       : placement.x - camera.x;
     const screenY = GROUND_TOP - sprite.height * scale - camera.y;
     if (isBackgroundLayer) {
-      drawSpriteBlocky(ctx, sprite.rows, screenX, screenY, scale, palette, BACKGROUND_PIXEL_BLOCK, {
+      // ground-plant-1 keeps full pixel detail at layer 3 (block 1) instead
+      // of the usual coarser background sampling — it reads as too mushy
+      // otherwise at this sprite's small size/detail level.
+      const block = placement.sprite === 'ground-plant-1' ? 1 : BACKGROUND_PIXEL_BLOCK;
+      drawSpriteBlocky(ctx, sprite.rows, screenX, screenY, scale, palette, block, {
         minAlpha: TREE_FADE_MIN_ALPHA,
         maxAlpha: TREE_FADE_MAX_ALPHA,
       });
@@ -213,7 +220,10 @@ export function drawBackgroundTexture(camera) {
 
 // The light switch prop (LIGHT_SWITCH_PLACEMENT, world-props.js) — mounted
 // on a trunk rather than standing on the floor, swapping art between
-// light-switch.js/light-switch-2.js based on state.lightOn.
+// light-switch.js/light-switch-2.js based on state.lightOn. The art is
+// drawn arm-into-bark on its right edge (a left-face mount); flipped
+// horizontally when LIGHT_SWITCH_PLACEMENT.side is 'right', same convention
+// drawTreeBranches uses for its side flip.
 export function drawLightSwitch(camera) {
   if (!LIGHT_SWITCH_TRUNK) return;
   const sprite = state.lightOn ? TERRARIUM_SPRITES.lightSwitch2 : TERRARIUM_SPRITES.lightSwitch;
@@ -221,7 +231,8 @@ export function drawLightSwitch(camera) {
   const origin = lightSwitchOrigin();
   const screenX = origin.x - camera.x;
   const screenY = origin.y - camera.y;
-  drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, palette);
+  const flipX = LIGHT_SWITCH_PLACEMENT.side === 'right';
+  drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, palette, undefined, flipX);
 }
 
 // Props that dangle from the glass lid (HANGING_PLACEMENTS, world-props.js)
@@ -317,21 +328,6 @@ export function drawTreePlants(camera, layer) {
   }
 }
 
-// Hanging vines from VINE_GEOMETRIES (game/world-geometry.js), dangling off
-// a branch tip rather than mounted on trunk bark. Drawn right after the
-// branches/plants on the same layer so a vine painted here sits on top of
-// the branch it hangs from.
-export function drawVines(camera, layer) {
-  for (const geo of VINE_GEOMETRIES) {
-    if (geo.placement.layer !== layer) continue;
-    const vineSprite = resolveVineSprite(geo.placement.sprite);
-    const palette = resolveSpritePalette(geo.placement.sprite);
-    const screenX = geo.originX - camera.x;
-    const screenY = geo.originY - camera.y;
-    drawSprite(ctx, vineSprite.rows, screenX, screenY, SCALE, palette);
-  }
-}
-
 // Bugs from BUG_GEOMETRIES (game/world-geometry.js) — currently empty, the
 // bug/fly sprite has been pulled (see BUG_PLACEMENTS in world-props.js), so
 // this is a no-op until placements are added back.
@@ -374,35 +370,100 @@ export function drawSpriteBlocky(ctx, spriteRows, x, y, scale, palette, block, f
   if (fade) ctx.globalAlpha = 1;
 }
 
-// Yellow slime (tree-plant-slime.js) tiled down the right-hand edge of every
+// Yellow slime (tree-plant-slime.js) tiled down both edges of every
 // side-climbable trunk (layer 7 — layer-5 trunks are front-climb only, no
-// side to lock) while the trunk-side-swap skill is still locked. Removed the
+// side to lock) while the side-climb skill is still locked, signaling the
+// trunk is entirely unclimbable from either side until then. Removed the
 // moment skillUnlocked flips, same as drawGateMoss() removing the gate moss
 // once state.gateSolved flips. See the attach gating in game/movement.js for
 // the actual movement restriction this is signaling.
 export function drawSkillSlime(camera) {
   if (state.skillUnlocked) return;
   const tileH = TREE_PLANT_SLIME.height * SCALE;
+  const tileW = TREE_PLANT_SLIME.width * SCALE;
   for (const placement of TREE_PLACEMENTS) {
     if (placement.layer !== 7) continue;
     const rect = treeTrunkRect(placement);
-    const screenX = rect.right - SLIME_TRUNK_OVERLAP * SCALE - camera.x;
+    const leftX = rect.left - (tileW - SLIME_TRUNK_OVERLAP * SCALE) - camera.x;
+    const rightX = rect.right - SLIME_TRUNK_OVERLAP * SCALE - camera.x;
     for (let y = rect.top; y < rect.bottom; y += tileH) {
-      drawSprite(ctx, TREE_PLANT_SLIME.rows, screenX, y - camera.y, SCALE, TERRARIUM_PALETTE['tree-plant-slime']);
+      const screenY = y - camera.y;
+      drawSprite(ctx, TREE_PLANT_SLIME.rows, leftX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-slime'], undefined, true);
+      drawSprite(ctx, TREE_PLANT_SLIME.rows, rightX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-slime']);
     }
   }
 }
 
-// Tiles the gate moss sprite (TREE_PLANT_1) down the gatekeeper tree's full
-// height, the same tiling approach drawGlassEdgeSide uses for the tank
-// walls. Skipped entirely once the tree's puzzle is solved.
+// Tiles the gate moss sprite (TREE_PLANT_1, now an edge strip rather than a
+// full-width span — see that file) down both edges of the Moss Tree's
+// (GATE_TRUNK) full height, the same tiling approach drawGlassEdgeSide uses
+// for the tank walls. Drawn twice per row: once flush against the trunk's
+// left edge as-is, once flush against the right edge mirrored (flipX), so
+// moss overlaps the bark from both sides and wide trunks show bare bark
+// down the middle instead of the moss stretching to cover it. Stops
+// GATE_MOSS_BOTTOM_GAP short of the trunk's base so the lowest tile doesn't
+// touch the glass floor line. Skipped entirely once the tree's puzzle is
+// solved.
 export function drawGateMoss(camera) {
   if (state.gateSolved) return;
   const rect = treeTrunkRect(GATE_TRUNK);
   const tileH = TREE_PLANT_1.height * SCALE;
-  const screenX = rect.left - GATE_MOSS_FINGER_MARGIN - camera.x;
-  for (let y = rect.top; y < rect.bottom; y += tileH) {
-    drawSprite(ctx, TREE_PLANT_1.rows, screenX, y - camera.y, SCALE, TERRARIUM_PALETTE['tree-plant-1']);
+  const stripW = TREE_PLANT_1.width * SCALE;
+  const barkSpan = stripW - GATE_MOSS_FINGER_MARGIN;
+  const leftX = rect.left - GATE_MOSS_FINGER_MARGIN - camera.x;
+  const rightX = rect.right - barkSpan - camera.x;
+  const bottom = rect.bottom - GATE_MOSS_BOTTOM_GAP;
+  for (let y = rect.top; y < bottom; y += tileH) {
+    const screenY = y - camera.y;
+    drawSprite(ctx, TREE_PLANT_1.rows, leftX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-1']);
+    drawSprite(ctx, TREE_PLANT_1.rows, rightX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-1'], undefined, true);
+  }
+}
+
+// Scatter layout for drawGateMossRemnant, computed once (not per-frame) so
+// the scraps don't jitter — a handful of clusters of 2-3 remnants each,
+// placed via a fixed-seed PRNG so the layout is random-looking but stable
+// across reloads. Each entry is a fraction of the trunk's height plus which
+// edge (mirrored = right edge, flipped) it clings to.
+const GATE_MOSS_REMNANT_LAYOUT = (() => {
+  let seed = 42;
+  const rand = () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed % 1000) / 1000;
+  };
+  const placements = [];
+  const clusterCount = 6;
+  for (let c = 0; c < clusterCount; c++) {
+    const centerFrac = (c + 0.5) / clusterCount + (rand() - 0.5) * 0.15;
+    const clusterSize = 2 + Math.floor(rand() * 2); // 2-3 per cluster
+    for (let i = 0; i < clusterSize; i++) {
+      placements.push({
+        frac: Math.min(0.95, Math.max(0.05, centerFrac + (rand() - 0.5) * 0.14)),
+        mirrored: rand() > 0.5,
+      });
+    }
+  }
+  return placements;
+})();
+
+// Once state.gateSolved flips, drawGateMoss above stops drawing the full
+// climbing moss — this leaves scattered scraps (TREE_PLANT_1B) clinging to
+// the trunk in a few loose clusters (GATE_MOSS_REMNANT_LAYOUT) as
+// decoration, so the solved puzzle doesn't read as if the moss vanished
+// without a trace.
+export function drawGateMossRemnant(camera) {
+  if (!state.gateSolved) return;
+  const rect = treeTrunkRect(GATE_TRUNK);
+  const remnantH = TREE_PLANT_1B.height * SCALE;
+  const stripW = TREE_PLANT_1B.width * SCALE;
+  const barkSpan = stripW - GATE_MOSS_FINGER_MARGIN;
+  const leftX = rect.left - GATE_MOSS_FINGER_MARGIN - camera.x;
+  const rightX = rect.right - barkSpan - camera.x;
+  const trunkSpan = rect.bottom - rect.top - remnantH;
+  for (const { frac, mirrored } of GATE_MOSS_REMNANT_LAYOUT) {
+    const screenY = rect.top + frac * trunkSpan - camera.y;
+    const screenX = mirrored ? rightX : leftX;
+    drawSprite(ctx, TREE_PLANT_1B.rows, screenX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-1b'], undefined, mirrored);
   }
 }
 
@@ -423,6 +484,11 @@ export function drawGateMoss(camera) {
 // specifically to cover this offset range without ever exposing an edge.
 export function drawBackgroundSprite(camera) {
   const variant = BACKGROUND_VARIANTS[ACTIVE_BACKGROUND_KEY];
+  if (variant.solidColor) {
+    ctx.fillStyle = variant.solidColor;
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    return;
+  }
   const offsetX = -(camera.x * BACKGROUND_PARALLAX);
   const offsetY = -(camera.y * BACKGROUND_PARALLAX);
   drawSpriteBlocky(ctx, variant.sprite.rows, offsetX, offsetY, SCALE, variant.palette, BACKGROUND_PIXEL_BLOCK);
@@ -459,9 +525,19 @@ export function draw() {
   // thin seam of blended color between them instead of butting up cleanly,
   // most visible as gaps in high-contrast sprites (e.g. near-black bark
   // next to the bright player) even though every cell is fully opaque.
+  const targetX = Math.max(0, Math.min(CAMERA_X_MAX, p.x - CANVAS_W / 2));
+  const targetY = Math.max(0, Math.min(CAMERA_Y_MAX, p.y - CANVAS_H / 2));
+  if (!state.camera) {
+    // First frame (or just after a restart) — snap straight to the target
+    // instead of easing in from 0,0.
+    state.camera = { x: targetX, y: targetY };
+  } else {
+    state.camera.x += (targetX - state.camera.x) * CAMERA_EASE;
+    state.camera.y += (targetY - state.camera.y) * CAMERA_EASE;
+  }
   const camera = {
-    x: Math.round(Math.max(0, Math.min(CAMERA_X_MAX, p.x - CANVAS_W / 2))),
-    y: Math.round(Math.max(0, Math.min(CAMERA_Y_MAX, p.y - CANVAS_H / 2))),
+    x: Math.round(state.camera.x),
+    y: Math.round(state.camera.y),
   };
 
   // Nothing else here clears the canvas — every layer used to paint the
@@ -489,6 +565,7 @@ export function draw() {
   // layer 2: cosmetic background decor, furthest back, painted before
   // anything the player can interact with or be occluded by
   drawBackgroundDecor(camera, BACKGROUND_PLACEMENTS, 2, BACKGROUND_DECOR_PARALLAX_LAYER2);
+  drawGroundPlants(camera, 2);
 
   // layer 3: second cosmetic background decor band, same idea as layer 2 —
   // a step closer/faster/more saturated (see DEPTH-LAYERS.md)
@@ -508,7 +585,6 @@ export function draw() {
   drawTreeTrunks(camera, 5);
   drawTreeBranches(camera, 5);
   drawTreePlants(camera, 5);
-  drawVines(camera, 5);
   drawGroundPlants(camera, 5);
   drawBugs(camera, 5);
 
@@ -525,11 +601,11 @@ export function draw() {
   drawGroundPlants(camera, 7);
   drawBugs(camera, 7);
   drawTreeTrunks(camera, 7);
-  // drawGateMoss(camera); // TEMP: disabled while working on plant/player sprites
+  drawGateMoss(camera); // Moss Tree (GATE_TRUNK, x720) — gatekeeper puzzle
+  drawGateMossRemnant(camera); // leftover moss scraps once state.gateSolved
   // drawSkillSlime(camera); // TEMP: disabled, not applied to any trunks right now
   drawTreeBranches(camera, 7);
   drawTreePlants(camera, 7);
-  drawVines(camera, 7);
 
   // layer 7: hidden pixel-digit backdrop, painted alongside the light
   // switch (only visible once the light is on)

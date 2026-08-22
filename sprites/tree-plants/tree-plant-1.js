@@ -1,19 +1,24 @@
 // === Tree Plant 1 - Gate Moss ===
-// Theme: bright/dark red lichen-moss climbing a trunk's full height, with
-// short fingers sprigging outward from the bark on both sides.
+// Theme: bright/dark red lichen-moss climbing a trunk's edge, with short
+// fingers sprigging outward from the bark.
 //
-// Unlike the other tree-plant sprites (which mount once at a single knot),
-// this one is a short repeatable tile: game/render.js's drawGateMoss() stacks it
-// top-to-bottom to cover an entire trunk, the same way the glass edge
-// sprites tile to cover the tank walls (see drawGlassEdgeSide in game/render.js).
-// Columns 2-12 sit directly over an 11-wide trunk's bark; columns 0-1 and
-// 13-14 are the finger tips reaching out past either edge.
-// Size: 15x12 (grid units; multiply by render scale)
+// One edge-strip, not a full trunk-width span: game/render.js's
+// drawGateMoss() tiles it top-to-bottom the same way drawGlassEdgeSide tiles
+// the tank walls, and draws it TWICE per row — once flush against the
+// trunk's left edge as-is, once flush against the right edge mirrored via
+// drawSprite's flipX — so the same art runs down both sides of the trunk
+// and overlaps its bark from either edge, leaving the middle of wide trunks
+// (e.g. Trunk Interact 2, 16 grid units) bare bark between the two mossy
+// edges rather than stretching to cover it.
+// Columns 2-7 sit directly over the bark; columns 0-1 are the finger tips
+// reaching out past the trunk edge (see GATE_MOSS_FINGER_MARGIN,
+// game/constants.js).
+// Size: 8x12 (grid units; multiply by render scale)
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
 const TREE_PLANT_1 = {
   name: 'Tree Plant 1 - Gate Moss',
-  theme: 'red lichen-moss running the length of a trunk, fingers reaching outward',
+  theme: 'red lichen-moss edging a trunk, fingers reaching outward',
   behavior: {
     type: "static",
     layer: "foreground",
@@ -23,21 +28,21 @@ const TREE_PLANT_1 = {
     mounts_to: "tree-trunk",
     tileable: true, // repeats vertically to cover a trunk's full height
   },
-  width: 15,
+  width: 8,
   height: 12,
   rows: [
-    '.....ZZZZZ.....',
-    '....ZzzzzzZ....',
-    '...Zz.....zZ...',
-    '..Zz.......zZ..',
-    '.....ZZZZZ.....',
-    '....ZzzzzzZ....',
-    '.....ZZZZZ.....',
-    '....ZzzzzzZ....',
-    '.Zz.........zZ.',
-    'Zz...........zZ',
-    '.....ZZZZZ.....',
-    '....ZzzzzzZ....',
+    '.....ZZZ',
+    '....Zzzz',
+    '...Zz...',
+    '..Zz....',
+    '.....ZZZ',
+    '....Zzzz',
+    '.....ZZZ',
+    '....Zzzz',
+    '.Zz.....',
+    'Zz......',
+    '.....ZZZ',
+    '....Zzzz',
   ],
 };
 
