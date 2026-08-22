@@ -115,8 +115,8 @@ export const BRANCH_PASS_MARGIN = 4;
 // a careful climb.
 export const BRANCH_SPEED = 4;
 
-export const GLASS_FRONT_TOP_ALPHA = 0.05; // near-clear at the top, even at the floor
-export const GLASS_FRONT_BOTTOM_ALPHA = 0.5; // hazy near the bottom, even at the floor
+export const GLASS_FRONT_TOP_ALPHA = 0.02; // near-clear at the top, even at the floor
+export const GLASS_FRONT_BOTTOM_ALPHA = 0.18; // hazy near the bottom, even at the floor
 
 // Depth-layer saturation ladder (see DEPTH-LAYERS.md for the full rationale
 // and measured baseline, and sprites/palette/bark-ladder.js for the actual

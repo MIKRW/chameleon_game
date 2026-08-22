@@ -632,6 +632,7 @@ export function draw() {
 
   ctx.restore();
 
-  // layer 9: glass edges (tank framing)
+  // layer 9: glass edges (tank framing), then the front pane haze on top of everything
   drawTankFraming(camera);
+  drawGlassFront(playerCenter().y);
 }
