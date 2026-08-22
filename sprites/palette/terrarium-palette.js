@@ -50,14 +50,14 @@ const TERRARIUM_PALETTE = {
   // pale rim highlight at each leaf tip (ground-plant-6's f, own copy) and a
   // brighter vein-line accent running down each leaf's tapered body
   'ground-plant-1b': {
-    'k': '#1a1a1a',
-    'l': '#66bb6a',
-    'L': '#2e7d32',
-    'f': '#c8e6c9',
-    'v': '#a5d6a7',
+    'k': '#202127',
+    'l': '#464702',
+    'L': '#473e0a',
+    'f': '#4d5a2f',
+    'v': '#686e2e',
   },
 
-  // === ground-plant-7 — Split-Leaf Philodendron (Small Olive Variant) ===
+  // === ground-pladnt-7 — Split-Leaf Philodendron (Small Olive Variant) ===
   // same shape as ground-plant-1, own independent palette shifted olive
   'ground-plant-7': {
     'k': '#1a1a1a',
@@ -126,24 +126,27 @@ const TERRARIUM_PALETTE = {
     'Z': '#7a1414',
   },
 
-  // === tree-plant-2 — Hanging Moss ===d
+  // === tree-plant-2 — Hanging Moss ===
   // leaf light/dark/highlight + shared outline
   // was keyed !/@ in the old flat palette to dodge a collision; reverted back to plain l/L now each sprite has its own object
+  // darkened/desaturated to the layer-5 ~32% saturation band (DEPTH-LAYERS.md)
+  // — the old pastel mint (#a5d6a7, ~74% lightness) read as an isolated
+  // highlight against the muted trunk/water backdrop instead of blending in
   'tree-plant-2': {
-    'k': '#1a1a1a',
-    'l': '#66bb6a',
-    'L': '#2e7d32',
-    'f': '#a5d6a7',
+    'k': '#1c241f',
+    'l': '#325d36',
+    'L': '#1f3d22',
+    'f': '#47854d',
   },
 
   // === tree-plant-2b — Hanging Moss (Large) ===
   // leaf light/dark/highlight + shared outline
   // same mossy-clump family and starting tones as tree-plant-2, now its own independently-tunable copy
   'tree-plant-2b': {
-    'k': '#1a1a1a',
-    'l': '#66bb6a',
-    'L': '#2e7d32',
-    'f': '#a5d6a7',
+    'k': '#1c241f',
+    'l': '#325d36',
+    'L': '#1f3d22',
+    'f': '#47854d',
   },
 
   // === tree-plant-3 — Spanish Moss ===

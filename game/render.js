@@ -176,16 +176,17 @@ export function drawGroundPlants(camera, layer) {
   for (const placement of placements) {
     const sprite = resolveGroundPlantSprite(placement.sprite);
     const palette = resolveSpritePalette(placement.sprite);
-    const scale = SCALE * (sprite.renderScale || 1);
+    const scale = SCALE * (sprite.renderScale || 1) * (placement.scaleMultiplier || 1);
     const screenX = isBackgroundLayer
       ? placement.x - camera.x * parallax
       : placement.x - camera.x;
     const screenY = GROUND_TOP - sprite.height * scale - camera.y;
     if (isBackgroundLayer) {
-      // ground-plant-1 keeps full pixel detail at layer 3 (block 1) instead
-      // of the usual coarser background sampling — it reads as too mushy
-      // otherwise at this sprite's small size/detail level.
-      const block = placement.sprite === 'ground-plant-1' ? 1 : BACKGROUND_PIXEL_BLOCK;
+      // ground-plant-1 (and ground-plant-7, its same-shape olive variant)
+      // keep full pixel detail at layer 3 (block 1) instead of the usual
+      // coarser background sampling — it reads as too mushy otherwise at
+      // this sprite's small size/detail level.
+      const block = (placement.sprite === 'ground-plant-1' || placement.sprite === 'ground-plant-7') ? 1 : BACKGROUND_PIXEL_BLOCK;
       drawSpriteBlocky(ctx, sprite.rows, screenX, screenY, scale, palette, block, {
         minAlpha: TREE_FADE_MIN_ALPHA,
         maxAlpha: TREE_FADE_MAX_ALPHA,

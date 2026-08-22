@@ -34,13 +34,23 @@
 // new layout is settled.
 const PLANT_PLACEMENTS = [
   { sprite: 'ground-plant-1b', x: 120, layer: 2 },
+  { sprite: 'ground-plant-1b', x: 900, layer: 2 },
+  { sprite: 'ground-plant-1b', x: 1500, layer: 2 },
+  { sprite: 'ground-plant-1b', x: 2050, layer: 2 },
   { sprite: 'ground-plant-1', x: 15, layer: 3 },
   { sprite: 'ground-plant-1', x: 400, layer: 3 },
   { sprite: 'ground-plant-1', x: 800, layer: 3 },
   { sprite: 'ground-plant-1', x: 1200, layer: 3 },
   { sprite: 'ground-plant-1', x: 3050, layer: 3 },
+  { sprite: 'ground-plant-7', x: 1430, layer: 3, scaleMultiplier: 1.7 },
+  { sprite: 'ground-plant-1', x: 1430, layer: 2, scaleMultiplier: 1.2 },
   { sprite: 'ground-plant-7', x: 100, layer: 7 },
   { sprite: 'ground-plant-7', x: 360, layer: 7 },
+  { sprite: 'ground-plant-1', x: 560, layer: 7, scaleMultiplier: 0.6 },
+  { sprite: 'ground-plant-1', x: 770, layer: 5, scaleMultiplier: 0.6 },
+  { sprite: 'ground-plant-7', x: 1760, layer: 5 },
+  { sprite: 'ground-plant-7', x: 1900, layer: 5 },
+  { sprite: 'ground-plant-1', x: 2300, layer: 7, scaleMultiplier: 0.3 },
   { sprite: 'ground-plant-7', x: 900, layer: 7 },
   { sprite: 'ground-plant-7', x: 1450, layer: 7 },
 ];
@@ -266,6 +276,17 @@ const TREE_PLANT_PLACEMENTS = [
   { trunkX: 2350, layer: 7, sprite: 'tree-plant-slime', attachRow: 25, side: 'left' },
   { trunkX: 2350, layer: 7, sprite: 'tree-plant-slime', attachRow: 82, side: 'left' },
 
+  // Layer 7 — Trunk Interact 2 at x1580, the level's one remaining
+  // branchless/foliage-free layer-7 trunk (see the comment above its
+  // TREE_PLACEMENTS entry). 5 slime patches alternating sides (3 left/2
+  // right) spread top to bottom of the 157-tall trunk, each >=30 rows from
+  // its neighbors so the patches read as separate drips down both faces
+  // rather than one continuous coating.
+  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 15, side: 'left' },
+  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 45, side: 'right' },
+  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 80, side: 'left' },
+  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 110, side: 'right' },
+  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 140, side: 'left' },
 ];
 
 // Hanging props — anchor at row 0 (top of the sprite) against LID_TOP
