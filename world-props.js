@@ -37,22 +37,31 @@ const PLANT_PLACEMENTS = [
   { sprite: 'ground-plant-1b', x: 900, layer: 2 },
   { sprite: 'ground-plant-1b', x: 1500, layer: 2 },
   { sprite: 'ground-plant-1b', x: 2050, layer: 2 },
+  { sprite: 'ground-plant-4', x: 600, layer: 2 },
+  { sprite: 'ground-plant-4', x: 790, layer: 2 },
   { sprite: 'ground-plant-1', x: 15, layer: 3 },
   { sprite: 'ground-plant-1', x: 400, layer: 3 },
   { sprite: 'ground-plant-1', x: 800, layer: 3 },
   { sprite: 'ground-plant-1', x: 1200, layer: 3 },
   { sprite: 'ground-plant-1', x: 3050, layer: 3 },
+  { sprite: 'ground-plant-4', x: 2130, layer: 3 },
   { sprite: 'ground-plant-7', x: 1430, layer: 3, scaleMultiplier: 1.7 },
   { sprite: 'ground-plant-1', x: 1430, layer: 2, scaleMultiplier: 1.2 },
+  { sprite: 'ground-plant-5', x: 50, layer: 5 },
+  { sprite: 'ground-plant-5', x: 196, layer: 5 },
+  { sprite: 'ground-plant-5', x: 2484, layer: 5 },
   { sprite: 'ground-plant-7', x: 100, layer: 7 },
   { sprite: 'ground-plant-7', x: 360, layer: 7 },
   { sprite: 'ground-plant-1', x: 560, layer: 7, scaleMultiplier: 0.6 },
   { sprite: 'ground-plant-1', x: 770, layer: 5, scaleMultiplier: 0.6 },
   { sprite: 'ground-plant-7', x: 1760, layer: 5 },
   { sprite: 'ground-plant-7', x: 1900, layer: 5 },
+  { sprite: 'ground-plant-4', x: 2100, layer: 5 },
   { sprite: 'ground-plant-1', x: 2300, layer: 7, scaleMultiplier: 0.3 },
   { sprite: 'ground-plant-7', x: 900, layer: 7 },
   { sprite: 'ground-plant-7', x: 1450, layer: 7 },
+  { sprite: 'ground-plant-1', x: 2200, layer: 7, scaleMultiplier: 0.7 },
+  { sprite: 'ground-plant-7', x: 2550, layer: 7, scaleMultiplier: 1.4 },
 ];
 
 // Purely cosmetic background scenery — furthest back, painted before the
@@ -287,6 +296,15 @@ const TREE_PLANT_PLACEMENTS = [
   { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 80, side: 'left' },
   { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 110, side: 'right' },
   { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 140, side: 'left' },
+
+  // Layer 5 — Trunk Interact 3 at x2000, the second trunk-interact-3
+  // placement. Oyster mushroom clusters stepping down both faces of the
+  // trunk, clear of that trunk's existing branches (attachRow 30/right,
+  // 70/left, 110/right — see BRANCH_PLACEMENTS).
+  { trunkX: 2000, layer: 5, sprite: 'tree-plant-4', attachRow: 15, side: 'left' },
+  { trunkX: 2000, layer: 5, sprite: 'tree-plant-4', attachRow: 50, side: 'right' },
+  { trunkX: 2000, layer: 5, sprite: 'tree-plant-4', attachRow: 90, side: 'left' },
+  { trunkX: 2000, layer: 5, sprite: 'tree-plant-4', attachRow: 130, side: 'right' },
 ];
 
 // Hanging props — anchor at row 0 (top of the sprite) against LID_TOP

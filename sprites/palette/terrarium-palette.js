@@ -94,8 +94,8 @@ const TERRARIUM_PALETTE = {
   // was keyed 0/9 in the old flat palette to dodge a collision with ground-plant-1; no longer needed now each sprite has its own object
   'ground-plant-5': {
     'k': '#1a1a1a',
-    'l': '#66bb6a',
-    'L': '#2e7d32',
+    'l': '#2caa6b',
+    'L': '#1f644a',
   },
 
   // === ground-plant-6 — Split-Leaf Philodendron (Large Variant) ===
@@ -158,11 +158,17 @@ const TERRARIUM_PALETTE = {
   },
 
   // === tree-plant-4 — Oyster Mushrooms ===
-  // pale ivory caps, tan gill underside
+  // muted cool grey-brown ironbark-mushroom caps, deeper cool-brown gill underside
   // same host-trunk bark-stub convention as tree-plant-3 — no k/R/r owned here
+  // Pulled further off the original #ece0c8/#c4a878 (pale cream/tan) and its
+  // first ironbark pass (#c6b8a9/#936d53, still read too warm/light against
+  // the scene's dim cool-teal ambiance) — darker and cooler now so the
+  // cluster sits into the backdrop instead of standing out against it.
+  // Darkened once more (same hue/sat, ~10% less lightness) off #ad9c90/
+  // #765a4c so the cluster reads closer to its host trunk's bark tone.
   'tree-plant-4': {
-    'P': '#ece0c8',
-    'H': '#c4a878',
+    'P': '#978172',
+    'H': '#5d473c',
   },
 
   // === tree-plant-5 — Bromeliad Rosette ===

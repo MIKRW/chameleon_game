@@ -5,7 +5,7 @@
 // splitting it further risks the physics and the drawing silently drifting
 // apart.
 
-import { SCALE, GROUND_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, TREE_PLANT_2B_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE, BUG_INTERACT_MARGIN } from './constants.js';
+import { SCALE, GROUND_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, TREE_PLANT_2B_TRUNK_OVERLAP, TREE_PLANT_4_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE, BUG_INTERACT_MARGIN } from './constants.js';
 import { state } from './state.js';
 
 // "ground-plant-3" -> TERRARIUM_SPRITES.groundPlant[2]
@@ -144,7 +144,9 @@ export function treePlantGeometry(pp) {
     ? TREE_PLANT_2B_TRUNK_OVERLAP
     : pp.sprite === 'tree-plant-slime'
       ? SLIME_TRUNK_OVERLAP
-      : TREE_PLANT_TRUNK_OVERLAP;
+      : pp.sprite === 'tree-plant-4'
+        ? TREE_PLANT_4_TRUNK_OVERLAP
+        : TREE_PLANT_TRUNK_OVERLAP;
   const originX = pp.side === 'right'
     ? trunkPlacement.x + trunkSprite.width * SCALE - overlap * SCALE
     : trunkPlacement.x - (plantSprite.width - overlap) * SCALE;
