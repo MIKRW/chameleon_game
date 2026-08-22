@@ -1,12 +1,11 @@
-// === Tree Plant Slime - Locked Trunk Coating ===
-// Theme: dull olive-yellow slime, tiled down both edges of every
-// side-climbable trunk (layer 7, see TREE_PLACEMENTS in world-props.js) as
-// long as the side-climb skill is still locked (state.skillUnlocked
-// false, see game/state.js). Uses its own muted K/W/X keys (see
-// TERRARIUM_PALETTE) rather than the bright ground-plant-2 y/Y, so it reads
-// as a sickly coating instead of a saturated accent. Drawn by
-// drawSkillSlime() in game/render.js, tiled the same way drawGateMoss()
-// tiles TREE_PLANT_1 down the gatekeeper trunk.
+// === Tree Plant Slime - Trunk Coating ===
+// Theme: dull olive-yellow slime, tiled down both edges of every layer-8
+// trunk (see TREE_PLACEMENTS in world-props.js) as purely decorative
+// coating — not gated by Cling to Sides or any other puzzle state. Uses its
+// own muted K/W/X keys (see TERRARIUM_PALETTE) rather than the bright
+// ground-plant-2 y/Y, so it reads as a sickly coating instead of a
+// saturated accent. Drawn by drawTrunkSlime() in game/render.js, tiled the
+// same way drawGateMoss() tiles TREE_PLANT_1 down the gatekeeper trunk.
 // A skinny single-cell drip core (with an occasional adjacent highlight/
 // shade accent, never a full second core column) that zig-zags left/right
 // a cell at a time down the tile instead of running dead-straight, so the
@@ -17,8 +16,8 @@
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 
 const TREE_PLANT_SLIME = {
-  name: 'Tree Plant Slime - Locked Trunk Coating',
-  theme: 'dull olive-yellow slime coating blocking the right-hand side of a trunk',
+  name: 'Tree Plant Slime - Trunk Coating',
+  theme: 'dull olive-yellow decorative slime coating both edges of a trunk',
   behavior: {
     type: "static",
     layer: "mid-ground",

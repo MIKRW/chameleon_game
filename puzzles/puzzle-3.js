@@ -1,13 +1,13 @@
-// Puzzle 3: the both-sides tree climbing skill unlock. See ../README.md.
+// Puzzle 3: the Cling to Sides unlock. See ../README.md.
 // No in-world trigger — the passcode lives in localStorage (see
 // game/state.js), findable via the Application/Storage devtools panel, and
-// is submitted through the console via skillUnlockPasscode() (see
+// is submitted through the console via clingToSidesPasscode() (see
 // game/interactions.js) rather than a popup.
 PUZZLES[3] = {
   room: null,
   title: 'Trunk-Side Traversal',
   prompt: 'No gate, no switch — just a status line that says "NO". The passcode is sitting in storage, not on screen.',
-  hint: 'Check the Application/Storage tab in devtools for a value stored next to the theme preference, then call skillUnlockPasscode(\'...\') from the console.',
-  answerHash: 'ff7b676cdada9bca54a59647777a1c1d964c1b756d2c60ad27282c9df55c0387',
+  hint: 'Check the Application/Storage tab in devtools for a value stored next to the theme preference, then call clingToSidesPasscode(\'...\') from the console.',
+  answerHash: '64454603689cbfeb2fb1ac98371df767da142c3b2c1322f156b36d4b24249e84',
   useConsole: true,
 };

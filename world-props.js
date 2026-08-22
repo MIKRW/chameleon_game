@@ -1,18 +1,19 @@
 // World prop placement — where each terrarium sprite instance sits, laid out
-// against the 9-layer scene stack (see game/render.js header comment):
+// against the 10-layer scene stack (see draw() in game/render.js):
 //   1 background, 2 background decor (cosmetic only — no floor
 //   placement/occlusion logic, painted before everything else), 3 second
 //   background decor band (same idea as layer 2, closer/faster/more
 //   saturated — see DEPTH-LAYERS.md), 4 dirt/glass bottom, 5 far plants
-//   (behind player), 6 player, 7 near plants (in front of player, plus the
-//   hidden pixel-digit backdrop and light switch), 8 glass edges, 9 glass
-//   front.
+//   (behind player), 6 bugs (own layer, between the far/near plant passes so
+//   a bug never gets buried under foliage or the player), 7 player, 8 near
+//   plants (in front of player, plus the hidden pixel-digit backdrop and
+//   light switch), 9 glass edges, 10 glass front.
 //
 // BACKGROUND_PLACEMENTS/BACKGROUND_LAYER3_PLACEMENTS (layers 2/3) are for
 // scenery only — they never occlude or interact with the player, unlike the
-// layer-5/7 far/near plant passes.
+// layer-5/8 far/near plant passes.
 //
-// `layer` (5 or 7) picks the coarse pass — behind or in front of the player.
+// `layer` (5 or 8) picks the coarse pass — behind or in front of the player.
 // `z` is OPTIONAL and only needed to override the default stacking order.
 // Within a layer, instances paint in array order (a stable sort falls back
 // to insertion order when z is omitted/equal) — so appending an entry
@@ -50,18 +51,18 @@ const PLANT_PLACEMENTS = [
   { sprite: 'ground-plant-5', x: 50, layer: 5 },
   { sprite: 'ground-plant-5', x: 196, layer: 5 },
   { sprite: 'ground-plant-5', x: 2484, layer: 5 },
-  { sprite: 'ground-plant-7', x: 100, layer: 7 },
-  { sprite: 'ground-plant-7', x: 360, layer: 7 },
-  { sprite: 'ground-plant-1', x: 560, layer: 7, scaleMultiplier: 0.6 },
+  { sprite: 'ground-plant-7', x: 100, layer: 8 },
+  { sprite: 'ground-plant-7', x: 360, layer: 8 },
+  { sprite: 'ground-plant-1', x: 560, layer: 8, scaleMultiplier: 0.6 },
   { sprite: 'ground-plant-1', x: 770, layer: 5, scaleMultiplier: 0.6 },
   { sprite: 'ground-plant-7', x: 1760, layer: 5 },
   { sprite: 'ground-plant-7', x: 1900, layer: 5 },
   { sprite: 'ground-plant-4', x: 2100, layer: 5 },
-  { sprite: 'ground-plant-1', x: 2300, layer: 7, scaleMultiplier: 0.3 },
-  { sprite: 'ground-plant-7', x: 900, layer: 7 },
-  { sprite: 'ground-plant-7', x: 1450, layer: 7 },
-  { sprite: 'ground-plant-1', x: 2200, layer: 7, scaleMultiplier: 0.7 },
-  { sprite: 'ground-plant-7', x: 2550, layer: 7, scaleMultiplier: 1.4 },
+  { sprite: 'ground-plant-1', x: 2300, layer: 8, scaleMultiplier: 0.3 },
+  { sprite: 'ground-plant-7', x: 900, layer: 8 },
+  { sprite: 'ground-plant-7', x: 1450, layer: 8 },
+  { sprite: 'ground-plant-1', x: 2200, layer: 8, scaleMultiplier: 0.7 },
+  { sprite: 'ground-plant-7', x: 2550, layer: 8, scaleMultiplier: 1.4 },
 ];
 
 // Purely cosmetic background scenery — furthest back, painted before the
@@ -128,20 +129,20 @@ const TREE_PLACEMENTS = [
   { sprite: 'trunk-interact-1', x: 1150, layer: 5 },
   { sprite: 'trunk-interact-3', x: 2000, layer: 5 },
   { sprite: 'trunk-interact-3', x: 2700, layer: 5 },
-  { sprite: 'trunk-interact-2', x: 2350, layer: 7 },
-  { sprite: 'trunk-interact-2', x: 2900, layer: 7 },
-  { sprite: 'trunk-interact-2', x: 720, layer: 7 },
+  { sprite: 'trunk-interact-2', x: 2350, layer: 8 },
+  { sprite: 'trunk-interact-2', x: 2900, layer: 8 },
+  { sprite: 'trunk-interact-2', x: 720, layer: 8 },
   { sprite: 'trunk-interact-3', x: 3200, layer: 5 },
-  { sprite: 'trunk-interact-2', x: 3550, layer: 7 },
-  // Moved from layer 5 (branchless trunk-interact-3) to layer 7, same x,
-  // still branchless — brings a layer-7 (closer/interactive) tree into this
+  { sprite: 'trunk-interact-2', x: 3550, layer: 8 },
+  // Moved from layer 5 (branchless trunk-interact-3) to layer 8, same x,
+  // still branchless — brings a layer-8 (closer/interactive) tree into this
   // gap instead of a background one.
-  { sprite: 'trunk-interact-2', x: 1580, layer: 7 },
+  { sprite: 'trunk-interact-2', x: 1580, layer: 8 },
 ];
 
 // Branches mounted onto a subset of the trees above (see sprites/tree-branches/tree-branch-1.js
 // / tree-branch-2.js) — kept sparse so the scene doesn't read as cluttered:
-// only 1 of the 5 layer-5 trees (25%, max 3 branches) and 4 of the 9 layer-7
+// only 1 of the 5 layer-5 trees (25%, max 3 branches) and 4 of the 9 layer-8
 // trees (~44%, max 4 branches) get them. Each entry's `trunkX` + `layer` must
 // match a TREE_PLACEMENTS entry exactly (that's how drawTreeBranches in
 // game/render.js finds the trunk to hang off). `attachRow` is the row (0 = top of
@@ -149,12 +150,12 @@ const TREE_PLACEMENTS = [
 // touches the bark; `side` picks which edge it grows from and whether the
 // branch-1/2 sprite gets flipped. Branches on the same trunk alternate sides
 // and stay >=30 rows apart so they can't touch each other, and every chosen
-// trunk is >=380px from any other chosen layer-5/7 trunk so no branch's
+// trunk is >=380px from any other chosen layer-5/8 trunk so no branch's
 // ~40-64px reach crosses into a neighboring tree's branches. That clearance
-// is only checked against other layer-5/7 branch trunks — layer 2
+// is only checked against other layer-5/8 branch trunks — layer 2
 // (BACKGROUND_PLACEMENTS) is purely cosmetic scenery with no occlusion or
 // interaction logic (see the comment above BACKGROUND_PLACEMENTS), so a
-// layer-5/7 branch is free to visually run in front of a layer-2 trunk
+// layer-5/8 branch is free to visually run in front of a layer-2 trunk
 // without that being a bug.
 const BRANCH_PLACEMENTS = [
   // Layer 5 — Trunk Interact 3 at x300 (11 wide x157 tall: branch-1).
@@ -185,28 +186,28 @@ const BRANCH_PLACEMENTS = [
   { trunkX: 1150, layer: 5, sprite: 'tree-branch-2', attachRow: 65, side: 'left' },
   { trunkX: 1150, layer: 5, sprite: 'tree-branch-2', attachRow: 105, side: 'right' },
 
-  // Layer 7 — Trunk Interact 3 at x550 (11 wide, knotted/narrow: branch-1).
-  { trunkX: 550, layer: 7, sprite: 'tree-branch-1', attachRow: 35, side: 'right' },
-  { trunkX: 550, layer: 7, sprite: 'tree-branch-1', attachRow: 90, side: 'left' },
+  // Layer 8 — Trunk Interact 3 at x550 (11 wide, knotted/narrow: branch-1).
+  { trunkX: 550, layer: 8, sprite: 'tree-branch-1', attachRow: 35, side: 'right' },
+  { trunkX: 550, layer: 8, sprite: 'tree-branch-1', attachRow: 90, side: 'left' },
 
-  // Layer 7 — Trunk Interact 2 at x1540 (16 wide, thick trunk, recolored to
+  // Layer 8 — Trunk Interact 2 at x1540 (16 wide, thick trunk, recolored to
   // driftwood bark: branch-3, the driftwood-toned variant of branch-2, max 4).
-  { trunkX: 1540, layer: 7, sprite: 'tree-branch-3', attachRow: 20, side: 'right' },
-  { trunkX: 1540, layer: 7, sprite: 'tree-branch-3', attachRow: 55, side: 'left' },
-  { trunkX: 1540, layer: 7, sprite: 'tree-branch-3', attachRow: 90, side: 'right' },
-  { trunkX: 1540, layer: 7, sprite: 'tree-branch-3', attachRow: 125, side: 'left' },
+  { trunkX: 1540, layer: 8, sprite: 'tree-branch-3', attachRow: 20, side: 'right' },
+  { trunkX: 1540, layer: 8, sprite: 'tree-branch-3', attachRow: 55, side: 'left' },
+  { trunkX: 1540, layer: 8, sprite: 'tree-branch-3', attachRow: 90, side: 'right' },
+  { trunkX: 1540, layer: 8, sprite: 'tree-branch-3', attachRow: 125, side: 'left' },
 
-  // Layer 7 — Trunk Interact 2 at x2610 (thick trunk, recolored to driftwood
+  // Layer 8 — Trunk Interact 2 at x2610 (thick trunk, recolored to driftwood
   // bark: branch-3).
-  { trunkX: 2610, layer: 7, sprite: 'tree-branch-3', attachRow: 30, side: 'left' },
-  { trunkX: 2610, layer: 7, sprite: 'tree-branch-3', attachRow: 70, side: 'right' },
-  { trunkX: 2610, layer: 7, sprite: 'tree-branch-3', attachRow: 110, side: 'left' },
+  { trunkX: 2610, layer: 8, sprite: 'tree-branch-3', attachRow: 30, side: 'left' },
+  { trunkX: 2610, layer: 8, sprite: 'tree-branch-3', attachRow: 70, side: 'right' },
+  { trunkX: 2610, layer: 8, sprite: 'tree-branch-3', attachRow: 110, side: 'left' },
 
-  // Layer 7 — Trunk Interact 3 at x3520 (narrow trunk: branch-1).
-  { trunkX: 3520, layer: 7, sprite: 'tree-branch-1', attachRow: 40, side: 'right' },
-  { trunkX: 3520, layer: 7, sprite: 'tree-branch-1', attachRow: 95, side: 'left' },
+  // Layer 8 — Trunk Interact 3 at x3520 (narrow trunk: branch-1).
+  { trunkX: 3520, layer: 8, sprite: 'tree-branch-1', attachRow: 40, side: 'right' },
+  { trunkX: 3520, layer: 8, sprite: 'tree-branch-1', attachRow: 95, side: 'left' },
 
-  // Layer 7 — Trunk Interact 2 at x2350 (16 wide, thick trunk, recolored to
+  // Layer 8 — Trunk Interact 2 at x2350 (16 wide, thick trunk, recolored to
   // driftwood bark: branch-3, the driftwood-toned variant of branch-2), this
   // being the rightmost of the three trunk-interact-2 placements. Only 2
   // branches (down from 3) at rows chosen to clear the layer-5 Trunk
@@ -216,29 +217,29 @@ const BRANCH_PLACEMENTS = [
   // >380px away), but the original rows 30/70/110 lined up in height with
   // those neighbors' reaching branches and visually crossed them. Row 60/100
   // sit clear of both neighbors' occupied row-bands.
-  { trunkX: 2350, layer: 7, sprite: 'tree-branch-3', attachRow: 60, side: 'left' },
-  { trunkX: 2350, layer: 7, sprite: 'tree-branch-3', attachRow: 100, side: 'right' },
+  { trunkX: 2350, layer: 8, sprite: 'tree-branch-3', attachRow: 60, side: 'left' },
+  { trunkX: 2350, layer: 8, sprite: 'tree-branch-3', attachRow: 100, side: 'right' },
 
-  // Layer 7 — Trunk Interact 2 at x720 (16 wide, thick trunk, recolored to
+  // Layer 8 — Trunk Interact 2 at x720 (16 wide, thick trunk, recolored to
   // driftwood bark: branch-3). Three branches, right/left/right reading from
   // the bottom (attachRow 110) up to the top (attachRow 30).
-  { trunkX: 720, layer: 7, sprite: 'tree-branch-3', attachRow: 30, side: 'right' },
-  { trunkX: 720, layer: 7, sprite: 'tree-branch-3', attachRow: 70, side: 'left' },
-  { trunkX: 720, layer: 7, sprite: 'tree-branch-3', attachRow: 110, side: 'right' },
+  { trunkX: 720, layer: 8, sprite: 'tree-branch-3', attachRow: 30, side: 'right' },
+  { trunkX: 720, layer: 8, sprite: 'tree-branch-3', attachRow: 70, side: 'left' },
+  { trunkX: 720, layer: 8, sprite: 'tree-branch-3', attachRow: 110, side: 'right' },
 
-  // Layer 7 — Trunk Interact 2 at x3550 (16 wide, thick trunk, recolored to
+  // Layer 8 — Trunk Interact 2 at x3550 (16 wide, thick trunk, recolored to
   // driftwood bark: branch-3). One branch in the lower half.
-  { trunkX: 3550, layer: 7, sprite: 'tree-branch-3', attachRow: 110, side: 'left' },
+  { trunkX: 3550, layer: 8, sprite: 'tree-branch-3', attachRow: 110, side: 'left' },
 ];
 
 // Decorative single-knot foliage (tree-plant-2..5, see sprites/tree-plants/)
 // mounted onto a subset of the trees above, excluding the Moss Tree
-// (x720/layer7 — TREE_PLANT_1, the moss variety, is reserved for that
+// (x720/layer8 — TREE_PLANT_1, the moss variety, is reserved for that
 // gatekeeper trunk's puzzle, tiled by drawGateMoss() in game/render.js, and
 // isn't reused decoratively here). 10 instances total across the other 4
 // varieties (3/3/2/2 split): 6
 // on layer 5 (the tall x1150 trunk gets two, on opposite sides; the four
-// shorter layer-5 trees get one each) and 4 on layer 7 (spread across trunks
+// shorter layer-5 trees get one each) and 4 on layer 8 (spread across trunks
 // that don't already carry a branch, so foliage doesn't stack on top of
 // branches). `trunkX`/`layer` must match a TREE_PLACEMENTS entry exactly
 // (same convention as BRANCH_PLACEMENTS); `attachRow` sits within the middle
@@ -248,10 +249,10 @@ const BRANCH_PLACEMENTS = [
 // Cleared for a trees/layers readjustment pass — re-add placements once the
 // new layout is settled.
 const TREE_PLANT_PLACEMENTS = [
-  // Layer 7 — Trunk Interact 2 at x3550, the rightmost tree placement.
+  // Layer 8 — Trunk Interact 2 at x3550, the rightmost tree placement.
   // Shares the left face with that trunk's existing branch-3 at attachRow
   // 110 (see BRANCH_PLACEMENTS); this foliage sits higher up the trunk.
-  { trunkX: 3550, layer: 7, sprite: 'tree-plant-2', attachRow: 21, side: 'left' },
+  { trunkX: 3550, layer: 8, sprite: 'tree-plant-2', attachRow: 21, side: 'left' },
   // Layer 5 — Trunk Interact 3 at x300. Right face, very top of the trunk.
   { trunkX: 300, layer: 5, sprite: 'tree-plant-2', attachRow: 10, side: 'right' },
   // Left face, directly under the trunk's branch (tree-branch-1 at attachRow
@@ -260,6 +261,12 @@ const TREE_PLANT_PLACEMENTS = [
   // Right face, lower still — below the attachRow-60 instance above. Large
   // (3x) variant so it reads clearly near the base of the trunk.
   { trunkX: 300, layer: 5, sprite: 'tree-plant-2b', attachRow: 130, side: 'right' },
+  // One oyster mushroom cluster (tree-plant-4), right face, midway between
+  // the attachRow-10 and attachRow-130 moss above — clear of both, and of
+  // the left-side branch/moss at attachRow 88/90. Scaled down 15%
+  // (scaleMultiplier) so a single cluster reads as an accent rather than
+  // the full stepped set used at x2000.
+  { trunkX: 300, layer: 5, sprite: 'tree-plant-4', attachRow: 55, side: 'right', scaleMultiplier: 0.85 },
 
   // Layer 5 — Trunk Interact 1 at x1150, the tall branch-bearing trunk (11
   // wide x151 tall, branches at attachRow 25/right, 65/left, 105/right — see
@@ -274,28 +281,34 @@ const TREE_PLANT_PLACEMENTS = [
   { trunkX: 1150, layer: 5, sprite: 'tree-plant-2', attachRow: 78, side: 'left' },
   { trunkX: 1150, layer: 5, sprite: 'tree-plant-2', attachRow: 118, side: 'right' },
   { trunkX: 1150, layer: 5, sprite: 'tree-plant-2b', attachRow: 140, side: 'left' },
+  // One oyster mushroom cluster (tree-plant-4), right face, attachRow 61 —
+  // between the trunk's two right-side branches (attachRow 25 and 105) and
+  // clear of the attachRow-35/118 moss above. Scaled down 15%
+  // (scaleMultiplier) so it reads as a single accent, not the full stepped
+  // set used at x2000.
+  { trunkX: 1150, layer: 5, sprite: 'tree-plant-4', attachRow: 61, side: 'right', scaleMultiplier: 0.85 },
 
-  // Layer 7 — Trunk Interact 2 at x2350, the light-switch tree (branches at
+  // Layer 8 — Trunk Interact 2 at x2350, the light-switch tree (branches at
   // attachRow 60/left, 100/right — see BRANCH_PLACEMENTS; switch itself at
   // attachRow 70/right). A right-side drip below the lower (right) branch,
   // a left-side drip further up the trunk clear of the left branch, and a
   // second left-side drip just below the left branch (attachRow 60) reading
   // as slime seeping out from under it.
-  { trunkX: 2350, layer: 7, sprite: 'tree-plant-slime', attachRow: 125, side: 'right' },
-  { trunkX: 2350, layer: 7, sprite: 'tree-plant-slime', attachRow: 25, side: 'left' },
-  { trunkX: 2350, layer: 7, sprite: 'tree-plant-slime', attachRow: 82, side: 'left' },
+  { trunkX: 2350, layer: 8, sprite: 'tree-plant-slime', attachRow: 125, side: 'right' },
+  { trunkX: 2350, layer: 8, sprite: 'tree-plant-slime', attachRow: 25, side: 'left' },
+  { trunkX: 2350, layer: 8, sprite: 'tree-plant-slime', attachRow: 82, side: 'left' },
 
-  // Layer 7 — Trunk Interact 2 at x1580, the level's one remaining
-  // branchless/foliage-free layer-7 trunk (see the comment above its
+  // Layer 8 — Trunk Interact 2 at x1580, the level's one remaining
+  // branchless/foliage-free layer-8 trunk (see the comment above its
   // TREE_PLACEMENTS entry). 5 slime patches alternating sides (3 left/2
   // right) spread top to bottom of the 157-tall trunk, each >=30 rows from
   // its neighbors so the patches read as separate drips down both faces
   // rather than one continuous coating.
-  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 15, side: 'left' },
-  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 45, side: 'right' },
-  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 80, side: 'left' },
-  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 110, side: 'right' },
-  { trunkX: 1580, layer: 7, sprite: 'tree-plant-slime', attachRow: 140, side: 'left' },
+  { trunkX: 1580, layer: 8, sprite: 'tree-plant-slime', attachRow: 15, side: 'left' },
+  { trunkX: 1580, layer: 8, sprite: 'tree-plant-slime', attachRow: 45, side: 'right' },
+  { trunkX: 1580, layer: 8, sprite: 'tree-plant-slime', attachRow: 80, side: 'left' },
+  { trunkX: 1580, layer: 8, sprite: 'tree-plant-slime', attachRow: 110, side: 'right' },
+  { trunkX: 1580, layer: 8, sprite: 'tree-plant-slime', attachRow: 140, side: 'left' },
 
   // Layer 5 — Trunk Interact 3 at x2000, the second trunk-interact-3
   // placement. Oyster mushroom clusters stepping down both faces of the
@@ -305,6 +318,13 @@ const TREE_PLANT_PLACEMENTS = [
   { trunkX: 2000, layer: 5, sprite: 'tree-plant-4', attachRow: 50, side: 'right' },
   { trunkX: 2000, layer: 5, sprite: 'tree-plant-4', attachRow: 90, side: 'left' },
   { trunkX: 2000, layer: 5, sprite: 'tree-plant-4', attachRow: 130, side: 'right' },
+
+  // Layer 5 — Trunk Interact 3 at x3200, the level's other branchless-of-foliage
+  // layer-5 trunk (branches at attachRow 30/right, 90/left — see
+  // BRANCH_PLACEMENTS). One oyster mushroom cluster, left face, clear of
+  // both branches. Scaled down 15% (scaleMultiplier) to read as a single
+  // accent rather than the full stepped set used at x2000.
+  { trunkX: 3200, layer: 5, sprite: 'tree-plant-4', attachRow: 130, side: 'left', scaleMultiplier: 0.85 },
 ];
 
 // Hanging props — anchor at row 0 (top of the sprite) against LID_TOP
@@ -317,7 +337,7 @@ const HANGING_PLACEMENTS = [
   { sprite: 'lightbulb', x: 150, layer: 5 },
 
   // Original decorative bulb between the two rightmost trees (Interact 2 at
-  // x3280 and Interact 3 at x3520, both layer 7) — bait to lure the player
+  // x3280 and Interact 3 at x3520, both layer 8) — bait to lure the player
   // into flicking the (distant) real switch faster. Left in place even
   // though WORLD_WIDTH (game/constants.js) was later shortened to 2650,
   // pushing it (and those two trees) past the camera clamp/canvas clip and
@@ -326,7 +346,7 @@ const HANGING_PLACEMENTS = [
 
   // Second decorative bulb, added for the current shortened world so a bait
   // bulb is actually reachable/visible again: sits just past the x2350
-  // trunk-interact-2 (layer 7, the real light switch's tree), playing the
+  // trunk-interact-2 (layer 8, the real light switch's tree), playing the
   // same "lure the player toward the switch" role the x3400 bulb used to,
   // comfortably inside CAMERA_X_MAX's reach (2650) with room before the
   // right wall. Also uses lightbulb-3.js (never lights up) for the same
@@ -335,7 +355,7 @@ const HANGING_PLACEMENTS = [
   { sprite: 'lightbulb3', x: 2500, layer: 5 },
 ];
 
-// Light switch — mounted on the trunk of x2350 (Trunk Interact 2, layer 7),
+// Light switch — mounted on the trunk of x2350 (Trunk Interact 2, layer 8),
 // currently the last/rightmost reachable tree given WORLD_WIDTH's temporary
 // 2650 shortening (see the GATE_TRUNK comment in game/world-geometry.js).
 // Sits on the right face of that trunk, between its two branches (see
@@ -347,20 +367,50 @@ const HANGING_PLACEMENTS = [
 // the trunk sprite) the switch is bolted to; `side` picks which face it's
 // drawn/interacted from (see lightSwitchOrigin()/nearLightSwitch() in
 // game/world-geometry.js / drawLightSwitch() in game/render.js — the sprite
-// mirrors when side is 'right'). Interacting with it while side-climbing
-// that trunk on the matching side (see handleInteractPress() in
+// mirrors when side is 'right'). Interacting with it while gripping that
+// trunk via Cling to Sides on the matching side (see handleInteractPress() in
 // game/interactions.js) flips state.lightOn, which swaps the drawn sprite
 // between light-switch.js/light-switch-2.js as well as
 // lightbulb.js/lightbulb-2.js and toggles background-texture.js's
 // visibility.
-const LIGHT_SWITCH_PLACEMENT = { trunkX: 2350, layer: 7, attachRow: 70, side: 'right' };
+const LIGHT_SWITCH_PLACEMENT = { trunkX: 2350, layer: 8, attachRow: 70, side: 'right' };
 
 // Collectible bugs (see game/interactions.js collectNearbyBug() /
 // game/render.js drawBugs()), resolved by bugGeometry() in
-// game/world-geometry.js. Empty for now — the bug/fly sprite has been
-// pulled — so BUGS_REQUIRED (game/constants.js) is 0 and bug collection is
-// trivially satisfied without affecting the completion condition.
-const BUG_PLACEMENTS = [];
+// game/world-geometry.js. 20 total (BUGS_REQUIRED, game/constants.js, is
+// just this array's length). The first BUG_LOCKED_START_INDEX (10, see
+// game/constants.js) entries are visible/catchable from the start; the rest
+// stay hidden and uncatchable (see isBugUnlocked() in game/world-geometry.js)
+// until Cling to Sides is unlocked, so a player can't finish bug collection
+// before that puzzle — array order is significant here, not just x position.
+// Interleaved by x across the map (rather than clustered at one end) so both
+// halves read as scattered throughout, not "first half of the level then
+// second half". All ground-mode, drawn on their own dedicated layer (6,
+// between the layer-5/8 far/near plant passes).
+const BUG_PLACEMENTS = [
+  // Always visible (indices 0-9)
+  { sprite: 'bug-1', x: 100, layer: 6 },
+  { sprite: 'bug-1', x: 363, layer: 6 },
+  { sprite: 'bug-1', x: 626, layer: 6 },
+  { sprite: 'bug-1', x: 890, layer: 6 },
+  { sprite: 'bug-1', x: 1153, layer: 6 },
+  { sprite: 'bug-1', x: 1416, layer: 6 },
+  { sprite: 'bug-1', x: 1679, layer: 6 },
+  { sprite: 'bug-1', x: 1942, layer: 6 },
+  { sprite: 'bug-1', x: 2205, layer: 6 },
+  { sprite: 'bug-1', x: 2468, layer: 6 },
+  // Hidden until Cling to Sides is unlocked (indices 10-19)
+  { sprite: 'bug-1', x: 232, layer: 6 },
+  { sprite: 'bug-1', x: 495, layer: 6 },
+  { sprite: 'bug-1', x: 758, layer: 6 },
+  { sprite: 'bug-1', x: 1021, layer: 6 },
+  { sprite: 'bug-1', x: 1284, layer: 6 },
+  { sprite: 'bug-1', x: 1547, layer: 6 },
+  { sprite: 'bug-1', x: 1811, layer: 6 },
+  { sprite: 'bug-1', x: 2074, layer: 6 },
+  { sprite: 'bug-1', x: 2337, layer: 6 },
+  { sprite: 'bug-1', x: 2600, layer: 6 },
+];
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {

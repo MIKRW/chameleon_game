@@ -20,7 +20,7 @@ const TERRARIUM_SPRITES = {
   // in game/world-geometry.js, which checks this map before falling back to
   // the numbered array above.
   treePlantVariants: { 'tree-plant-1b': TREE_PLANT_1B, 'tree-plant-2b': TREE_PLANT_2B, 'tree-plant-slime': TREE_PLANT_SLIME },
-  bug: [],
+  bug: [BUG_1],
   treeTrunk: {
     // Background-only decor (layer 2, cosmetic, never climbable) — indexed by
     // silhouette family (1-6), each holding whichever bark variants exist for
@@ -34,7 +34,7 @@ const TERRARIUM_SPRITES = {
       { a: TREE_TRUNK_BG_5A, b: TREE_TRUNK_BG_5B },
       { a: TREE_TRUNK_BG_6A, b: TREE_TRUNK_BG_6B },
     ],
-    // Climbable trunks (TREE_PLACEMENTS, layer 5/7) — numbered on their own
+    // Climbable trunks (TREE_PLACEMENTS, layer 5/8) — numbered on their own
     // track, independent of the bg silhouette numbers above.
     interact: [TREE_TRUNK_INTERACT_1, TREE_TRUNK_INTERACT_2, TREE_TRUNK_INTERACT_3],
   },

@@ -5,7 +5,7 @@
 // splitting it further risks the physics and the drawing silently drifting
 // apart.
 
-import { SCALE, GROUND_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, TREE_PLANT_2B_TRUNK_OVERLAP, TREE_PLANT_4_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE, BUG_INTERACT_MARGIN } from './constants.js';
+import { SCALE, GROUND_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, TREE_PLANT_2B_TRUNK_OVERLAP, TREE_PLANT_4_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE, BUG_INTERACT_MARGIN, BUG_LOCKED_START_INDEX } from './constants.js';
 import { state } from './state.js';
 
 // "ground-plant-3" -> TERRARIUM_SPRITES.groundPlant[2]
@@ -140,6 +140,7 @@ export function treePlantGeometry(pp) {
   const trunkSprite = resolveTreeTrunkSprite(trunkPlacement.sprite);
   const plantSprite = resolveTreePlantSprite(pp.sprite);
   const trunkTopY = GROUND_TOP - trunkSprite.height * SCALE;
+  const plantScale = SCALE * (pp.scaleMultiplier || 1);
   const overlap = pp.sprite === 'tree-plant-2b'
     ? TREE_PLANT_2B_TRUNK_OVERLAP
     : pp.sprite === 'tree-plant-slime'
@@ -148,9 +149,9 @@ export function treePlantGeometry(pp) {
         ? TREE_PLANT_4_TRUNK_OVERLAP
         : TREE_PLANT_TRUNK_OVERLAP;
   const originX = pp.side === 'right'
-    ? trunkPlacement.x + trunkSprite.width * SCALE - overlap * SCALE
-    : trunkPlacement.x - (plantSprite.width - overlap) * SCALE;
-  const originY = trunkTopY + pp.attachRow * SCALE - (plantSprite.height - 1) * SCALE;
+    ? trunkPlacement.x + trunkSprite.width * SCALE - overlap * plantScale
+    : trunkPlacement.x - (plantSprite.width - overlap) * plantScale;
+  const originY = trunkTopY + pp.attachRow * SCALE - (plantSprite.height - 1) * plantScale;
   // Host trunk's sprite id, so drawTreePlants (game/render.js) can merge
   // this plant's own palette entry with the trunk's resolved bark palette —
   // tree-plant-3/4/5's small bark-stub accent (k/R/r) matches whichever
@@ -205,18 +206,26 @@ export function bugRect(geo) {
   return { left: geo.originX, right: geo.originX + geo.width, top: geo.originY, bottom: geo.originY + geo.height };
 }
 
-// A trunk-mounted bug can only be caught while actually side-climbing the
-// exact trunk face it's mounted on — not just standing/falling somewhere
-// that happens to overlap its (small) hitbox. Without this, a jump that
-// arcs past the trunk's far face — e.g. hopping the gap behind a tree from
-// its left side to its right side and dropping down the other side — could
-// scoop up a right-side bug without ever needing the side-climb skill
-// that's supposed to gate that face (see attachToTrunk() in
+// A trunk-mounted bug can only be caught while actually using Cling to
+// Sides on the exact trunk face it's mounted on — not just standing/falling
+// somewhere that happens to overlap its (small) hitbox. Without this, a jump
+// that arcs past the trunk's far face — e.g. hopping the gap behind a tree
+// from its left side to its right side and dropping down the other side —
+// could scoop up a right-side bug without ever needing the Cling to Sides
+// skill that's supposed to gate that face (see attachToTrunk() in
 // game/movement.js). Ground/air bugs have no trunk to grip, so they're
 // always reachable by position alone.
 export function canReachBug(geo) {
   if (geo.placement.mode !== 'trunk') return true;
   return !!(state.climb && state.climb.trunk === geo.trunkPlacement && state.climb.side === geo.placement.side);
+}
+
+// Bugs at BUG_LOCKED_START_INDEX (game/constants.js) and beyond are hidden
+// (drawBugs, game/render.js) and uncatchable (collectNearbyBug,
+// game/interactions.js) until Cling to Sides is unlocked, so the last 10 of
+// the 20 total bugs can't be found before that puzzle is solved.
+export function isBugUnlocked(index) {
+  return index < BUG_LOCKED_START_INDEX || state.clingToSidesUnlocked;
 }
 
 // Tight bounding box (barely larger than the player's actual sprite) used to
@@ -249,12 +258,12 @@ export function branchSurfaceYAt(geo, worldX) {
 }
 
 // The "Moss Tree" — the second tree the player reaches overall (after the
-// x300 layer-5 trunk), and the first reachable layer-7 trunk (see
+// x300 layer-5 trunk), and the first reachable layer-8 trunk (see
 // TREE_PLACEMENTS in world-props.js, x720 — note WORLD_WIDTH is currently
-// shortened to 2650, so x2350 is the last reachable layer-7 trunk, not the
+// shortened to 2650, so x2350 is the last reachable layer-8 trunk, not the
 // second) — walled off by red gate moss (TREE_PLANT_1) until room 1's puzzle
 // is solved.
-export const GATE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 720 && p.layer === 7);
+export const GATE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 720 && p.layer === 8);
 
 // The light switch — mounted on the left face of the second tree from the
 // far right (see LIGHT_SWITCH_PLACEMENT, world-props.js).
@@ -273,10 +282,10 @@ export const LIGHT_SWITCH_BRANCH = BRANCH_GEOMETRIES.find((g) =>
 // The background-texture binary puzzle — no physical prop, just the lit
 // pixel-digit grid (sprites/background-texture.js) hanging under the
 // lightbulb at x150. Read from the closest climbable tree (Tree Trunk Fore 3
-// at x320, layer 7 — see TREE_PLACEMENTS in world-props.js), side-climbed on
-// its left face so the player is looking back toward the bulb/texture
+// at x320, layer 8 — see TREE_PLACEMENTS in world-props.js), reached via
+// Cling to Sides on its left face so the player is looking back toward the bulb/texture
 // cluster. Same interaction convention as LIGHT_SWITCH_TRUNK above.
-export const CODE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 320 && p.layer === 7);
+export const CODE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 320 && p.layer === 8);
 
 // True while the player is close enough to the gatekeeper tree — standing on
 // the ground within reach, or gripping that exact trunk — to press E and
@@ -305,8 +314,8 @@ export function lightSwitchOrigin() {
   return { x, y, width: sprite.width * SCALE, height: sprite.height * SCALE };
 }
 
-// True while the player can reach the light switch: either side-climbing
-// LIGHT_SWITCH_TRUNK on the switch's face, anywhere from just above the
+// True while the player can reach the light switch: either gripping
+// LIGHT_SWITCH_TRUNK via Cling to Sides on the switch's face, anywhere from just above the
 // switch down to LIGHT_SWITCH_BRANCH's height (so the whole stretch of trunk
 // between the branch and the switch works, not just a narrow band centered
 // on the switch), or standing/hanging on LIGHT_SWITCH_BRANCH itself near its
@@ -333,7 +342,7 @@ export function nearLightSwitch() {
   return false;
 }
 
-// True while the player is side-climbing CODE_TRUNK on its left face — the
+// True while the player is gripping CODE_TRUNK via Cling to Sides on its left face — the
 // face looking back toward the bulb/background-texture cluster — regardless
 // of height on the trunk, since there's no mounted prop/row to be "at". Only
 // the light being on actually makes the grid legible; that's enforced in

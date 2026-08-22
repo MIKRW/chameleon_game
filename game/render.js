@@ -16,7 +16,7 @@ import { state, ctx } from './state.js';
 import {
   resolveGroundPlantSprite, resolveHangingSprite, resolveTreeTrunkSprite, resolveTreeBranchSprite,
   resolveTreePlantSprite, resolveBugSprite, byAscendingZ, BRANCH_GEOMETRIES, TREE_PLANT_GEOMETRIES,
-  BUG_GEOMETRIES, GATE_TRUNK, LIGHT_SWITCH_TRUNK, treeTrunkRect, lightSwitchOrigin,
+  BUG_GEOMETRIES, isBugUnlocked, GATE_TRUNK, LIGHT_SWITCH_TRUNK, treeTrunkRect, lightSwitchOrigin,
 } from './world-geometry.js';
 import { playerCenter } from './movement.js';
 
@@ -44,7 +44,7 @@ export function resolveBarkPalette(id, layer) {
   return entry;
 }
 
-// Front-climb uses the flat, head-on clinging pose; side-climb uses whichever
+// Front-climb uses the flat, head-on clinging pose; Cling to Sides uses whichever
 // left/right-facing pose matches the edge the player attached from (see
 // attachToTrunk). Every other state — grounded, mid-air — uses the default
 // sprite, which already reverts automatically once jumpOffTrunk() clears
@@ -159,12 +159,12 @@ export function drawGlassEdgeBottom(camera) {
 }
 
 // Ground-floor foliage placed from PLANT_PLACEMENTS (world-props.js), split
-// across layer 5 (behind the player) and layer 7 (in front of the player)
+// across layer 5 (behind the player) and layer 8 (in front of the player)
 // so plants can occlude the chameleon as it walks past. Layers 2/3 are two
 // further, non-interactive options — cosmetic background foliage that
 // shares the layer-2/3 background-decor bands' treatment (their own
 // BACKGROUND_DECOR_PARALLAX_LAYER2/3, the same crown-fade as
-// drawBackgroundDecor) instead of the opaque 1:1 rendering layers 5/7 get —
+// drawBackgroundDecor) instead of the opaque 1:1 rendering layers 5/8 get —
 // see DEPTH-LAYERS.md. Ground plants have no bark keys, so unlike
 // drawBackgroundDecor's trunks this layer doesn't need resolveBarkPalette/a
 // saturation step — each plant's own palette entry is used as-is regardless
@@ -197,7 +197,7 @@ export function drawGroundPlants(camera, layer) {
   }
 }
 
-// Layer 7 — hidden pixel-digit backdrop (sprites/background-texture.js),
+// Layer 8 — hidden pixel-digit backdrop (sprites/background-texture.js),
 // painted alongside the light switch (same point in the draw order as
 // drawLightSwitch, right before tank framing) rather than with the rest of
 // the background scenery. Only drawn while the light is on; at rest its
@@ -263,7 +263,7 @@ export function drawHangingProps(camera, layer) {
 // which layer/z it's placed on.
 export function drawTreeTrunks(camera, layer) {
   const placements = TREE_PLACEMENTS.filter((p) => p.layer === layer).sort(byAscendingZ);
-  // Interactive trunks (layers 5/7) are never alpha-faded — see
+  // Interactive trunks (layers 5/8) are never alpha-faded — see
   // DEPTH-LAYERS.md: they need to read as clean and climbable at any camera
   // position, so depth between them comes entirely from the saturation
   // ladder, not opacity.
@@ -279,7 +279,7 @@ export function drawTreeTrunks(camera, layer) {
 // Branches from BRANCH_PLACEMENTS (world-props.js), mounted onto a sparse
 // subset of the trees drawn by drawTreeTrunks above. Drawn right after the
 // trunks on the same layer so they pick up the same depth treatment (the
-// layer-5 fade + darkened bark palette, or full-strength layer-7 bark) and
+// layer-5 fade + darkened bark palette, or full-strength layer-8 bark) and
 // paint on top of the trunk they're attached to. Reuses branchGeometry's
 // world-space sprite origin (see game/world-geometry.js) so the rendered
 // sprite and the standable/hangable physics region it's derived from always
@@ -325,16 +325,18 @@ export function drawTreePlants(camera, layer) {
     const flipX = geo.placement.side === 'left';
     const screenX = geo.originX - camera.x;
     const screenY = geo.originY - camera.y;
-    drawSprite(ctx, plantSprite.rows, screenX, screenY, SCALE, palette, undefined, flipX);
+    const scale = SCALE * (geo.placement.scaleMultiplier || 1);
+    drawSprite(ctx, plantSprite.rows, screenX, screenY, scale, palette, undefined, flipX);
   }
 }
 
-// Bugs from BUG_GEOMETRIES (game/world-geometry.js) — currently empty, the
-// bug/fly sprite has been pulled (see BUG_PLACEMENTS in world-props.js), so
-// this is a no-op until placements are added back.
+// Bugs from BUG_GEOMETRIES (game/world-geometry.js) — the last
+// BUG_LOCKED_START_INDEX-and-later bugs (game/constants.js) stay undrawn
+// until Cling to Sides is unlocked (see isBugUnlocked()), so they can't be
+// spotted, let alone caught, before that puzzle is solved.
 export function drawBugs(camera, layer) {
   BUG_GEOMETRIES.forEach((geo, i) => {
-    if (geo.placement.layer !== layer || state.bugsFound[i]) return;
+    if (geo.placement.layer !== layer || state.bugsFound[i] || !isBugUnlocked(i)) return;
     const sprite = resolveBugSprite(geo.placement.sprite);
     const palette = resolveSpritePalette(geo.placement.sprite);
     const screenX = geo.originX - camera.x;
@@ -372,18 +374,14 @@ export function drawSpriteBlocky(ctx, spriteRows, x, y, scale, palette, block, f
 }
 
 // Yellow slime (tree-plant-slime.js) tiled down both edges of every
-// side-climbable trunk (layer 7 — layer-5 trunks are front-climb only, no
-// side to lock) while the side-climb skill is still locked, signaling the
-// trunk is entirely unclimbable from either side until then. Removed the
-// moment skillUnlocked flips, same as drawGateMoss() removing the gate moss
-// once state.gateSolved flips. See the attach gating in game/movement.js for
-// the actual movement restriction this is signaling.
-export function drawSkillSlime(camera) {
-  if (state.skillUnlocked) return;
+// layer-8 trunk (layer-5 trunks are front-climb only, no side to coat) —
+// purely decorative, unrelated to Cling to Sides or any puzzle state. Stays
+// on the trees regardless of whether Cling to Sides is unlocked.
+export function drawTrunkSlime(camera) {
   const tileH = TREE_PLANT_SLIME.height * SCALE;
   const tileW = TREE_PLANT_SLIME.width * SCALE;
   for (const placement of TREE_PLACEMENTS) {
-    if (placement.layer !== 7) continue;
+    if (placement.layer !== 8) continue;
     const rect = treeTrunkRect(placement);
     const leftX = rect.left - (tileW - SLIME_TRUNK_OVERLAP * SCALE) - camera.x;
     const rightX = rect.right - SLIME_TRUNK_OVERLAP * SCALE - camera.x;
@@ -587,9 +585,12 @@ export function draw() {
   drawTreeBranches(camera, 5);
   drawTreePlants(camera, 5);
   drawGroundPlants(camera, 5);
-  drawBugs(camera, 5);
 
-  // layer 6: player — invisible until CHAMELEON_VISIBLE is flipped on (see game/state.js)
+  // layer 6: bugs — own layer between the far/near plant passes so a bug
+  // never gets buried under foliage or the player
+  drawBugs(camera, 6);
+
+  // layer 7: player — invisible until CHAMELEON_VISIBLE is flipped on (see game/state.js)
   // TEMP: forced on while working on plant/player sprites — restore `window.CHAMELEON_VISIBLE` check when done
   if (true) {
     const playerSprite = playerSpriteForState();
@@ -598,27 +599,26 @@ export function draw() {
     drawSprite(ctx, playerSprite, state.player.x - camera.x, state.player.y - camera.y, SCALE, PLAYER_PALETTE, undefined, flipDefaultPose, hanging);
   }
 
-  // layer 7: near plants and tree trunks, in front of the player
-  drawGroundPlants(camera, 7);
-  drawBugs(camera, 7);
-  drawTreeTrunks(camera, 7);
+  // layer 8: near plants and tree trunks, in front of the player
+  drawGroundPlants(camera, 8);
+  drawTreeTrunks(camera, 8);
   drawGateMoss(camera); // Moss Tree (GATE_TRUNK, x720) — gatekeeper puzzle
   drawGateMossRemnant(camera); // leftover moss scraps once state.gateSolved
-  // drawSkillSlime(camera); // TEMP: disabled, not applied to any trunks right now
-  drawTreeBranches(camera, 7);
-  drawTreePlants(camera, 7);
+  // drawTrunkSlime(camera); // disabled, not applied to any trunks right now
+  drawTreeBranches(camera, 8);
+  drawTreePlants(camera, 8);
 
-  // layer 7: hidden pixel-digit backdrop, painted alongside the light
+  // layer 8: hidden pixel-digit backdrop, painted alongside the light
   // switch (only visible once the light is on)
   drawBackgroundTexture(camera);
 
   // light switch — mounted on a trunk (see LIGHT_SWITCH_PLACEMENT,
   // world-props.js), drawn last so it always sits on top of that trunk's
-  // bark and any layer-5/7 foliage near it.
+  // bark and any layer-5/8 foliage near it.
   drawLightSwitch(camera);
 
   ctx.restore();
 
-  // layer 8: glass edges (tank framing)
+  // layer 9: glass edges (tank framing)
   drawTankFraming(camera);
 }

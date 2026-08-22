@@ -26,6 +26,6 @@ specific recon technique that room teaches:
 |---|---|---|
 | 1 — Gatekeeper Tree | View page source | HTML comment |
 | 2 — The Warm Light | Binary decoding | 8x8 pixel-digit grid grown into the backdrop (sprites/background-texture.js), only readable while the lightbulb is lit |
-| 3 — Trunk-Side Traversal | Inspect storage | `terrarium-skill-hint` key in localStorage (see game/state.js), set next to the theme preference; submitted via `skillUnlockPasscode()` in the console rather than an in-world popup |
+| 3 — Trunk-Side Traversal | Inspect storage | `terrarium-skill-hint` key in localStorage (see game/state.js), set next to the theme preference; submitted via `clingToSidesPasscode()` in the console rather than an in-world popup |
 
 That plaintext is each puzzle's intended clue, not a leaked secret.

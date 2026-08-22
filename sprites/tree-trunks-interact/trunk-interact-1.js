@@ -2,7 +2,7 @@
 // Theme: plain straight trunk, narrow, walnut bark
 //
 // Plain trunk, open at the top row (row 0). Recolored off the shared r/R/h
-// bark onto the layer-5/7 branch bark so this trunk's color matches the
+// bark onto the layer-5/8 branch bark so this trunk's color matches the
 // branches mounted on it. Bark grain is a short vertical highlight tick (h,
 // 2 rows tall) in a single column that repeats every 6 rows with plain gaps
 // between, matching trunk-bg-1a's vertical-grain style. The

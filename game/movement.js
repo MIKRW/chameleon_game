@@ -93,16 +93,17 @@ export function update() {
 
 // Snaps the player onto a trunk and enters climbing state. `face` is decided
 // purely by whichever layer the trunk is already placed on (see world-props.js) —
-// layer 5 trunks paint behind the player (front-climb), layer 7 trunks paint
-// in front of the player (side-climb), so no extra render logic is needed.
-// Returns false (and leaves the player airborne) instead of attaching if the
-// trunk is a side-climb (layer 7) trunk and the side-climb skill
-// (state.skillUnlocked, see setSkillUnlocked() in game/interactions.js) isn't
-// unlocked yet — those trunks are entirely unclimbable, from either side,
-// until then. Once unlocked, both faces are approachable normally.
+// layer 5 trunks paint behind the player (front-climb), layer 8 trunks paint
+// in front of the player (Cling to Sides), so no extra render logic is
+// needed. Returns false (and leaves the player airborne) instead of
+// attaching if the trunk is a Cling to Sides (layer 8) trunk and Cling to
+// Sides (state.clingToSidesUnlocked, see setClingToSidesUnlocked() in
+// game/interactions.js) isn't unlocked yet — those trunks are entirely
+// unclimbable, from either side, until then. Once unlocked, both faces are
+// approachable normally.
 export function attachToTrunk(placement) {
   const face = placement.layer === 5 ? 'front' : 'side';
-  if (face === 'side' && !state.skillUnlocked) return false;
+  if (face === 'side' && !state.clingToSidesUnlocked) return false;
 
   const rect = treeTrunkRect(placement);
   let targetX;
@@ -111,7 +112,7 @@ export function attachToTrunk(placement) {
     // centered on top of the trunk, fully visible
     targetX = rect.left + (rect.right - rect.left) / 2 - PLAYER_W / 2;
   } else {
-    // side-climb: offset toward the edge the player approached from, so most
+    // Cling to Sides: offset toward the edge the player approached from, so most
     // of the player tucks behind the (opaque, painted-after-player) trunk
     // but a slice still pokes out — reads as gripping the side, not vanishing
     // behind it. Approach side is whichever side of the trunk's center the
@@ -167,13 +168,12 @@ export function jumpOffTrunk() {
 // together with that direction (see passBranchAlongTrunk) rather than just
 // walking into it.
 //
-// Layer-7 trunks are entirely unclimbable (see attachToTrunk) until the
-// side-climb skill is unlocked, so their branches can't be reached to climb
-// past in the first place before then — no extra gating needed here beyond
-// that.
+// Layer-8 trunks are entirely unclimbable (see attachToTrunk) until Cling
+// to Sides is unlocked, so their branches can't be reached to climb past in
+// the first place before then — no extra gating needed here beyond that.
 //
 // Only a branch on the side of the trunk the player is actually gripping
-// (state.climb.side, side-climb only — front-climb has no side, it's
+// (state.climb.side, Cling to Sides only — front-climb has no side, it's
 // centered on the trunk) can catch them — otherwise a branch mounted on the
 // opposite face of the trunk would reach through the bark and pull the
 // player around to a side they were never climbing on.
@@ -255,10 +255,10 @@ export function updateClimbing(dx) {
 // climbing — the deliberate way past a branch that would otherwise auto-catch
 // them (see findBranchCrossedClimbingUp/Down above and updateBranch below).
 // A branch can be reached directly (falling onto it, reaching up into it)
-// without ever climbing its trunk first, but a layer-7 branch is only
-// reachable at all once the side-climb skill is unlocked (see
+// without ever climbing its trunk first, but a layer-8 branch is only
+// reachable at all once Cling to Sides is unlocked (see
 // findStandableBranch/findHangableBranch), so by the time this runs for one,
-// skillUnlocked is already guaranteed true — no extra gating needed here.
+// clingToSidesUnlocked is already guaranteed true — no extra gating needed here.
 export function passBranchAlongTrunk(direction) {
   const { geo } = state.branch;
   const trunkPlacement = TREE_PLACEMENTS.find((p) => p.layer === geo.placement.layer && p.x === geo.placement.trunkX);
@@ -350,15 +350,15 @@ export function updateBranch(dx) {
 // flat one. `nextY` is the player's would-be top-of-sprite y after this
 // frame's gravity is applied (i.e. state.player.y + state.vy).
 //
-// Layer-7 (side-climb) trunks' branches are unreachable the same way their
-// trunk is (see attachToTrunk) until the side-climb skill is unlocked —
+// Layer-8 (Cling to Sides) trunks' branches are unreachable the same way
+// their trunk is (see attachToTrunk) until Cling to Sides is unlocked —
 // skipped here so falling past one doesn't catch the player early.
 export function findStandableBranch(nextY) {
   const centerX = state.player.x + PLAYER_W / 2;
   const feetY = state.player.y + PLAYER_H;
   const nextFeetY = nextY + PLAYER_H;
   for (const geo of BRANCH_GEOMETRIES) {
-    if (geo.placement.layer === 7 && !state.skillUnlocked) continue;
+    if (geo.placement.layer === 8 && !state.clingToSidesUnlocked) continue;
     if (centerX < geo.minX || centerX > geo.maxX) continue;
     const surfaceY = branchSurfaceYAt(geo, centerX);
     if (feetY <= surfaceY + 1 && nextFeetY >= surfaceY) {
@@ -371,15 +371,15 @@ export function findStandableBranch(nextY) {
 // While airborne, reaching (holding up) lets the player grab the underside
 // of any overlapping branch to hang and shimmy along it — deliberate, so
 // jumping past a branch's underside doesn't snag on it by accident the way
-// landing on top does automatically. Layer-7 branches are gated the same as
-// findStandableBranch above — unreachable until the side-climb skill unlocks.
+// landing on top does automatically. Layer-8 branches are gated the same as
+// findStandableBranch above — unreachable until Cling to Sides unlocks.
 export function findHangableBranch() {
   if (!(state.keys['arrowup'] || state.keys['w'])) return null;
   const centerX = state.player.x + PLAYER_W / 2;
   const headY = state.player.y - BRANCH_GRAB_MARGIN;
   const reachY = state.player.y + BRANCH_HANG_BAND;
   for (const geo of BRANCH_GEOMETRIES) {
-    if (geo.placement.layer === 7 && !state.skillUnlocked) continue;
+    if (geo.placement.layer === 8 && !state.clingToSidesUnlocked) continue;
     if (centerX < geo.minX || centerX > geo.maxX) continue;
     const surfaceY = branchSurfaceYAt(geo, centerX);
     const underY = surfaceY + geo.thickness;

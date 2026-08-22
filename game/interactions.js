@@ -4,7 +4,7 @@
 
 import { JUMP_VELOCITY, LIGHT_WARNING_FLICKS, LIGHT_BREAK_FLICKS, TOTAL_PUZZLES, BUGS_REQUIRED } from './constants.js';
 import { state, resetGame } from './state.js';
-import { nearGate, nearLightSwitch, nearBackgroundTexture, BUG_GEOMETRIES, bugRect, canReachBug, bugInteractRect, rectsOverlap } from './world-geometry.js';
+import { nearGate, nearLightSwitch, nearBackgroundTexture, BUG_GEOMETRIES, bugRect, canReachBug, isBugUnlocked, bugInteractRect, rectsOverlap } from './world-geometry.js';
 import { jumpOffTrunk, jumpOffBranch, passBranchAlongTrunk } from './movement.js';
 
 // Edge-triggered (fire once per press, not per repeat/hold) so keyboard
@@ -54,36 +54,36 @@ export function handleJumpPress() {
 }
 
 // --- Skill status display ---
-// Reflects state.skillUnlocked; flipped by skillUnlockPasscode() below, not
-// by direct user input.
+// Reflects state.clingToSidesUnlocked; flipped by clingToSidesPasscode()
+// below, not by direct user input.
 const skillStatusEl = document.getElementById('skill-status');
 
 // Module-scoped, unlike CHAMELEON_VISIBLE/resetLightbulb (see game/state.js)
 // — this one gates real puzzle progress, so it deliberately isn't exposed on
 // `window` for the console to call.
-export function setSkillUnlocked(unlocked) {
-  state.skillUnlocked = unlocked;
-  skillStatusEl.textContent = `Side climb: ${unlocked ? 'Yes' : 'No'}`;
+export function setClingToSidesUnlocked(unlocked) {
+  state.clingToSidesUnlocked = unlocked;
+  skillStatusEl.textContent = `Cling to Sides: ${unlocked ? 'Yes' : 'No'}`;
   if (unlocked) {
-    // The right-hand side of every side-climbable (layer-7) trunk was locked
-    // until now — see attachToTrunk() in game/movement.js.
+    // The right-hand side of every layer-8 trunk was locked until now — see
+    // attachToTrunk() in game/movement.js.
     openSkillPopup('Wow, this new skill will make it easier to find bugs!');
   }
 }
 
-// --- Side-climb skill unlock (puzzle 3) ---
+// --- Cling to Sides unlock (puzzle 3) ---
 // No popup — the passcode lives in localStorage (see game/state.js) rather
 // than anywhere on screen, so it's submitted straight from the console.
-window.skillUnlockPasscode = async function (guess) {
-  if (state.skillUnlocked) {
-    console.log('Skill already unlocked.');
+window.clingToSidesPasscode = async function (guess) {
+  if (state.clingToSidesUnlocked) {
+    console.log('Cling to Sides already unlocked.');
     return;
   }
   const correct = await checkAnswer(3, guess);
   if (correct) {
-    setSkillUnlocked(true);
+    setClingToSidesUnlocked(true);
     setPuzzlesComplete(state.puzzlesComplete + 1);
-    console.log('Skill unlocked: both-sides tree climbing.');
+    console.log('Cling to Sides unlocked.');
   } else {
     console.log('Incorrect passcode.');
   }
@@ -94,32 +94,32 @@ const puzzleStatusEl = document.getElementById('puzzle-status');
 
 export function setPuzzlesComplete(n) {
   state.puzzlesComplete = n;
-  puzzleStatusEl.textContent = `Puzzles complete: ${n} / ${TOTAL_PUZZLES}`;
+  puzzleStatusEl.textContent = `Puzzle: ${n} / ${TOTAL_PUZZLES}`;
   maybeShowCompletion();
 }
 
 // --- Bug collection (a fourth, non-devtools puzzle) ---
-// Currently empty (see BUG_PLACEMENTS in world-props.js — the bug/fly sprite
-// has been pulled for now), so BUGS_REQUIRED is 0 and this is trivially
-// satisfied without affecting maybeShowCompletion() below. Left in place so
-// bug placements can be reintroduced later. Unlike most props, a bug isn't
-// caught just by touching it — it takes an E press while lined up (see
-// bugInteractRect() in game/world-geometry.js), so catching one is a
-// deliberately timed action rather than an automatic walk/jump-through.
-// Called from handleInteractPress() above, not polled every frame.
+// 20 total (see BUG_PLACEMENTS in world-props.js). The last 10 stay hidden
+// and uncatchable (isBugUnlocked(), game/world-geometry.js) until Cling to
+// Sides is unlocked, so all of them can't be found before that puzzle is
+// solved. Unlike most props, a bug isn't caught just by touching it — it
+// takes an E press while lined up (see bugInteractRect() in
+// game/world-geometry.js), so catching one is a deliberately timed action
+// rather than an automatic walk/jump-through. Called from
+// handleInteractPress() above, not polled every frame.
 const bugStatusEl = document.getElementById('bug-status');
-bugStatusEl.textContent = `Bugs found: 0 / ${BUGS_REQUIRED}`;
+bugStatusEl.textContent = `Bugs: 0 / ${BUGS_REQUIRED}`;
 
 function collectNearbyBug() {
   const interactRect = bugInteractRect();
   for (let i = 0; i < BUG_GEOMETRIES.length; i++) {
-    if (state.bugsFound[i]) continue;
+    if (state.bugsFound[i] || !isBugUnlocked(i)) continue;
     const geo = BUG_GEOMETRIES[i];
     if (!canReachBug(geo)) continue;
     if (!rectsOverlap(interactRect, bugRect(geo))) continue;
     state.bugsFound[i] = true;
     state.bugsCollectedCount++;
-    bugStatusEl.textContent = `Bugs found: ${state.bugsCollectedCount} / ${BUGS_REQUIRED}`;
+    bugStatusEl.textContent = `Bugs: ${state.bugsCollectedCount} / ${BUGS_REQUIRED}`;
     maybeShowCompletion();
     return true;
   }
@@ -304,7 +304,7 @@ export function fullResetGame() {
   closeCodePopup();
   closeCompletionPopup();
   closeSkillPopup();
-  skillStatusEl.textContent = 'Side climb: No';
-  puzzleStatusEl.textContent = `Puzzles complete: 0 / ${TOTAL_PUZZLES}`;
-  bugStatusEl.textContent = `Bugs found: 0 / ${BUGS_REQUIRED}`;
+  skillStatusEl.textContent = 'Cling to Sides: No';
+  puzzleStatusEl.textContent = `Puzzle: 0 / ${TOTAL_PUZZLES}`;
+  bugStatusEl.textContent = `Bugs: 0 / ${BUGS_REQUIRED}`;
 }

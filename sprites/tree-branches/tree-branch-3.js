@@ -6,7 +6,7 @@
 // left side), just recolored with the near-black driftwood bark keys
 // (1/2/3) instead of the shared r/R/h bark, so it matches trunk-interact-2's
 // recolored driftwood trunk and trunk-bg-6a/6b (the angled feature trees)
-// rather than the other, lighter-barked layer-7 trunks. Reads as one solid
+// rather than the other, lighter-barked layer-8 trunks. Reads as one solid
 // wedge of bark, not a speckled dither: a flat, thick, perpendicular launch
 // straight out of the trunk (reading as a clean right angle at the join
 // instead of sloping away immediately) that then tapers and rises to a

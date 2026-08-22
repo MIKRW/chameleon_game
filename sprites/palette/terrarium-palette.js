@@ -101,7 +101,7 @@ const TERRARIUM_PALETTE = {
   // === ground-plant-6 — Split-Leaf Philodendron (Large Variant) ===
   // dark leaf light/dark + shared outline + pale rim highlight
   // brightened off ground-plant-4's e/E dark-leaf tones (which now read as too close to the
-  // jewel-green forest-v5 background at this layer-7 prominence) and given a highlight tone
+  // jewel-green forest-v5 background at this layer-8 prominence) and given a highlight tone
   // so the leaf edges read crisp against the backdrop instead of blending into it
   'ground-plant-6': {
     'k': '#5c4e42',
@@ -191,7 +191,7 @@ const TERRARIUM_PALETTE = {
 
   // === bug-1 — collectible critter bug ===
   // matte black body, pale marking
-  // no sprite file currently defines bug-1 (BUG_GEOMETRIES/BUG_PLACEMENTS are empty, see world-props.js) — kept in case one is reintroduced
+  // see sprites/bugs/bug-1.js; placed via BUG_PLACEMENTS in world-props.js
   'bug-1': {
     'I': '#262626',
     'O': '#e8e8e8',
@@ -199,10 +199,10 @@ const TERRARIUM_PALETTE = {
 
   // === trunk-interact-1 — Straight Slim Walnut ===
   // vivid bark: bark/shade/highlight, ladder-driven
-  // authored at its native layer 7 (richest/closest tier); also appears at layer 5 — see .layers, built by buildBarkLayers() in ./bark-ladder.js
+  // authored at its native layer 8 (richest/closest tier); also appears at layer 5 — see .layers, built by buildBarkLayers() in ./bark-ladder.js
   'trunk-interact-1': {
     'k': '#1a1a1a',
-    layers: buildBarkLayers({ r: '#8f623d', R: '#75561f', h: '#836c53' }, 7, [5, 7]),
+    layers: buildBarkLayers({ r: '#8f623d', R: '#75561f', h: '#836c53' }, 8, [5, 8]),
   },
 
   // === trunk-interact-2 — Thick, driftwood, flat (not ladder-driven) ===
@@ -217,10 +217,10 @@ const TERRARIUM_PALETTE = {
 
   // === trunk-interact-3 — Knotted ===
   // vivid bark: bark/shade/highlight, ladder-driven
-  // same r/R/h family and native layer-7 tier as trunk-interact-1 (both read from the same shared bark today), now independently tunable; also appears at layer 5
+  // same r/R/h family and native layer-8 tier as trunk-interact-1 (both read from the same shared bark today), now independently tunable; also appears at layer 5
   'trunk-interact-3': {
     'k': '#1a1a1a',
-    layers: buildBarkLayers({ r: '#795024', R: '#614220', h: '#8f683f' }, 7, [5, 7]),
+    layers: buildBarkLayers({ r: '#795024', R: '#614220', h: '#8f683f' }, 8, [5, 8]),
   },
 
   // === trunk-bg-1a / 2a / 3a / 4a / 5a — muted back-bark family ===

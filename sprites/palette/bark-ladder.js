@@ -9,8 +9,8 @@
 //
 // Measured baseline (see the old TERRARIUM_PALETTE_LAYER5_TREES /
 // TERRARIUM_PALETTE_LAYER3_TREES tables, formerly in game/constants.js):
-// layer 2 (~18% sat) < layer 3 (~24%) < layer 5 (~32%) < layer 7 (~42%, the
-// richest/closest tier). Layers 5 and 7 (interactive trunks) are never
+// layer 2 (~18% sat) < layer 3 (~24%) < layer 5 (~32%) < layer 8 (~42%, the
+// richest/closest tier). Layers 5 and 8 (interactive trunks) are never
 // alpha-faded — depth between them is carried entirely by this ladder, not
 // opacity (see DEPTH-LAYERS.md and the comment above TREE_FADE_MIN_ALPHA in
 // game/constants.js).
@@ -19,7 +19,7 @@ const LAYER_BARK_SATURATION = {
   2: 0.18,
   3: 0.24,
   5: 0.32,
-  7: 0.42,
+  8: 0.42,
 };
 
 function hexToHsl(hex) {

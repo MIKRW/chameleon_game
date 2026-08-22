@@ -9,7 +9,7 @@ export const SCALE = 4; // sprite pixel scale
 export const PLAYER_SPEED = 7;
 // Fraction of the gap to the target camera position closed per frame —
 // makes the camera ease toward the player instead of snapping 1:1, so
-// world scenery (esp. layer 5/7 trunks, which must stay pixel-exact with
+// world scenery (esp. layer 5/8 trunks, which must stay pixel-exact with
 // their collision geometry and so can't get their own slower parallax)
 // slides by more gently. World positions/collision are untouched — this
 // only smooths the camera.x/y used at render time (see draw(), game/render.js).
@@ -21,7 +21,7 @@ export const CLIMB_GRAB_MARGIN = 6; // extra px of forgiveness when checking for
 export const CLIMB_MIN_AIR_HEIGHT = 16; // min px the player must have jumped above the floor line before a trunk can grab them — keeps a low hop near a trunk's base (where ground plants often sit) from snapping onto the trunk and reading as "stuck" on the plants
 export const CLIMB_JUMP_KICK = 4; // horizontal push when jumping off a trunk toward a direction
 export const CLIMB_JUMP_AWAY_KICK = 2; // horizontal push when jumping off with no direction held
-export const CLIMB_SIDE_PEEK_FRACTION = 0.8; // fraction of player width left visible outside the trunk when side-climbing
+export const CLIMB_SIDE_PEEK_FRACTION = 0.8; // fraction of player width left visible outside the trunk when using Cling to Sides
 export const TREE_BRANCH_TRUNK_OVERLAP = 2; // grid cells a branch's base sinks into the trunk's edge, both for the visual join and for its physics base point
 export const TREE_PLANT_TRUNK_OVERLAP = 1; // grid cells a decorative trunk plant's base sinks into the trunk's edge, same idea as TREE_BRANCH_TRUNK_OVERLAP
 export const TREE_PLANT_2B_TRUNK_OVERLAP = 4; // tree-plant-2b's wide rounded canopy sinks in deeper than TREE_PLANT_TRUNK_OVERLAP so more of its top reads as overlapping/emerging from the bark, not just touching its edge
@@ -86,6 +86,10 @@ export const LIGHT_BREAK_FLICKS = 12;
 
 export const TOTAL_PUZZLES = 3; // one per PUZZLES entry in puzzles/puzzle-N.js
 export const BUGS_REQUIRED = BUG_PLACEMENTS.length; // see world-props.js
+// BUG_PLACEMENTS entries at this index and beyond stay hidden/uncatchable
+// (see isBugUnlocked() in game/world-geometry.js) until Cling to Sides is
+// unlocked, so all 20 bugs can't be found before that puzzle is solved.
+export const BUG_LOCKED_START_INDEX = 10;
 
 export const GATE_MOSS_FINGER_MARGIN = 2 * SCALE; // TREE_PLANT_1's 2 leftmost columns are finger tips, not bark overlay
 export const GATE_MOSS_BOTTOM_GAP = 10 * SCALE; // keep the lowest moss tile from touching the glass floor line
@@ -113,12 +117,12 @@ export const GLASS_FRONT_BOTTOM_ALPHA = 0.5; // hazy near the bottom, even at th
 // and measured baseline, and sprites/palette/bark-ladder.js for the actual
 // LAYER_BARK_SATURATION numbers and the deriveBarkColor() formula that now
 // computes each layer's bark tone from a sprite's native color instead of
-// hand-tuned per-layer hex tables). Layers 5 and 7 (the interactive trunks)
+// hand-tuned per-layer hex tables). Layers 5 and 8 (the interactive trunks)
 // are fully opaque, crisp, and never alpha-faded — that vertical crown-fade
 // is reserved for the purely cosmetic layer-2/3 background decor (see
 // TREE_FADE_MIN_ALPHA below) so climbable trunks always read as clean and
 // separate from scenery, regardless of camera position. Depth between
-// layers 2/3/5/7 is instead carried entirely by saturation + lightness, each
+// layers 2/3/5/8 is instead carried entirely by saturation + lightness, each
 // layer's bark palette getting progressively richer as it sits closer to
 // the camera. See resolveBarkPalette() in game/render.js for how a bark
 // sprite's per-layer color is resolved at draw time from
@@ -142,9 +146,9 @@ export const BACKGROUND_PARALLAX = 0.06;
 // layer 3, ground-plant-1 — see drawGroundPlants(), game/render.js) scroll
 // by — each faster than BACKGROUND_PARALLAX (the layer-1 backdrop) but
 // still under 1:1, so the layers visibly separate as the camera pans:
-// 1 (0.06) < 2 (0.45) < 3 (0.6) < layers 5/7/player (1:1). Raised closer to
+// 1 (0.06) < 2 (0.45) < 3 (0.6) < layers 5/8/player (1:1). Raised closer to
 // 1:1 than earlier passes — at the previous lower values, a layer-3 ground
-// plant visibly drifted away from its layer-7 neighbor too fast as the
+// plant visibly drifted away from its layer-8 neighbor too fast as the
 // camera panned; keeping this nearer 1:1 makes that separation read as
 // subtle depth instead of a jarring speed mismatch. BACKGROUND_PLACEMENTS/
 // BACKGROUND_LAYER3_PLACEMENTS (world-props.js) place their trunks within

@@ -8,7 +8,7 @@
 // floor-contact row convention as Trunk 1.
 // Uses the same near-black driftwood bark (1/2/3) as trunk-bg-6a/6b (the
 // angled feature trees), instead of the shared r/R/h bark used by the other
-// layer-7 trunks, so this one reads as its own darker, driftwood-toned tree.
+// layer-8 trunks, so this one reads as its own darker, driftwood-toned tree.
 // Size: 16x157 (grid units; multiply by render scale) - height matches the terrarium's full interior span (lid to floor), width doubled from the standard trunk gauge.
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
 

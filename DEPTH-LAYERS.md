@@ -27,14 +27,15 @@ specific job, not reused as a second depth signal:
 | 2 | bg decor, non-interactive (`BACKGROUND_PLACEMENTS`) | **~18%** (`q`/`Q`/`p`) | shared vertical crown→floor range, `TREE_FADE_MIN/MAX_ALPHA` (0.12→1) | **0.4** (`BACKGROUND_DECOR_PARALLAX_LAYER2`) |
 | 3 | bg decor, non-interactive (`BACKGROUND_LAYER3_PLACEMENTS`, same sprite variety as layer 2, different placements) | **~24%** (`TERRARIUM_PALETTE_LAYER3_TREES`) | same shared range as layer 2 | **0.55** (`BACKGROUND_DECOR_PARALLAX_LAYER3`) |
 | 5 | interactive trunk, behind player (`TERRARIUM_PALETTE_LAYER5_TREES`) | **~32%** | **none — fully opaque** | 1:1 with camera (moves with player) |
-| 7 | interactive trunk, in front of player (`TERRARIUM_PALETTE`'s `r`/`R`/`h`) | **~42%**, highest of the tree layers | **none — fully opaque** | 1:1 with camera (moves with player) |
+| 6 | bugs (own layer, between the far/near plant passes) | n/a — not bark, no ladder tier | — | 1:1 with camera (moves with player) |
+| 8 | interactive trunk, in front of player (`TERRARIUM_PALETTE`'s `r`/`R`/`h`) | **~42%**, highest of the tree layers | **none — fully opaque** | 1:1 with camera (moves with player) |
 | player | — | 91-93% (already in the reserved 85-95% band, unchanged) | — | 1:1 |
 | accent sprites (e.g. gate moss) | sprites that deliberately need to pop | 72-100% (already in the reserved 95-100%+ band, unchanged) | — | matches whatever it's mounted on |
 
 Plants/foliage mounted on a given trunk layer should match that layer's
 saturation ±10, for a bit of natural variation without breaking the band.
 
-### Why layers 5/7 get no alpha fade
+### Why layers 5/8 get no alpha fade
 
 They're climbable/interactive — the player needs to read them as solid,
 clean, and clearly separated from the purely decorative background, at any
@@ -46,7 +47,7 @@ camera position. A crown-fade that looks fine on cosmetic scenery reads as
 Previously alpha fade did two jobs at once: the intra-sprite vertical
 crown→floor gradient (so a tall trunk fades into haze at the top), *and* a
 second, separate per-layer range used purely to signal "this layer is
-further back" (layer 2 dramatic, layer 5 subtle, layer 7 none). That's
+further back" (layer 2 dramatic, layer 5 subtle, layer 8 none). That's
 redundant once saturation/lightness carries the layer-to-layer signal —
 stacking multiple independently-tuned depth cues risks either over-crushing
 distant layers into near-invisibility, or the cues fighting each other.
@@ -73,7 +74,7 @@ existed going into this change:
 - Layer 1 backdrop (forest-v5 `BASE_COLORS`, post `BRIGHTNESS`): ~50-56%
 - Layer 2 bg decor bark (`q`/`Q`/`p`): ~20%
 - Layer 5 trunk bark (darkened `r`/`R`/`h`): ~25%
-- Layer 7 trunk bark (`r`/`R`/`h`): ~25%
+- Layer 8 trunk bark (`r`/`R`/`h`): ~25%
 - Ground/tree plant foliage (`l`/`L`/`f`, `e`/`E`): ~34-47%
 - Gate moss (`z`/`Z`): ~72-100% (already an accent-tier outlier)
 - Player body/crest (`g`, `u`): ~91-93%
