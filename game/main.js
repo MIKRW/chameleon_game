@@ -10,10 +10,13 @@
 
 import { update } from './movement.js';
 import { draw } from './render.js';
+import { updateBugPaths } from './bug-motion.js';
+import { BUG_GEOMETRIES } from './world-geometry.js';
 import './input.js';
 
-function loop() {
+function loop(now) {
   update();
+  updateBugPaths(BUG_GEOMETRIES, now);
   draw();
   requestAnimationFrame(loop);
 }

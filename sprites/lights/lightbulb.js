@@ -2,7 +2,7 @@
 // Theme: hanging Edison-style lightbulb, currently switched off — brass
 // socket, dark/grey glass and filament (no glow), long thin cord
 //
-// Anchors at row 0 (the cord), same convention as vine-1.js/vine-2.js,
+// Anchors at row 0 (the cord), the standard convention for hanging props,
 // since it hangs from above rather than sitting on the floor.
 // Size: 10x18 (grid units; multiply by render scale)
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.

@@ -2,7 +2,7 @@
 // interact buttons, and the restart button.
 
 import { state } from './state.js';
-import { handleInteractPress, handleJumpPress, handleSwapSidePress, gatePopupOpen, lightPopupOpen, codePopupOpen, completionPopupOpen, skillPopupOpen, closeGatePopup, closeLightPopup, closeCodePopup, closeCompletionPopup, closeSkillPopup, fullResetGame } from './interactions.js';
+import { handleInteractPress, handleJumpPress, gatePopupOpen, lightPopupOpen, codePopupOpen, completionPopupOpen, skillPopupOpen, closeGatePopup, closeLightPopup, closeCodePopup, closeCompletionPopup, closeSkillPopup, fullResetGame } from './interactions.js';
 
 window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
@@ -41,14 +41,6 @@ window.addEventListener('keydown', (e) => {
     handleInteractPress();
   }
 
-  // Left/right (arrows or A/D) double as the trunk-side-swap input while side-climbing —
-  // see swapTrunkSide() in game/movement.js for why this is a no-op unless
-  // it actually changes which face is gripped (so it never fights with
-  // normal ground movement's use of the same keys).
-  if ((key === 'arrowleft' || key === 'arrowright' || key === 'a' || key === 'd') && !e.repeat) {
-    handleSwapSidePress(key === 'arrowleft' || key === 'a' ? -1 : 1);
-  }
-
   if (key === ' ') {
     e.preventDefault(); // stop the page from scrolling
     if (!e.repeat) handleJumpPress();
@@ -69,11 +61,6 @@ document.getElementById('restart-btn').addEventListener('click', fullResetGame);
     const press = (e) => {
       e.preventDefault();
       state.keys[key] = true;
-      // Same left/right-doubles-as-swap behavior as the keyboard handler
-      // above — a no-op unless it actually changes the gripped side.
-      if (key === 'arrowleft' || key === 'arrowright') {
-        handleSwapSidePress(key === 'arrowleft' ? -1 : 1);
-      }
     };
     const release = (e) => {
       e.preventDefault();

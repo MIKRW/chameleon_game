@@ -5,11 +5,12 @@
 // splitting it further risks the physics and the drawing silently drifting
 // apart.
 
-import { SCALE, GROUND_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE, BUG_INTERACT_MARGIN } from './constants.js';
+import { SCALE, GROUND_TOP, LID_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, TREE_PLANT_2B_TRUNK_OVERLAP, TREE_PLANT_4_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE, BACKGROUND_TEXTURE_INTERACT_RANGE_X, BACKGROUND_TEXTURE_INTERACT_RANGE_Y, BUG_INTERACT_MARGIN, BUG_LOCKED_START_INDEX } from './constants.js';
 import { state } from './state.js';
 
 // "ground-plant-3" -> TERRARIUM_SPRITES.groundPlant[2]
 export function resolveGroundPlantSprite(id) {
+  if (TERRARIUM_SPRITES.groundPlantVariants[id]) return TERRARIUM_SPRITES.groundPlantVariants[id];
   const index = Number(id.slice('ground-plant-'.length)) - 1;
   return TERRARIUM_SPRITES.groundPlant[index];
 }
@@ -19,12 +20,16 @@ export function resolveHangingSprite(id) {
   return TERRARIUM_SPRITES[id];
 }
 
-// "tree-trunk-fore-1" -> TERRARIUM_SPRITES.treeTrunk.fore[0]
-// "tree-trunk-back-3" -> TERRARIUM_SPRITES.treeTrunk.back[2]
+// "trunk-bg-4b" -> TERRARIUM_SPRITES.treeTrunk.bg[3].b
+// "trunk-interact-1" -> TERRARIUM_SPRITES.treeTrunk.interact[0]
 export function resolveTreeTrunkSprite(id) {
-  const match = id.match(/^tree-trunk-(fore|back)-(\d+)$/);
-  const [, variant, number] = match;
-  return TERRARIUM_SPRITES.treeTrunk[variant][Number(number) - 1];
+  const bgMatch = id.match(/^trunk-bg-(\d+)([ab])$/);
+  if (bgMatch) {
+    const [, number, variant] = bgMatch;
+    return TERRARIUM_SPRITES.treeTrunk.bg[Number(number) - 1][variant];
+  }
+  const [, number] = id.match(/^trunk-interact-(\d+)$/);
+  return TERRARIUM_SPRITES.treeTrunk.interact[Number(number) - 1];
 }
 
 export function resolveTreeBranchSprite(id) {
@@ -33,6 +38,7 @@ export function resolveTreeBranchSprite(id) {
 }
 
 export function resolveTreePlantSprite(id) {
+  if (TERRARIUM_SPRITES.treePlantVariants[id]) return TERRARIUM_SPRITES.treePlantVariants[id];
   const index = Number(id.slice('tree-plant-'.length)) - 1;
   return TERRARIUM_SPRITES.treePlant[index];
 }
@@ -113,6 +119,11 @@ export function branchGeometry(bp) {
     maxX: Math.max(baseX, tipX),
     thickness,
     tBend,
+    // Host trunk's sprite id, so drawTreeBranches (game/render.js) can merge
+    // this branch's own palette entry (just its 'k' outline) with the
+    // trunk's resolved bark palette, so the branch always matches whichever
+    // trunk it's mounted on (see sprites/palette/terrarium-palette.js).
+    trunkSpriteId: trunkPlacement.sprite,
   };
 }
 
@@ -129,17 +140,30 @@ export function treePlantGeometry(pp) {
   const trunkSprite = resolveTreeTrunkSprite(trunkPlacement.sprite);
   const plantSprite = resolveTreePlantSprite(pp.sprite);
   const trunkTopY = GROUND_TOP - trunkSprite.height * SCALE;
+  const plantScale = SCALE * (pp.scaleMultiplier || 1);
+  const overlap = pp.sprite === 'tree-plant-2b'
+    ? TREE_PLANT_2B_TRUNK_OVERLAP
+    : pp.sprite === 'tree-plant-slime'
+      ? SLIME_TRUNK_OVERLAP
+      : pp.sprite === 'tree-plant-4'
+        ? TREE_PLANT_4_TRUNK_OVERLAP
+        : TREE_PLANT_TRUNK_OVERLAP;
   const originX = pp.side === 'right'
-    ? trunkPlacement.x + trunkSprite.width * SCALE - TREE_PLANT_TRUNK_OVERLAP * SCALE
-    : trunkPlacement.x - (plantSprite.width - TREE_PLANT_TRUNK_OVERLAP) * SCALE;
-  const originY = trunkTopY + pp.attachRow * SCALE - (plantSprite.height - 1) * SCALE;
-  return { placement: pp, originX, originY };
+    ? trunkPlacement.x + trunkSprite.width * SCALE - overlap * plantScale
+    : trunkPlacement.x - (plantSprite.width - overlap) * plantScale;
+  const originY = trunkTopY + pp.attachRow * SCALE - (plantSprite.height - 1) * plantScale;
+  // Host trunk's sprite id, so drawTreePlants (game/render.js) can merge
+  // this plant's own palette entry with the trunk's resolved bark palette —
+  // tree-plant-3/4/5's small bark-stub accent (k/R/r) matches whichever
+  // trunk they're mounted on, the same way branches do (see branchGeometry
+  // above and sprites/palette/terrarium-palette.js).
+  return { placement: pp, originX, originY, trunkSpriteId: trunkPlacement.sprite };
 }
 
 // All decorative trunk plants, resolved once at load time (TREE_PLANT_PLACEMENTS is static).
 export const TREE_PLANT_GEOMETRIES = TREE_PLANT_PLACEMENTS.map(treePlantGeometry).filter(Boolean);
 
-// World-space geometry for a BUG_PLACEMENTS entry (world-props.js) — three
+// World-space geometry for a BUG_PLACEMENTS entry (world-props.js) — four
 // modes: `ground` bugs snap to the floor at `x` like PLANT_PLACEMENTS;
 // `trunk` bugs mount onto a trunk's side at `attachRow` the same way
 // treePlantGeometry() does, reusing TREE_PLANT_TRUNK_OVERLAP so a bug tucked
@@ -147,7 +171,11 @@ export const TREE_PLANT_GEOMETRIES = TREE_PLANT_PLACEMENTS.map(treePlantGeometry
 // it; `air` bugs hang at a fixed `x`/`heightAboveFloor` in open space between
 // trees, with no prop underneath — reachable by a plain jump (max jump apex
 // is JUMP_VELOCITY^2 / (2*GRAVITY), see game/constants.js) rather than by
-// climbing.
+// climbing; `path` bugs are the same open-air case but drift around a
+// `x`/`heightAboveFloor` center along a repeating shape (see
+// game/bug-motion.js) instead of sitting still — originX/originY here are
+// just the shape's t=0 point, and updateBugPaths() (called every frame from
+// game/main.js) overwrites them each frame as the bug moves.
 export function bugGeometry(bp) {
   const sprite = resolveBugSprite(bp.sprite);
   if (bp.mode === 'trunk') {
@@ -155,16 +183,34 @@ export function bugGeometry(bp) {
     if (!trunkPlacement) return null;
     const trunkSprite = resolveTreeTrunkSprite(trunkPlacement.sprite);
     const trunkTopY = GROUND_TOP - trunkSprite.height * SCALE;
+    const bugScale = SCALE * (bp.scaleMultiplier || 1);
     const originX = bp.side === 'right'
-      ? trunkPlacement.x + trunkSprite.width * SCALE - TREE_PLANT_TRUNK_OVERLAP * SCALE
-      : trunkPlacement.x - (sprite.width - TREE_PLANT_TRUNK_OVERLAP) * SCALE;
-    const originY = trunkTopY + bp.attachRow * SCALE - (sprite.height - 1) * SCALE;
-    return { placement: bp, trunkPlacement, originX, originY, width: sprite.width * SCALE, height: sprite.height * SCALE };
+      ? trunkPlacement.x + trunkSprite.width * SCALE - TREE_PLANT_TRUNK_OVERLAP * bugScale
+      : trunkPlacement.x - (sprite.width - TREE_PLANT_TRUNK_OVERLAP) * bugScale;
+    const originY = trunkTopY + bp.attachRow * SCALE - (sprite.height - 1) * bugScale;
+    return { placement: bp, trunkPlacement, originX, originY, width: sprite.width * bugScale, height: sprite.height * bugScale };
   }
   if (bp.mode === 'air') {
     const originX = bp.x;
     const originY = GROUND_TOP - bp.heightAboveFloor - sprite.height * SCALE;
     return { placement: bp, originX, originY, width: sprite.width * SCALE, height: sprite.height * SCALE };
+  }
+  if (bp.mode === 'path') {
+    const centerX = bp.x;
+    const centerY = GROUND_TOP - bp.heightAboveFloor - sprite.height * SCALE;
+    return {
+      placement: bp,
+      centerX,
+      centerY,
+      originX: centerX,
+      originY: centerY,
+      width: sprite.width * SCALE,
+      height: sprite.height * SCALE,
+      pathType: bp.pathType,
+      pathSize: bp.pathSize,
+      pathSpeed: bp.pathSpeed,
+      pathPhase: bp.pathPhase || 0,
+    };
   }
   const originX = bp.x;
   const originY = GROUND_TOP - sprite.height * SCALE;
@@ -182,18 +228,31 @@ export function bugRect(geo) {
   return { left: geo.originX, right: geo.originX + geo.width, top: geo.originY, bottom: geo.originY + geo.height };
 }
 
-// A trunk-mounted bug can only be caught while actually side-climbing the
-// exact trunk face it's mounted on — not just standing/falling somewhere
-// that happens to overlap its (small) hitbox. Without this, a jump that
-// arcs past the trunk's far face — e.g. hopping the gap behind a tree from
-// its left side to its right side and dropping down the other side — could
-// scoop up a right-side bug without ever needing the trunk-side-swap skill
-// that's supposed to gate that face (see attachToTrunk() in
-// game/movement.js). Ground/air bugs have no trunk to grip, so they're
-// always reachable by position alone.
+// A trunk-mounted bug can only be caught while actually gripping the trunk
+// it's mounted on. On a layer-8 (Cling to Sides) trunk that means the exact
+// face it's mounted on — not just standing/falling somewhere that happens to
+// overlap its (small) hitbox. Without this, a jump that arcs past the
+// trunk's far face — e.g. hopping the gap behind a tree from its left side
+// to its right side and dropping down the other side — could scoop up a
+// right-side bug without ever needing the Cling to Sides skill that's
+// supposed to gate that face (see attachToTrunk() in game/movement.js). On a
+// layer-5 (front-climb) trunk there's only one climbing face — state.climb.side
+// is always null there (attachToTrunk sets a side only for Cling to Sides) —
+// so `side` on the bug is purely cosmetic (which face the sprite is drawn
+// hugging) and any front-climb on that trunk reaches it. Ground/air bugs
+// have no trunk to grip, so they're always reachable by position alone.
 export function canReachBug(geo) {
   if (geo.placement.mode !== 'trunk') return true;
-  return !!(state.climb && state.climb.trunk === geo.trunkPlacement && state.climb.side === geo.placement.side);
+  if (!state.climb || state.climb.trunk !== geo.trunkPlacement) return false;
+  return geo.trunkPlacement.layer === 5 || state.climb.side === geo.placement.side;
+}
+
+// Bugs at BUG_LOCKED_START_INDEX (game/constants.js) and beyond are hidden
+// (drawBugs, game/render.js) and uncatchable (collectNearbyBug,
+// game/interactions.js) until Cling to Sides is unlocked, so the last 10 of
+// the 20 total bugs can't be found before that puzzle is solved.
+export function isBugUnlocked(index) {
+  return index < BUG_LOCKED_START_INDEX || state.clingToSidesUnlocked;
 }
 
 // Tight bounding box (barely larger than the player's actual sprite) used to
@@ -225,27 +284,33 @@ export function branchSurfaceYAt(geo, worldX) {
   return geo.baseY + riseT * (geo.tipY - geo.baseY);
 }
 
-// The gatekeeper tree — the first tree right of the player's start position
-// (see TREE_PLACEMENTS in world-props.js) — walled off by red gate moss
-// (TREE_PLANT_1) until room 1's puzzle is solved.
-export const GATE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 550 && p.layer === 6);
+// The "Moss Tree" — the second tree the player reaches overall (after the
+// x300 layer-5 trunk), and the first reachable layer-8 trunk (see
+// TREE_PLACEMENTS in world-props.js, x720 — note WORLD_WIDTH is currently
+// shortened to 2650, so x2350 is the last reachable layer-8 trunk, not the
+// second) — walled off by red gate moss (TREE_PLANT_1) until room 1's puzzle
+// is solved.
+export const GATE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 720 && p.layer === 8);
 
 // The light switch — mounted on the left face of the second tree from the
 // far right (see LIGHT_SWITCH_PLACEMENT, world-props.js).
 export const LIGHT_SWITCH_TRUNK = TREE_PLACEMENTS.find((p) => p.x === LIGHT_SWITCH_PLACEMENT.trunkX && p.layer === LIGHT_SWITCH_PLACEMENT.layer);
 
-// The background-texture binary puzzle — no physical prop, just the lit
-// pixel-digit grid (sprites/background-texture.js) hanging under the
-// lightbulb at x150. Read from the closest climbable tree (Tree Trunk Fore 3
-// at x320, layer 6 — see TREE_PLACEMENTS in world-props.js), side-climbed on
-// its left face so the player is looking back toward the bulb/texture
-// cluster. Same interaction convention as LIGHT_SWITCH_TRUNK above.
-export const CODE_TRUNK = TREE_PLACEMENTS.find((p) => p.x === 320 && p.layer === 6);
+// The branch mounted on the same face LIGHT_SWITCH_PLACEMENT.side names, on
+// LIGHT_SWITCH_TRUNK — reachable "for free" once the player has climbed up
+// to it, and used by nearLightSwitch() below as the lower end of the
+// reachable band (and as its own perch — see onSwitchBranch there).
+export const LIGHT_SWITCH_BRANCH = BRANCH_GEOMETRIES.find((g) =>
+  g.placement.trunkX === LIGHT_SWITCH_PLACEMENT.trunkX &&
+  g.placement.layer === LIGHT_SWITCH_PLACEMENT.layer &&
+  g.placement.side === LIGHT_SWITCH_PLACEMENT.side
+);
 
-// True while the player is close enough to the gatekeeper tree — standing on
+// True while the player is close enough to the Moss Tree — standing on
 // the ground within reach, or gripping that exact trunk — to press E and
 // open its keypad popup.
 export function nearGate() {
+  if (!GATE_TRUNK) return false;
   const rect = treeTrunkRect(GATE_TRUNK);
   const centerX = state.player.x + PLAYER_W / 2;
   const inRange = centerX >= rect.left - GATE_INTERACT_RANGE && centerX <= rect.right + GATE_INTERACT_RANGE;
@@ -253,33 +318,77 @@ export function nearGate() {
   return inRange && stationary;
 }
 
-// World-space top-left origin for the light switch, mounted into the left
-// face of LIGHT_SWITCH_TRUNK at LIGHT_SWITCH_PLACEMENT.attachRow — same
-// row/overlap approach branchGeometry() uses for a branch's base.
+// World-space top-left origin for the light switch, mounted into whichever
+// face of LIGHT_SWITCH_TRUNK LIGHT_SWITCH_PLACEMENT.side names, at
+// LIGHT_SWITCH_PLACEMENT.attachRow — same row/overlap approach
+// branchGeometry() uses for a branch's base (see its side==='right' vs
+// default split above).
 export function lightSwitchOrigin() {
   const rect = treeTrunkRect(LIGHT_SWITCH_TRUNK);
   const sprite = TERRARIUM_SPRITES.lightSwitch;
-  const x = rect.left - (sprite.width - SWITCH_TRUNK_OVERLAP) * SCALE;
+  const x = LIGHT_SWITCH_PLACEMENT.side === 'right'
+    ? rect.right - SWITCH_TRUNK_OVERLAP * SCALE
+    : rect.left - (sprite.width - SWITCH_TRUNK_OVERLAP) * SCALE;
   const y = rect.top + LIGHT_SWITCH_PLACEMENT.attachRow * SCALE;
   return { x, y, width: sprite.width * SCALE, height: sprite.height * SCALE };
 }
 
-// True while the player is side-climbing LIGHT_SWITCH_TRUNK on its left face
-// (the same face the switch is mounted on) at roughly the switch's height,
-// close enough to press E and flip it.
+// True while the player can reach the light switch: either gripping
+// LIGHT_SWITCH_TRUNK via Cling to Sides on the switch's face, anywhere from just above the
+// switch down to LIGHT_SWITCH_BRANCH's height (so the whole stretch of trunk
+// between the branch and the switch works, not just a narrow band centered
+// on the switch), or standing/hanging on LIGHT_SWITCH_BRANCH itself near its
+// trunk end. Both are the same side of the tree as the switch by
+// construction — LIGHT_SWITCH_BRANCH is looked up with that same side.
 export function nearLightSwitch() {
-  if (!state.climb || state.climb.trunk !== LIGHT_SWITCH_TRUNK || state.climb.side !== 'left') return false;
   const origin = lightSwitchOrigin();
   const switchCenterY = origin.y + origin.height / 2;
   const playerCenterY = state.player.y + PLAYER_H / 2;
-  return Math.abs(playerCenterY - switchCenterY) <= LIGHT_SWITCH_INTERACT_RANGE;
+
+  const onTrunkSide = state.climb && state.climb.trunk === LIGHT_SWITCH_TRUNK && state.climb.side === LIGHT_SWITCH_PLACEMENT.side;
+  if (onTrunkSide) {
+    const topBound = switchCenterY - LIGHT_SWITCH_INTERACT_RANGE;
+    const bottomBound = (LIGHT_SWITCH_BRANCH ? LIGHT_SWITCH_BRANCH.baseY : switchCenterY) + LIGHT_SWITCH_INTERACT_RANGE;
+    return playerCenterY >= topBound && playerCenterY <= bottomBound;
+  }
+
+  const onSwitchBranch = LIGHT_SWITCH_BRANCH && state.branch && state.branch.geo === LIGHT_SWITCH_BRANCH;
+  if (onSwitchBranch) {
+    const playerCenterX = state.player.x + PLAYER_W / 2;
+    return Math.abs(playerCenterX - LIGHT_SWITCH_BRANCH.baseX) <= LIGHT_SWITCH_INTERACT_RANGE;
+  }
+
+  return false;
 }
 
-// True while the player is side-climbing CODE_TRUNK on its left face — the
-// face looking back toward the bulb/background-texture cluster — regardless
-// of height on the trunk, since there's no mounted prop/row to be "at". Only
-// the light being on actually makes the grid legible; that's enforced in
+// World-space position of the background-texture grid (sprites/background-texture.js)
+// — no physical prop, just the pixel-digit backdrop hanging under the
+// lightbulb (HANGING_PLACEMENTS) at LID_TOP + the bulb's height. Same
+// centering math drawBackgroundTexture() (game/render.js) uses to place it
+// on screen, just in world space (no camera offset) so it can be compared
+// against the player's position.
+export function backgroundTextureOrigin() {
+  const bulbPlacement = HANGING_PLACEMENTS.find((p) => p.sprite === 'lightbulb');
+  const bulbSprite = TERRARIUM_SPRITES.lightbulb;
+  const sprite = TERRARIUM_SPRITES.backgroundTexture;
+  const bulbCenterX = bulbPlacement.x + (bulbSprite.width * SCALE) / 2;
+  const x = bulbCenterX - (sprite.width * SCALE) / 2;
+  const y = LID_TOP + bulbSprite.height * SCALE;
+  return { x, y, width: sprite.width * SCALE, height: sprite.height * SCALE };
+}
+
+// True while the player is within BACKGROUND_TEXTURE_INTERACT_RANGE_X/Y of
+// the grid's center — plain position check, no trunk/climb requirement,
+// since the puzzle isn't mounted on anything. Only reachable while the light
+// is actually on (so the grid is both visible and legible); enforced in
 // handleInteractPress() rather than here so this stays a pure position check.
 export function nearBackgroundTexture() {
-  return !!(state.climb && state.climb.trunk === CODE_TRUNK && state.climb.side === 'left');
+  const origin = backgroundTextureOrigin();
+  const centerX = origin.x + origin.width / 2;
+  const centerY = origin.y + origin.height / 2;
+  const playerCenterX = state.player.x + PLAYER_W / 2;
+  const playerCenterY = state.player.y + PLAYER_H / 2;
+  return Math.abs(playerCenterX - centerX) <= BACKGROUND_TEXTURE_INTERACT_RANGE_X &&
+    Math.abs(playerCenterY - centerY) <= BACKGROUND_TEXTURE_INTERACT_RANGE_Y;
 }
+

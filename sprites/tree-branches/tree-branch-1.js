@@ -6,16 +6,17 @@
 // speckled dither: a flat, thick, perpendicular launch straight out of the trunk
 // (reading as a clean right angle at the join instead of sloping away
 // immediately) that then tapers and rises to a point at the tip -- same
-// top-row-highlight / bottom-row-shade banding the tree-trunk-fore-* sprites
-// use, just laid out horizontally, so it matches the bark of the trunk it's
-// mounted on. Long/flat enough for the chameleon to stand on and run out
+// top-row-highlight / bottom-row-shade banding the vivid-bark trunk sprites
+// (trunk-interact-*, trunk-bg-*b) use, just laid out horizontally, so it
+// matches the bark of the trunk it's mounted on. Long/flat enough for the
+// chameleon to stand on and run out
 // along its length (see BRANCH_GEOMETRIES in game/world-geometry.js / updateBranch in game/movement.js).
 // Defined for a right-side attach; flip horizontally (drawSprite's flipX) to
 // mount on a trunk's left side instead.
 // Size: 32x10 (grid units; multiply by render scale) -- a ~128px reach at the
 // game's SCALE 4, comfortably wider than the player.
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js -- same r/R/h bark keys as
-// the tree-trunk-fore-* set so it matches whichever fore trunk it's attached to.
+// the vivid-bark trunk sprites so it matches whichever trunk it's attached to.
 
 const TREE_BRANCH_1 = {
   name: 'Tree Branch 1 - Short Knob',

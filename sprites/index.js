@@ -6,15 +6,39 @@
 // the terrarium scene is built.
 
 const TERRARIUM_SPRITES = {
-  groundPlant: [GROUND_PLANT_1, GROUND_PLANT_2, GROUND_PLANT_3, GROUND_PLANT_4, GROUND_PLANT_5],
+  // index 1 (ground-plant-2, the yellow bush) is intentionally left out — see
+  // resolveGroundPlantSprite() in game/world-geometry.js, which maps
+  // "ground-plant-N" to index N-1, so the gap must stay to keep
+  // ground-plant-3/4/5's ids resolving to the right sprite.
+  groundPlant: [GROUND_PLANT_1, undefined, GROUND_PLANT_3, GROUND_PLANT_4, GROUND_PLANT_5, GROUND_PLANT_6, GROUND_PLANT_7],
+  // Lettered size/angle variants, keyed by full id — see
+  // resolveGroundPlantSprite() in game/world-geometry.js, which checks this
+  // map before falling back to the numbered array above.
+  groundPlantVariants: { 'ground-plant-1b': GROUND_PLANT_1B },
   treePlant: [TREE_PLANT_1, TREE_PLANT_2, TREE_PLANT_3, TREE_PLANT_4, TREE_PLANT_5],
+  // Lettered size variants, keyed by full id — see resolveTreePlantSprite()
+  // in game/world-geometry.js, which checks this map before falling back to
+  // the numbered array above.
+  treePlantVariants: { 'tree-plant-1b': TREE_PLANT_1B, 'tree-plant-2b': TREE_PLANT_2B, 'tree-plant-slime': TREE_PLANT_SLIME },
   bug: [BUG_1],
-  vine: [VINE_1, VINE_2],
   treeTrunk: {
-    fore: [TREE_TRUNK_FORE_1, TREE_TRUNK_FORE_2, TREE_TRUNK_FORE_3, TREE_TRUNK_FORE_4, TREE_TRUNK_FORE_5],
-    back: [TREE_TRUNK_BACK_1, TREE_TRUNK_BACK_2, TREE_TRUNK_BACK_3, TREE_TRUNK_BACK_4, TREE_TRUNK_BACK_5],
+    // Background-only decor (layer 2, cosmetic, never climbable) — indexed by
+    // silhouette family (1-6), each holding whichever bark variants exist for
+    // it: 'a' (muted) and/or 'b' (vivid). See resolveTreeTrunkSprite() in
+    // game/world-geometry.js for how 'trunk-bg-Nx' ids resolve here.
+    bg: [
+      { a: TREE_TRUNK_BG_1A },
+      { a: TREE_TRUNK_BG_2A },
+      { a: TREE_TRUNK_BG_3A },
+      { a: TREE_TRUNK_BG_4A, b: TREE_TRUNK_BG_4B },
+      { a: TREE_TRUNK_BG_5A, b: TREE_TRUNK_BG_5B },
+      { a: TREE_TRUNK_BG_6A, b: TREE_TRUNK_BG_6B },
+    ],
+    // Climbable trunks (TREE_PLACEMENTS, layer 5/8) — numbered on their own
+    // track, independent of the bg silhouette numbers above.
+    interact: [TREE_TRUNK_INTERACT_1, TREE_TRUNK_INTERACT_2, TREE_TRUNK_INTERACT_3],
   },
-  treeBranch: [TREE_BRANCH_1, TREE_BRANCH_2],
+  treeBranch: [TREE_BRANCH_1, TREE_BRANCH_2, TREE_BRANCH_3],
   lightbulb: LIGHTBULB,
   lightbulb2: LIGHTBULB_2,
   lightbulb3: LIGHTBULB_3,

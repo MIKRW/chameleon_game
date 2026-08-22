@@ -25,9 +25,8 @@
 </head>
 <body>
   <main class="game-wrap">
-    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button">☀ Light</button>
-
     <header class="game-header">
+      <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle theme"></button>
       <h1>Escape <span class="title-accent">the Terrarium</span></h1>
       <button id="devtools-btn" class="devtools-btn" type="button" aria-label="Open mobile dev tools">🛠</button>
     </header>
@@ -45,8 +44,7 @@
       <div id="gate-popup" class="popup-overlay hidden">
         <button id="gate-close-btn" class="popup-close-btn" type="button" aria-label="Close">×</button>
         <div class="popup-content">
-          <h2>The Gatekeeper Tree</h2>
-          <p class="popup-text">That red moss is stopping me from passing. There must be a way to remove it.</p>
+          <p class="popup-text">The Moss Tree is stopping me from passing. There must be a way to remove it.</p>
           <form id="gate-form" class="dialog-form gate-form">
             <input id="gate-input" type="text" autocomplete="off" placeholder="Enter code" />
             <button type="submit" class="dialog-form-btn">Remove Moss</button>
@@ -65,8 +63,7 @@
       <div id="code-popup" class="popup-overlay hidden">
         <button id="code-close-btn" class="popup-close-btn" type="button" aria-label="Close">×</button>
         <div class="popup-content">
-          <h2>The Warm Light</h2>
-          <p id="code-popup-text" class="popup-text">Enter the code to keep the Lights on</p>
+          <p id="code-popup-text" class="popup-text">Enter the right code to keep the nice warm lights on</p>
           <form id="code-form" class="dialog-form">
             <input id="code-input" type="text" autocomplete="off" placeholder="Enter code" />
             <button type="submit" class="dialog-form-btn">Submit</button>
@@ -88,11 +85,14 @@
           <h2>So Close...</h2>
           <p class="popup-text">I'm so close to escaping! Take this code outside the tank and enter it into the chameleon pet — that's how you'll finally see me on screen.</p>
           <p id="completion-flag" class="win-flag"></p>
-          <p class="win-note">Enter this code into the chameleon pet on the portfolio site.</p>
+          <button id="win-hint-btn" class="hint-toggle-btn" type="button" aria-label="Show hint" aria-expanded="false">?</button>
+          <p id="win-note" class="win-note hidden">Enter this code into the chameleon pet on the portfolio site.</p>
         </div>
       </div>
 
     </div>
+
+    <button id="restart-btn" class="restart-btn hidden" type="button" aria-label="Restart">↻</button>
 
     <!-- Visible D-pad + action buttons for touch devices, stacked below the
          canvas in normal document flow (not overlaid on top of it) so they
@@ -111,18 +111,24 @@
       </div>
     </div>
 
-    <p class="controls-hint">Move: Arrow keys / WASD &nbsp;·&nbsp; Jump: Space &nbsp;·&nbsp; Interact/catch: E &nbsp;·&nbsp; Swap trunk side while climbing: Left/Right</p>
-
-    <div class="status-row">
-      <p id="skill-status" class="controls-hint">Skill unlocked: NO</p>
-      <p id="puzzle-status" class="controls-hint">Puzzles complete: 0 / 3</p>
-      <p id="bug-status" class="controls-hint">Bugs found: 0 / 0</p>
+    <div id="pre-start-info" class="status-row">
+      <p class="controls-hint">Move: WASD</p>
+      <p class="controls-hint">Jump: Space</p>
+      <p class="controls-hint">Interact: E</p>
     </div>
 
-    <button id="restart-btn" class="secondary-btn restart-btn" type="button">Restart</button>
+    <div id="post-start-info" class="hidden">
+      <div class="status-row status-row-line">
+        <p id="skill-status" class="controls-hint">Cling to Sides: No</p>
+        <p id="puzzle-status" class="controls-hint">Puzzle: 0 / 3</p>
+        <p id="bug-status" class="controls-hint">Bugs: 0 / 0</p>
+      </div>
+
+    </div>
   </main>
 
   <script src="sprites.js"></script>
+  <script src="sprites/palette/bark-ladder.js"></script>
   <script src="sprites/palette/terrarium-palette.js"></script>
   <script src="sprites/palette/player-palette.js"></script>
   <script src="sprites/user/player/player.js"></script>
@@ -136,34 +142,48 @@
   <script src="sprites/glass-edges/glass-edge-4.js"></script>
   <script src="sprites/floor.js"></script>
   <script src="sprites/ground-plants/ground-plant-1.js"></script>
-  <script src="sprites/ground-plants/ground-plant-2.js"></script>
+  <script src="sprites/ground-plants/ground-plant-1b.js"></script>
+  <script src="sprites/ground-plants/ground-plant-6.js"></script>
   <script src="sprites/ground-plants/ground-plant-3.js"></script>
   <script src="sprites/ground-plants/ground-plant-4.js"></script>
   <script src="sprites/ground-plants/ground-plant-5.js"></script>
+  <script src="sprites/ground-plants/ground-plant-7.js"></script>
   <script src="sprites/tree-plants/tree-plant-1.js"></script>
+  <script src="sprites/tree-plants/tree-plant-1b.js"></script>
   <script src="sprites/tree-plants/tree-plant-2.js"></script>
+  <script src="sprites/tree-plants/tree-plant-2b.js"></script>
   <script src="sprites/tree-plants/tree-plant-3.js"></script>
   <script src="sprites/tree-plants/tree-plant-4.js"></script>
   <script src="sprites/tree-plants/tree-plant-5.js"></script>
   <script src="sprites/tree-plants/tree-plant-slime.js"></script>
   <script src="sprites/bugs/bug-1.js"></script>
-  <script src="sprites/vines/vine-1.js"></script>
-  <script src="sprites/vines/vine-2.js"></script>
-  <script src="sprites/tree-trunk-fores/tree-trunk-fore-1.js"></script>
-  <script src="sprites/tree-trunk-fores/tree-trunk-fore-2.js"></script>
-  <script src="sprites/tree-trunk-fores/tree-trunk-fore-3.js"></script>
-  <script src="sprites/tree-trunk-fores/tree-trunk-fore-4.js"></script>
-  <script src="sprites/tree-trunk-fores/tree-trunk-fore-5.js"></script>
-  <script src="sprites/tree-trunk-backs/tree-trunk-back-1.js"></script>
-  <script src="sprites/tree-trunk-backs/tree-trunk-back-2.js"></script>
-  <script src="sprites/tree-trunk-backs/tree-trunk-back-3.js"></script>
-  <script src="sprites/tree-trunk-backs/tree-trunk-back-4.js"></script>
-  <script src="sprites/tree-trunk-backs/tree-trunk-back-5.js"></script>
+  <script src="sprites/tree-trunks-bg/trunk-bg-1a.js"></script>
+  <script src="sprites/tree-trunks-bg/trunk-bg-2a.js"></script>
+  <script src="sprites/tree-trunks-bg/trunk-bg-3a.js"></script>
+  <script src="sprites/tree-trunks-bg/trunk-bg-4a.js"></script>
+  <script src="sprites/tree-trunks-bg/trunk-bg-4b.js"></script>
+  <script src="sprites/tree-trunks-bg/trunk-bg-5a.js"></script>
+  <script src="sprites/tree-trunks-bg/trunk-bg-5b.js"></script>
+  <script src="sprites/tree-trunks-bg/trunk-bg-6a.js"></script>
+  <script src="sprites/tree-trunks-bg/trunk-bg-6b.js"></script>
+  <script src="sprites/tree-trunks-interact/trunk-interact-1.js"></script>
+  <script src="sprites/tree-trunks-interact/trunk-interact-2.js"></script>
+  <script src="sprites/tree-trunks-interact/trunk-interact-3.js"></script>
   <script src="sprites/tree-branches/tree-branch-1.js"></script>
   <script src="sprites/tree-branches/tree-branch-2.js"></script>
+  <script src="sprites/tree-branches/tree-branch-3.js"></script>
   <script src="sprites/lights/lightbulb.js"></script>
   <script src="sprites/lights/lightbulb-2.js"></script>
   <script src="sprites/lights/lightbulb-3.js"></script>
+  <script src="sprites/backgrounds/background-alternative/forest-v1.js"></script>
+  <script src="sprites/backgrounds/background-alternative/forest-v2.js"></script>
+  <script src="sprites/backgrounds/background-alternative/forest-v3.js"></script>
+  <script src="sprites/backgrounds/background-alternative/forest-v4.js"></script>
+  <script src="sprites/backgrounds/forest-v5.js"></script>
+  <script src="sprites/backgrounds/forest-v6.js"></script>
+  <script src="sprites/backgrounds/forest-v7.js"></script>
+  <script src="sprites/backgrounds/background-alternative/solid-dark-emerald.js"></script>
+  <script src="sprites/backgrounds/index.js"></script>
   <script src="sprites/background-texture.js"></script>
   <script src="sprites/lights/light-switch.js"></script>
   <script src="sprites/lights/light-switch-2.js"></script>
@@ -178,8 +198,14 @@
     (function () {
       var startScreen = document.getElementById('start-screen');
       var startBtn = document.getElementById('start-btn');
+      var preStartInfo = document.getElementById('pre-start-info');
+      var postStartInfo = document.getElementById('post-start-info');
+      var restartBtn = document.getElementById('restart-btn');
       startBtn.addEventListener('click', function () {
         startScreen.classList.add('hidden');
+        preStartInfo.classList.add('hidden');
+        postStartInfo.classList.remove('hidden');
+        restartBtn.classList.remove('hidden');
       });
     })();
 
@@ -192,8 +218,11 @@
         return window.matchMedia('(prefers-color-scheme: light)').matches;
       }
 
+      var moonIcon = '<svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>';
+      var sunIcon = '<svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M21.5 12H19M5 12H2.5M18.36 5.64l-1.77 1.77M7.41 16.59l-1.77 1.77M18.36 18.36l-1.77-1.77M7.41 7.41 5.64 5.64"/></svg>';
+
       function syncLabel() {
-        btn.textContent = isLight() ? '☾ Dark' : '☀ Light';
+        btn.innerHTML = isLight() ? moonIcon : sunIcon;
       }
 
       function applyTheme(theme) {
@@ -208,6 +237,7 @@
 
       btn.addEventListener('click', function () {
         applyTheme(isLight() ? 'dark' : 'light');
+        btn.blur();
       });
 
       // Lets an embedding page keep the game's theme in sync live, e.g.

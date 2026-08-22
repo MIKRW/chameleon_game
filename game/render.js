@@ -6,19 +6,45 @@ import {
   CANVAS_W, CANVAS_H, SCALE, WORLD_WIDTH, WORLD_HEIGHT, GROUND_TOP, LID_TOP,
   GLASS_EDGE_RENDER_SCALE, GLASS_BOTTOM_TILE_W, GLASS_BOTTOM_TILE_H, GLASS_SIDE_THICKNESS,
   GLASS_SIDE_RENDER_SCALE, GLASS_SIDE_TILE_H, PLAYER_H, FLOOR_Y, GLASS_FRONT_TOP_ALPHA,
-  GLASS_FRONT_BOTTOM_ALPHA, TREE_FADE_MIN_ALPHA_LAYER4, TREE_FADE_MAX_ALPHA_LAYER4,
-  TERRARIUM_PALETTE_LAYER4_TREES, BACKGROUND_PIXEL_BLOCK, TREE_FADE_MIN_ALPHA, TREE_FADE_MAX_ALPHA,
-  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, TREE_PLANT_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP,
+  GLASS_FRONT_BOTTOM_ALPHA,
+  BACKGROUND_PIXEL_BLOCK, BACKGROUND_PARALLAX, BACKGROUND_DECOR_PARALLAX_LAYER2, BACKGROUND_DECOR_PARALLAX_LAYER3,
+  TREE_FADE_MIN_ALPHA, TREE_FADE_MAX_ALPHA,
+  CAMERA_X_MAX, CAMERA_Y_MAX, GATE_MOSS_FINGER_MARGIN, GATE_MOSS_BOTTOM_GAP, TREE_PLANT_TRUNK_OVERLAP, SLIME_TRUNK_OVERLAP,
+  CAMERA_EASE,
 } from './constants.js';
 import { state, ctx } from './state.js';
 import {
   resolveGroundPlantSprite, resolveHangingSprite, resolveTreeTrunkSprite, resolveTreeBranchSprite,
   resolveTreePlantSprite, resolveBugSprite, byAscendingZ, BRANCH_GEOMETRIES, TREE_PLANT_GEOMETRIES,
-  BUG_GEOMETRIES, GATE_TRUNK, treeTrunkRect, lightSwitchOrigin,
+  BUG_GEOMETRIES, isBugUnlocked, GATE_TRUNK, LIGHT_SWITCH_TRUNK, treeTrunkRect, lightSwitchOrigin,
 } from './world-geometry.js';
 import { playerCenter } from './movement.js';
 
-// Front-climb uses the flat, head-on clinging pose; side-climb uses whichever
+// A sprite's own nested palette entry (sprites/palette/terrarium-palette.js)
+// — for sprites with no depth-layer bark variation, this is the whole
+// palette to draw with. Returns undefined for an unknown id, same as a bare
+// TERRARIUM_PALETTE[id] lookup would.
+export function resolveSpritePalette(id) {
+  return TERRARIUM_PALETTE[id];
+}
+
+// A bark-owning sprite's palette resolved for one depth layer. Ladder-driven
+// entries (trunk-interact-1/3, trunk-bg-1a/2a/3a/4a/5a — see
+// sprites/palette/terrarium-palette.js) carry a `.layers[layerNumber]`
+// table built by buildBarkLayers() (sprites/palette/bark-ladder.js); this
+// merges that layer's colors over the entry's non-varying keys (k, D, ...).
+// Flat (non-ladder) bark entries and everything else are returned as-is.
+export function resolveBarkPalette(id, layer) {
+  const entry = TERRARIUM_PALETTE[id];
+  if (!entry) return entry;
+  if (entry.layers) {
+    const { layers, ...base } = entry;
+    return { '.': null, ...base, ...layers[layer] };
+  }
+  return entry;
+}
+
+// Front-climb uses the flat, head-on clinging pose; Cling to Sides uses whichever
 // left/right-facing pose matches the edge the player attached from (see
 // attachToTrunk). Every other state — grounded, mid-air — uses the default
 // sprite, which already reverts automatically once jumpOffTrunk() clears
@@ -36,13 +62,13 @@ export function playerSpriteForState() {
 export function drawTankFraming(camera) {
   const leftX = 0 - camera.x;
   const rightX = WORLD_WIDTH - camera.x - GLASS_SIDE_THICKNESS;
-  drawGlassEdgeSide(camera, GLASS_EDGE_LEFT, leftX);
-  drawGlassEdgeSide(camera, GLASS_EDGE_RIGHT, rightX);
+  drawGlassEdgeSide(camera, GLASS_EDGE_LEFT, leftX, TERRARIUM_PALETTE.glassEdgeLeft);
+  drawGlassEdgeSide(camera, GLASS_EDGE_RIGHT, rightX, TERRARIUM_PALETTE.glassEdgeRight);
 
   const lidY = LID_TOP - camera.y;
-  if (lidY > -20 && lidY < CANVAS_H) {
-    ctx.fillStyle = 'rgba(200, 220, 180, 0.6)';
-    ctx.fillRect(0, lidY, CANVAS_W, 4);
+  if (lidY > -3 && lidY < CANVAS_H) {
+    ctx.fillStyle = '#c8dcb4';
+    ctx.fillRect(0, lidY, CANVAS_W, 3);
   }
 }
 
@@ -56,8 +82,8 @@ export function drawGlassFront(playerWorldY) {
   const fade = 1 - climbT; // 1 at the floor, 0 right at the lid
 
   const front = ctx.createLinearGradient(0, 0, 0, CANVAS_H);
-  front.addColorStop(0, `rgba(220, 245, 255, ${GLASS_FRONT_TOP_ALPHA * fade})`);
-  front.addColorStop(1, `rgba(220, 245, 255, ${GLASS_FRONT_BOTTOM_ALPHA * fade})`);
+  front.addColorStop(0, `rgba(180, 215, 255, ${GLASS_FRONT_TOP_ALPHA * fade})`);
+  front.addColorStop(1, `rgba(180, 215, 255, ${GLASS_FRONT_BOTTOM_ALPHA * fade})`);
   ctx.fillStyle = front;
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 }
@@ -91,7 +117,7 @@ export function drawDirtLayer(camera) {
 
 // A side wall of the glass tank, tiled vertically down the world so it
 // covers the full height regardless of how far the camera has panned.
-export function drawGlassEdgeSide(camera, sprite, screenX) {
+export function drawGlassEdgeSide(camera, sprite, screenX, palette) {
   if (screenX < -GLASS_SIDE_THICKNESS || screenX > CANVAS_W) return;
 
   const startTile = Math.floor(camera.y / GLASS_SIDE_TILE_H) - 1;
@@ -101,7 +127,7 @@ export function drawGlassEdgeSide(camera, sprite, screenX) {
   for (let i = startTile; i <= endTile; i++) {
     const wy = i * GLASS_SIDE_TILE_H;
     if (wy + GLASS_SIDE_TILE_H < 0 || wy > WORLD_HEIGHT) continue;
-    drawSprite(ctx, sprite.rows, screenX, wy - camera.y, GLASS_SIDE_RENDER_SCALE, TERRARIUM_PALETTE);
+    drawSprite(ctx, sprite.rows, screenX, wy - camera.y, GLASS_SIDE_RENDER_SCALE, palette);
   }
   ctx.restore();
 
@@ -127,31 +153,57 @@ export function drawGlassEdgeBottom(camera) {
   for (let i = startTile; i <= endTile; i++) {
     const wx = i * GLASS_BOTTOM_TILE_W;
     if (wx + GLASS_BOTTOM_TILE_W < 0 || wx > WORLD_WIDTH) continue;
-    drawSprite(ctx, GLASS_EDGE_BOTTOM.rows, wx - camera.x, screenY, GLASS_EDGE_RENDER_SCALE, TERRARIUM_PALETTE);
+    drawSprite(ctx, GLASS_EDGE_BOTTOM.rows, wx - camera.x, screenY, GLASS_EDGE_RENDER_SCALE, TERRARIUM_PALETTE.glassEdgeBottom);
   }
   ctx.restore();
 }
 
 // Ground-floor foliage placed from PLANT_PLACEMENTS (world-props.js), split
-// across layer 4 (behind the player) and layer 6 (in front of the player)
-// so plants can occlude the chameleon as it walks past.
+// across layer 5 (behind the player) and layer 8 (in front of the player)
+// so plants can occlude the chameleon as it walks past. Layers 2/3 are two
+// further, non-interactive options — cosmetic background foliage that
+// shares the layer-2/3 background-decor bands' treatment (their own
+// BACKGROUND_DECOR_PARALLAX_LAYER2/3, the same crown-fade as
+// drawBackgroundDecor) instead of the opaque 1:1 rendering layers 5/8 get —
+// see DEPTH-LAYERS.md. Ground plants have no bark keys, so unlike
+// drawBackgroundDecor's trunks this layer doesn't need resolveBarkPalette/a
+// saturation step — each plant's own palette entry is used as-is regardless
+// of which layer it's drawn on.
 export function drawGroundPlants(camera, layer) {
+  const isBackgroundLayer = layer === 2 || layer === 3;
+  const parallax = layer === 2 ? BACKGROUND_DECOR_PARALLAX_LAYER2 : BACKGROUND_DECOR_PARALLAX_LAYER3;
   const placements = PLANT_PLACEMENTS.filter((p) => p.layer === layer).sort(byAscendingZ);
   for (const placement of placements) {
     const sprite = resolveGroundPlantSprite(placement.sprite);
-    const scale = SCALE * (sprite.renderScale || 1);
-    const screenX = placement.x - camera.x;
+    const palette = resolveSpritePalette(placement.sprite);
+    const scale = SCALE * (sprite.renderScale || 1) * (placement.scaleMultiplier || 1);
+    const screenX = isBackgroundLayer
+      ? placement.x - camera.x * parallax
+      : placement.x - camera.x;
     const screenY = GROUND_TOP - sprite.height * scale - camera.y;
-    drawSprite(ctx, sprite.rows, screenX, screenY, scale, TERRARIUM_PALETTE);
+    if (isBackgroundLayer) {
+      // ground-plant-1 (and ground-plant-7, its same-shape olive variant)
+      // keep full pixel detail at layer 3 (block 1) instead of the usual
+      // coarser background sampling — it reads as too mushy otherwise at
+      // this sprite's small size/detail level.
+      const block = (placement.sprite === 'ground-plant-1' || placement.sprite === 'ground-plant-7') ? 1 : BACKGROUND_PIXEL_BLOCK;
+      drawSpriteBlocky(ctx, sprite.rows, screenX, screenY, scale, palette, block, {
+        minAlpha: TREE_FADE_MIN_ALPHA,
+        maxAlpha: TREE_FADE_MAX_ALPHA,
+      });
+    } else {
+      drawSprite(ctx, sprite.rows, screenX, screenY, scale, palette);
+    }
   }
 }
 
-// Layer 2 — hidden pixel-digit backdrop (sprites/background-texture.js),
-// painted straight onto the flat layer-1 fill, before any other scenery.
-// Only drawn while the light is on; at rest its digit strokes are dark
-// enough against the same backdrop color to be effectively invisible anyway,
-// but skipping the draw entirely avoids even a flat-diff giveaway in a
-// screenshot/pixel-inspector.
+// Layer 8 — hidden pixel-digit backdrop (sprites/background-texture.js),
+// painted alongside the light switch (same point in the draw order as
+// drawLightSwitch, right before tank framing) rather than with the rest of
+// the background scenery. Only drawn while the light is on; at rest its
+// digit strokes are dark enough against the same backdrop color to be
+// effectively invisible anyway, but skipping the draw entirely avoids even a
+// flat-diff giveaway in a screenshot/pixel-inspector.
 // Hangs from the lid directly under the lightbulb prop (HANGING_PLACEMENTS)
 // rather than sitting on the floor, so it reads as something the bulb is
 // illuminating; row 0 anchors at the bulb's bottom edge instead of the
@@ -164,18 +216,24 @@ export function drawBackgroundTexture(camera) {
   const bulbCenterX = bulbPlacement.x + (bulbSprite.width * SCALE) / 2;
   const screenX = bulbCenterX - (sprite.width * SCALE) / 2 - camera.x;
   const screenY = LID_TOP + bulbSprite.height * SCALE - camera.y;
-  drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, TERRARIUM_PALETTE);
+  drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, TERRARIUM_PALETTE.backgroundTexture);
 }
 
 // The light switch prop (LIGHT_SWITCH_PLACEMENT, world-props.js) — mounted
 // on a trunk rather than standing on the floor, swapping art between
-// light-switch.js/light-switch-2.js based on state.lightOn.
+// light-switch.js/light-switch-2.js based on state.lightOn. The art is
+// drawn arm-into-bark on its right edge (a left-face mount); flipped
+// horizontally when LIGHT_SWITCH_PLACEMENT.side is 'right', same convention
+// drawTreeBranches uses for its side flip.
 export function drawLightSwitch(camera) {
+  if (!LIGHT_SWITCH_TRUNK) return;
   const sprite = state.lightOn ? TERRARIUM_SPRITES.lightSwitch2 : TERRARIUM_SPRITES.lightSwitch;
+  const palette = state.lightOn ? TERRARIUM_PALETTE.lightSwitch2 : TERRARIUM_PALETTE.lightSwitch;
   const origin = lightSwitchOrigin();
   const screenX = origin.x - camera.x;
   const screenY = origin.y - camera.y;
-  drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, TERRARIUM_PALETTE);
+  const flipX = LIGHT_SWITCH_PLACEMENT.side === 'right';
+  drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, palette, undefined, flipX);
 }
 
 // Props that dangle from the glass lid (HANGING_PLACEMENTS, world-props.js)
@@ -185,10 +243,17 @@ export function drawHangingProps(camera, layer) {
   const placements = HANGING_PLACEMENTS.filter((p) => p.layer === layer).sort(byAscendingZ);
   for (const placement of placements) {
     const sprite = resolveHangingSprite(placement.sprite);
+    // resolveHangingSprite swaps 'lightbulb' -> the lit LIGHTBULB_2 sprite
+    // once state.lightOn, but the placement's own id stays 'lightbulb' — so
+    // the palette lookup needs the same swap, keyed off the resolved sprite
+    // rather than placement.sprite, or the lit bulb would draw with the
+    // off-state palette (no u/U/i keys).
+    const paletteId = placement.sprite === 'lightbulb' && state.lightOn ? 'lightbulb2' : placement.sprite;
+    const palette = resolveSpritePalette(paletteId);
     const scale = SCALE * (sprite.renderScale || 1);
     const screenX = placement.x - camera.x;
     const screenY = LID_TOP - camera.y;
-    drawSprite(ctx, sprite.rows, screenX, screenY, scale, TERRARIUM_PALETTE);
+    drawSprite(ctx, sprite.rows, screenX, screenY, scale, palette);
   }
 }
 
@@ -198,38 +263,47 @@ export function drawHangingProps(camera, layer) {
 // which layer/z it's placed on.
 export function drawTreeTrunks(camera, layer) {
   const placements = TREE_PLACEMENTS.filter((p) => p.layer === layer).sort(byAscendingZ);
-  const fade = layer === 4
-    ? { minAlpha: TREE_FADE_MIN_ALPHA_LAYER4, maxAlpha: TREE_FADE_MAX_ALPHA_LAYER4 }
-    : undefined;
-  const palette = layer === 4 ? TERRARIUM_PALETTE_LAYER4_TREES : TERRARIUM_PALETTE;
+  // Interactive trunks (layers 5/8) are never alpha-faded — see
+  // DEPTH-LAYERS.md: they need to read as clean and climbable at any camera
+  // position, so depth between them comes entirely from the saturation
+  // ladder, not opacity.
   for (const placement of placements) {
     const sprite = resolveTreeTrunkSprite(placement.sprite);
+    const palette = resolveBarkPalette(placement.sprite, placement.layer);
     const screenX = placement.x - camera.x;
     const screenY = GROUND_TOP - sprite.height * SCALE - camera.y;
-    drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, palette, fade);
+    drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, palette);
   }
 }
 
 // Branches from BRANCH_PLACEMENTS (world-props.js), mounted onto a sparse
 // subset of the trees drawn by drawTreeTrunks above. Drawn right after the
 // trunks on the same layer so they pick up the same depth treatment (the
-// layer-4 fade + darkened bark palette, or full-strength layer-6 bark) and
+// layer-5 fade + darkened bark palette, or full-strength layer-8 bark) and
 // paint on top of the trunk they're attached to. Reuses branchGeometry's
 // world-space sprite origin (see game/world-geometry.js) so the rendered
 // sprite and the standable/hangable physics region it's derived from always
 // agree.
 export function drawTreeBranches(camera, layer) {
-  const fade = layer === 4
-    ? { minAlpha: TREE_FADE_MIN_ALPHA_LAYER4, maxAlpha: TREE_FADE_MAX_ALPHA_LAYER4 }
-    : undefined;
-  const palette = layer === 4 ? TERRARIUM_PALETTE_LAYER4_TREES : TERRARIUM_PALETTE;
   for (const geo of BRANCH_GEOMETRIES) {
     if (geo.placement.layer !== layer) continue;
     const branchSprite = resolveTreeBranchSprite(geo.placement.sprite);
+    // A branch owns no bark color of its own (just its 'k' outline, see
+    // sprites/palette/terrarium-palette.js) — its r/R/h or 1/2/3 bark keys
+    // come from whichever trunk it's mounted to, so it always matches that
+    // trunk's resolved depth-layer tone. Key namespaces never collide: bark
+    // keys only ever come from the trunk, everything else only from the
+    // branch's own entry.
+    const ownPalette = resolveSpritePalette(geo.placement.sprite);
+    const barkPalette = resolveBarkPalette(geo.trunkSpriteId, layer);
+    // Own entry spread last so its 'k' outline (and any other non-bark key)
+    // always wins over the host trunk's own 'k' — bark keys (r/R/h/1/2/3)
+    // never collide since the branch's own entry never defines them.
+    const palette = { ...barkPalette, ...ownPalette };
     const flipX = geo.placement.side === 'left';
     const screenX = geo.originX - camera.x;
     const screenY = geo.originY - camera.y;
-    drawSprite(ctx, branchSprite.rows, screenX, screenY, SCALE, palette, fade, flipX);
+    drawSprite(ctx, branchSprite.rows, screenX, screenY, SCALE, palette, undefined, flipX);
   }
 }
 
@@ -238,58 +312,56 @@ export function drawTreeBranches(camera, layer) {
 // right after the branches on the same layer so it picks up the same depth
 // treatment and paints on top of the trunk (and any branch) it sits near.
 export function drawTreePlants(camera, layer) {
-  const fade = layer === 4
-    ? { minAlpha: TREE_FADE_MIN_ALPHA_LAYER4, maxAlpha: TREE_FADE_MAX_ALPHA_LAYER4 }
-    : undefined;
-  const palette = layer === 4 ? TERRARIUM_PALETTE_LAYER4_TREES : TERRARIUM_PALETTE;
   for (const geo of TREE_PLANT_GEOMETRIES) {
     if (geo.placement.layer !== layer) continue;
     const plantSprite = resolveTreePlantSprite(geo.placement.sprite);
+    // Same host-trunk bark-matching convention as drawTreeBranches above —
+    // tree-plant-3/4/5's small bark-stub accent (k/R/r) comes from whichever
+    // trunk this plant is mounted to; tree-plant-1/2/2b/slime have no bark
+    // keys at all, so barkPalette contributes nothing for them.
+    const ownPalette = resolveSpritePalette(geo.placement.sprite);
+    const barkPalette = resolveBarkPalette(geo.trunkSpriteId, layer);
+    const palette = { ...barkPalette, ...ownPalette };
     const flipX = geo.placement.side === 'left';
     const screenX = geo.originX - camera.x;
     const screenY = geo.originY - camera.y;
-    drawSprite(ctx, plantSprite.rows, screenX, screenY, SCALE, palette, fade, flipX);
+    const scale = SCALE * (geo.placement.scaleMultiplier || 1);
+    drawSprite(ctx, plantSprite.rows, screenX, screenY, scale, palette, undefined, flipX);
   }
 }
 
-// Bugs from BUG_GEOMETRIES (game/world-geometry.js) — ground ones stand in
-// the open the whole game, trunk ones sit past the slime coating
-// (drawSkillSlime below) until skillUnlocked. Drawn regardless of that flag
-// (a slime-locked bug is meant to be visible-but-unreachable, a teaser); a
-// collected bug (state.bugsFound[i]) just stops being drawn.
+// Bugs from BUG_GEOMETRIES (game/world-geometry.js) — the last
+// BUG_LOCKED_START_INDEX-and-later bugs (game/constants.js) stay undrawn
+// until Cling to Sides is unlocked (see isBugUnlocked()), so they can't be
+// spotted, let alone caught, before that puzzle is solved. `layer` here is
+// the bug's own placement.layer: ground/air/path bugs use the dedicated
+// layer 6 (drawn once, between the far/near plant passes below); trunk-mode
+// bugs instead carry their host trunk's layer (5 or 8, to match the
+// TREE_PLACEMENTS lookup in bugGeometry()) and are drawn from that layer's
+// own call, right after that layer's drawTreeTrunks, so they paint on top of
+// the bark instead of underneath it.
 export function drawBugs(camera, layer) {
   BUG_GEOMETRIES.forEach((geo, i) => {
-    if (geo.placement.layer !== layer || state.bugsFound[i]) return;
+    if (geo.placement.layer !== layer || state.bugsFound[i] || !isBugUnlocked(i)) return;
     const sprite = resolveBugSprite(geo.placement.sprite);
+    const palette = resolveSpritePalette(geo.placement.sprite);
     const screenX = geo.originX - camera.x;
     const screenY = geo.originY - camera.y;
-    drawSprite(ctx, sprite.rows, screenX, screenY, SCALE, TERRARIUM_PALETTE);
+    const scale = SCALE * (geo.placement.scaleMultiplier || 1);
+    drawSprite(ctx, sprite.rows, screenX, screenY, scale, palette);
   });
-}
-
-// Yellow slime (tree-plant-slime.js) tiled down the right-hand edge of every
-// side-climbable trunk (layer 6 — layer-4 trunks are front-climb only, no
-// side to lock) while the trunk-side-swap skill is still locked. Removed the
-// moment skillUnlocked flips, same as drawGateMoss() removing the gate moss
-// once state.gateSolved flips. See the attach gating in game/movement.js for
-// the actual movement restriction this is signaling.
-export function drawSkillSlime(camera) {
-  if (state.skillUnlocked) return;
-  const tileH = TREE_PLANT_SLIME.height * SCALE;
-  for (const placement of TREE_PLACEMENTS) {
-    if (placement.layer !== 6) continue;
-    const rect = treeTrunkRect(placement);
-    const screenX = rect.right - SLIME_TRUNK_OVERLAP * SCALE - camera.x;
-    for (let y = rect.top; y < rect.bottom; y += tileH) {
-      drawSprite(ctx, TREE_PLANT_SLIME.rows, screenX, y - camera.y, SCALE, TERRARIUM_PALETTE);
-    }
-  }
 }
 
 // `fade`, when given, fades rows from `minAlpha` (top, row 0) up to
 // `maxAlpha` (bottom, last row) so a tall background trunk reads as
 // vanishing into haze near its top instead of cutting off sharply.
 export function drawSpriteBlocky(ctx, spriteRows, x, y, scale, palette, block, fade) {
+  // Rounded to whole pixels — fractional x/y here (e.g. from parallax
+  // offsets like camera.x * BACKGROUND_PARALLAX) makes the canvas
+  // anti-alias each cell's fillRect independently, leaving faint seams
+  // between adjacent cells that shimmer into visible lines while panning.
+  x = Math.round(x);
+  y = Math.round(y);
   const cell = scale * block;
   const lastRow = spriteRows.length - 1;
   for (let row = 0; row <= lastRow; row += block) {
@@ -308,30 +380,143 @@ export function drawSpriteBlocky(ctx, spriteRows, x, y, scale, palette, block, f
   if (fade) ctx.globalAlpha = 1;
 }
 
-// Tiles the gate moss sprite (TREE_PLANT_1) down the gatekeeper tree's full
-// height, the same tiling approach drawGlassEdgeSide uses for the tank
-// walls. Skipped entirely once the tree's puzzle is solved.
+// Yellow slime (tree-plant-slime.js) tiled down both edges of every
+// layer-8 trunk (layer-5 trunks are front-climb only, no side to coat) —
+// purely decorative, unrelated to Cling to Sides or any puzzle state. Stays
+// on the trees regardless of whether Cling to Sides is unlocked.
+export function drawTrunkSlime(camera) {
+  const tileH = TREE_PLANT_SLIME.height * SCALE;
+  const tileW = TREE_PLANT_SLIME.width * SCALE;
+  for (const placement of TREE_PLACEMENTS) {
+    if (placement.layer !== 8) continue;
+    const rect = treeTrunkRect(placement);
+    const leftX = rect.left - (tileW - SLIME_TRUNK_OVERLAP * SCALE) - camera.x;
+    const rightX = rect.right - SLIME_TRUNK_OVERLAP * SCALE - camera.x;
+    for (let y = rect.top; y < rect.bottom; y += tileH) {
+      const screenY = y - camera.y;
+      drawSprite(ctx, TREE_PLANT_SLIME.rows, leftX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-slime'], undefined, true);
+      drawSprite(ctx, TREE_PLANT_SLIME.rows, rightX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-slime']);
+    }
+  }
+}
+
+// Tiles the gate moss sprite (TREE_PLANT_1, now an edge strip rather than a
+// full-width span — see that file) down both edges of the Moss Tree's
+// (GATE_TRUNK) full height, the same tiling approach drawGlassEdgeSide uses
+// for the tank walls. Drawn twice per row: once flush against the trunk's
+// left edge as-is, once flush against the right edge mirrored (flipX), so
+// moss overlaps the bark from both sides and wide trunks show bare bark
+// down the middle instead of the moss stretching to cover it. Stops
+// GATE_MOSS_BOTTOM_GAP short of the trunk's base so the lowest tile doesn't
+// touch the glass floor line. Skipped entirely once the tree's puzzle is
+// solved.
 export function drawGateMoss(camera) {
   if (state.gateSolved) return;
   const rect = treeTrunkRect(GATE_TRUNK);
   const tileH = TREE_PLANT_1.height * SCALE;
-  const screenX = rect.left - GATE_MOSS_FINGER_MARGIN - camera.x;
-  for (let y = rect.top; y < rect.bottom; y += tileH) {
-    drawSprite(ctx, TREE_PLANT_1.rows, screenX, y - camera.y, SCALE, TERRARIUM_PALETTE);
+  const stripW = TREE_PLANT_1.width * SCALE;
+  const barkSpan = stripW - GATE_MOSS_FINGER_MARGIN;
+  const leftX = rect.left - GATE_MOSS_FINGER_MARGIN - camera.x;
+  const rightX = rect.right - barkSpan - camera.x;
+  const bottom = rect.bottom - GATE_MOSS_BOTTOM_GAP;
+  for (let y = rect.top; y < bottom; y += tileH) {
+    const screenY = y - camera.y;
+    drawSprite(ctx, TREE_PLANT_1.rows, leftX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-1']);
+    drawSprite(ctx, TREE_PLANT_1.rows, rightX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-1'], undefined, true);
   }
 }
 
-// Purely cosmetic background scenery from BACKGROUND_PLACEMENTS (layer 3,
-// world-props.js) — painted before the far-plants pass, with no floor
-// occlusion/interaction logic, just depth. Reuses the tree-trunk resolver
-// since background decor is currently trunk-only.
-export function drawBackgroundDecor(camera) {
-  const placements = [...BACKGROUND_PLACEMENTS].sort(byAscendingZ);
-  for (const placement of placements) {
+// Scatter layout for drawGateMossRemnant, computed once (not per-frame) so
+// the scraps don't jitter — a handful of clusters of 2-3 remnants each,
+// placed via a fixed-seed PRNG so the layout is random-looking but stable
+// across reloads. Each entry is a fraction of the trunk's height plus which
+// edge (mirrored = right edge, flipped) it clings to.
+const GATE_MOSS_REMNANT_LAYOUT = (() => {
+  let seed = 42;
+  const rand = () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed % 1000) / 1000;
+  };
+  const placements = [];
+  const clusterCount = 6;
+  for (let c = 0; c < clusterCount; c++) {
+    const centerFrac = (c + 0.5) / clusterCount + (rand() - 0.5) * 0.15;
+    const clusterSize = 2 + Math.floor(rand() * 2); // 2-3 per cluster
+    for (let i = 0; i < clusterSize; i++) {
+      placements.push({
+        frac: Math.min(0.95, Math.max(0.05, centerFrac + (rand() - 0.5) * 0.14)),
+        mirrored: rand() > 0.5,
+      });
+    }
+  }
+  return placements;
+})();
+
+// Once state.gateSolved flips, drawGateMoss above stops drawing the full
+// climbing moss — this leaves scattered scraps (TREE_PLANT_1B) clinging to
+// the trunk in a few loose clusters (GATE_MOSS_REMNANT_LAYOUT) as
+// decoration, so the solved puzzle doesn't read as if the moss vanished
+// without a trace.
+export function drawGateMossRemnant(camera) {
+  if (!state.gateSolved) return;
+  const rect = treeTrunkRect(GATE_TRUNK);
+  const remnantH = TREE_PLANT_1B.height * SCALE;
+  const stripW = TREE_PLANT_1B.width * SCALE;
+  const barkSpan = stripW - GATE_MOSS_FINGER_MARGIN;
+  const leftX = rect.left - GATE_MOSS_FINGER_MARGIN - camera.x;
+  const rightX = rect.right - barkSpan - camera.x;
+  const trunkSpan = rect.bottom - rect.top - remnantH;
+  for (const { frac, mirrored } of GATE_MOSS_REMNANT_LAYOUT) {
+    const screenY = rect.top + frac * trunkSpan - camera.y;
+    const screenX = mirrored ? rightX : leftX;
+    drawSprite(ctx, TREE_PLANT_1B.rows, screenX, screenY, SCALE, TERRARIUM_PALETTE['tree-plant-1b'], undefined, mirrored);
+  }
+}
+
+// Layer 1 — the terrarium backdrop itself (sprites/backgrounds/*.js), a
+// generated gradient+noise texture drawn blocky/chunky (same lo-fi treatment
+// as drawBackgroundDecor) so it reads as hazy depth rather than a flat fill.
+// Draws whichever variant sprites/backgrounds/index.js currently points
+// ACTIVE_BACKGROUND_KEY at, using that variant's own palette rather than
+// TERRARIUM_PALETTE — see that file to swap versions.
+// Scrolls at BACKGROUND_PARALLAX of both camera.x and camera.y rather than
+// 1:1 or not at all — a flat fill could get away with being screen-fixed
+// (any offset looks identical), but this texture has visible structure, so
+// leaving either axis screen-fixed reads as "stuck" the moment the
+// foreground scrolls past it (most noticeable on a climbing trunk, where the
+// camera keeps the player near a fixed screen position — any screen-fixed
+// background pixel then reads as glued to the player). Each variant's
+// sprite is generated larger than the canvas in both dimensions
+// specifically to cover this offset range without ever exposing an edge.
+export function drawBackgroundSprite(camera) {
+  const variant = BACKGROUND_VARIANTS[ACTIVE_BACKGROUND_KEY];
+  if (variant.solidColor) {
+    ctx.fillStyle = variant.solidColor;
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    return;
+  }
+  const offsetX = -(camera.x * BACKGROUND_PARALLAX);
+  const offsetY = -(camera.y * BACKGROUND_PARALLAX);
+  drawSpriteBlocky(ctx, variant.sprite.rows, offsetX, offsetY, SCALE, variant.palette, BACKGROUND_PIXEL_BLOCK);
+}
+
+// Purely cosmetic background scenery from BACKGROUND_PLACEMENTS/
+// BACKGROUND_LAYER3_PLACEMENTS (layers 2/3, world-props.js) — painted before
+// the far-plants pass, with no floor occlusion/interaction logic, just
+// depth. Reuses the tree-trunk resolver since background decor is currently
+// trunk-only. `layer` and `parallax` are per-layer (see DEPTH-LAYERS.md):
+// layer 3 sits a step further up the saturation ladder (resolveBarkPalette,
+// per placement below) and scrolls at a faster parallax rate than layer 2,
+// everything else about the two layers' rendering is identical — same
+// shared vertical alpha fade, same blocky/chunky treatment.
+export function drawBackgroundDecor(camera, placements, layer, parallax) {
+  const sorted = [...placements].sort(byAscendingZ);
+  for (const placement of sorted) {
     const sprite = resolveTreeTrunkSprite(placement.sprite);
-    const screenX = placement.x - camera.x;
+    const palette = resolveBarkPalette(placement.sprite, layer);
+    const screenX = placement.x - camera.x * parallax;
     const screenY = GROUND_TOP - sprite.height * SCALE - camera.y;
-    drawSpriteBlocky(ctx, sprite.rows, screenX, screenY, SCALE, TERRARIUM_PALETTE, BACKGROUND_PIXEL_BLOCK, {
+    drawSpriteBlocky(ctx, sprite.rows, screenX, screenY, SCALE, palette, BACKGROUND_PIXEL_BLOCK, {
       minAlpha: TREE_FADE_MIN_ALPHA,
       maxAlpha: TREE_FADE_MAX_ALPHA,
     });
@@ -340,61 +525,113 @@ export function drawBackgroundDecor(camera) {
 
 export function draw() {
   const p = playerCenter();
+  // Rounded to whole pixels — fractional camera position pushes every
+  // sprite's fillRect calls onto fractional coordinates, which the canvas
+  // anti-aliases at each cell's edge. Adjacent opaque cells then show a
+  // thin seam of blended color between them instead of butting up cleanly,
+  // most visible as gaps in high-contrast sprites (e.g. near-black bark
+  // next to the bright player) even though every cell is fully opaque.
+  const targetX = Math.max(0, Math.min(CAMERA_X_MAX, p.x - CANVAS_W / 2));
+  const targetY = Math.max(0, Math.min(CAMERA_Y_MAX, p.y - CANVAS_H / 2));
+  if (!state.camera) {
+    // First frame (or just after a restart) — snap straight to the target
+    // instead of easing in from 0,0.
+    state.camera = { x: targetX, y: targetY };
+  } else {
+    state.camera.x += (targetX - state.camera.x) * CAMERA_EASE;
+    state.camera.y += (targetY - state.camera.y) * CAMERA_EASE;
+  }
   const camera = {
-    x: Math.max(0, Math.min(CAMERA_X_MAX, p.x - CANVAS_W / 2)),
-    y: Math.max(0, Math.min(CAMERA_Y_MAX, p.y - CANVAS_H / 2)),
+    x: Math.round(state.camera.x),
+    y: Math.round(state.camera.y),
   };
 
-  // flat background
-  ctx.fillStyle = '#132218';
-  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+  // Nothing else here clears the canvas — every layer used to paint the
+  // full frame unconditionally, so stale pixels never showed. Now that the
+  // clip below can leave the strip above the lid unpainted on any given
+  // frame, that strip needs a real clear or it keeps whatever was drawn
+  // there before the clip started excluding it (e.g. earlier frames where
+  // the camera was low enough that the clip rect covered the whole canvas).
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
-  // layer 2: hidden pixel-digit backdrop, only visible once the light is on
-  drawBackgroundTexture(camera);
+  // Clip everything below (backdrop, decor, trunks, hanging props, player,
+  // ...) to below the lid line so nothing can ever poke out above it — the
+  // glass walls (drawTankFraming, layer 8) are drawn afterward, unclipped,
+  // since their own top edge is the true top of the tank and sits above the
+  // lid on purpose.
+  const lidY = LID_TOP - camera.y;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, Math.max(0, lidY), CANVAS_W, CANVAS_H);
+  ctx.clip();
 
-  // ground line
-  ctx.fillStyle = '#12200f';
-  ctx.fillRect(0, GROUND_TOP - camera.y, CANVAS_W, WORLD_HEIGHT - GROUND_TOP);
+  // layer 1: terrarium backdrop texture
+  drawBackgroundSprite(camera);
 
-  // layer 3: cosmetic background decor, furthest back, painted before
+  // layer 2: cosmetic background decor, furthest back, painted before
   // anything the player can interact with or be occluded by
-  drawBackgroundDecor(camera);
+  drawBackgroundDecor(camera, BACKGROUND_PLACEMENTS, 2, BACKGROUND_DECOR_PARALLAX_LAYER2);
+  drawGroundPlants(camera, 2);
 
-  // dirt bed behind the glass, then the glass rim itself — both sit under the player
+  // layer 3: second cosmetic background decor band, same idea as layer 2 —
+  // a step closer/faster/more saturated (see DEPTH-LAYERS.md)
+  // TEMP: trunk band hidden while tuning parallax — layer 3's faster scroll rate reads as
+  // too much background motion; restore once BACKGROUND_DECOR_PARALLAX_LAYER3 is tuned down
+  // drawBackgroundDecor(camera, BACKGROUND_LAYER3_PLACEMENTS, 3, BACKGROUND_DECOR_PARALLAX_LAYER3);
+  drawGroundPlants(camera, 3);
+
+  // layer 4: dirt bed behind the glass, then the glass rim itself — both sit under the player
   drawDirtLayer(camera);
   drawGlassEdgeBottom(camera);
 
-  // layer 4: far plants and tree trunks, behind the player
-  // trunks paint first so they sit behind the ground plants, not on top of them
-  drawTreeTrunks(camera, 4);
-  drawTreeBranches(camera, 4);
-  drawTreePlants(camera, 4);
-  drawGroundPlants(camera, 4);
-  drawBugs(camera, 4);
-  drawHangingProps(camera, 4);
+  // layer 5: far plants and tree trunks, behind the player
+  // hanging props paint first so they sit behind the tree trunks, not on top
+  // of them; trunks paint next so they sit behind the ground plants
+  drawHangingProps(camera, 5);
+  drawTreeTrunks(camera, 5);
+  // trunk-mounted bugs on a layer-5 trunk (see BUG_PLACEMENTS, world-props.js)
+  // paint right after that trunk so they sit on top of the bark, not behind it
+  drawBugs(camera, 5);
+  drawTreeBranches(camera, 5);
+  drawTreePlants(camera, 5);
+  drawGroundPlants(camera, 5);
 
-  // player — invisible until CHAMELEON_VISIBLE is flipped on (see game/state.js)
-  if (window.CHAMELEON_VISIBLE) {
+  // layer 6: ground/air/path bugs — own layer between the far/near plant
+  // passes so a bug never gets buried under foliage or the player
+  drawBugs(camera, 6);
+
+  // layer 7: player — invisible until CHAMELEON_VISIBLE is flipped on (see game/state.js)
+  // TEMP: forced on while working on plant/player sprites — restore `window.CHAMELEON_VISIBLE` check when done
+  if (true) {
     const playerSprite = playerSpriteForState();
     const hanging = state.branch && state.branch.mode === 'hang';
     const flipDefaultPose = !state.climb && state.facing === 'left';
     drawSprite(ctx, playerSprite, state.player.x - camera.x, state.player.y - camera.y, SCALE, PLAYER_PALETTE, undefined, flipDefaultPose, hanging);
   }
 
-  // layer 6: near plants and tree trunks, in front of the player
-  drawGroundPlants(camera, 6);
-  drawBugs(camera, 6);
-  drawTreeTrunks(camera, 6);
-  drawGateMoss(camera);
-  drawSkillSlime(camera);
-  drawTreeBranches(camera, 6);
-  drawTreePlants(camera, 6);
+  // layer 8: near plants and tree trunks, in front of the player
+  drawGroundPlants(camera, 8);
+  drawTreeTrunks(camera, 8);
+  // trunk-mounted bugs on a layer-8 (Cling to Sides) trunk, same reasoning as
+  // the layer-5 call above — paint right after that trunk so they're on top
+  drawBugs(camera, 8);
+  drawGateMoss(camera); // Moss Tree (GATE_TRUNK, x720) — Moss Tree puzzle
+  drawGateMossRemnant(camera); // leftover moss scraps once state.gateSolved
+  // drawTrunkSlime(camera); // disabled, not applied to any trunks right now
+  drawTreeBranches(camera, 8);
+  drawTreePlants(camera, 8);
+
+  // layer 8: hidden pixel-digit backdrop, painted alongside the light
+  // switch (only visible once the light is on)
+  drawBackgroundTexture(camera);
 
   // light switch — mounted on a trunk (see LIGHT_SWITCH_PLACEMENT,
   // world-props.js), drawn last so it always sits on top of that trunk's
-  // bark and any layer-4/6 foliage near it.
+  // bark and any layer-5/8 foliage near it.
   drawLightSwitch(camera);
 
+  ctx.restore();
+
+  // layer 9: glass edges (tank framing)
   drawTankFraming(camera);
-  drawGlassFront(state.player.y);
 }
