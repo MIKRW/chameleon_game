@@ -244,6 +244,18 @@ body.touch-controls .devtools-btn {
   opacity: 0.8;
 }
 
+/* "So Close..." completion popup — closing this exits the puzzle for good,
+   so its close button is oversized and colored to stand out from the
+   regular popup-close-btn used elsewhere. */
+#completion-close-btn {
+  width: clamp(60px, 24cqw, 84px);
+  height: clamp(60px, 24cqw, 84px);
+  font-size: clamp(15px, 6cqw, 22px);
+  background: var(--emerald-border);
+  border-color: var(--emerald-border);
+  border-radius: 50%;
+}
+
 .popup-content {
   max-width: 480px;
   width: 100%;
@@ -439,6 +451,27 @@ body.touch-controls .devtools-btn {
   margin-top: 14px;
 }
 
+/* Code popup form — button stacked under and centered below the input,
+   same layout as .gate-form, instead of the side-by-side .dialog-form
+   default. */
+#code-form {
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+#code-form input {
+  flex: none;
+  width: 100%;
+  max-width: 260px;
+}
+
+#code-form .dialog-form-btn {
+  margin-top: 14px;
+}
+
 /* Text color is pinned (not var(--text)) since the popup overlay behind it
    is always dark regardless of the light/dark theme toggle. */
 .dialog-form input {
@@ -496,7 +529,9 @@ body.touch-controls .devtools-btn {
 .restart-btn {
   position: absolute;
   /* 30px matches .game-wrap's horizontal padding, so the button's right
-     edge lines up with the canvas's right edge rather than the card's. */
+     edge lines up with the canvas's right edge rather than the card's.
+     Re-derived for the narrow-viewport padding in the max-width:480px
+     query below — keep both in sync if either padding changes. */
   right: 30px;
   /* Anchors to the vertical center of the post-start status row (56px
      padding-bottom + half its 40px min-height), then translateY(50%)
@@ -537,18 +572,47 @@ body.touch-controls .devtools-btn {
 
 .win-flag {
   font-size: 14px;
+  letter-spacing: 3px;
   color: #ffd54f;
-  background: #1b130a;
+  background: transparent;
   padding: 14px;
   border-radius: 4px;
   word-break: break-all;
   text-align: center;
 }
 
+.hint-toggle-btn {
+  align-self: center;
+  margin: 0 auto;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  background: transparent;
+  color: #ff6b6b;
+  border: 2px solid #ff6b6b;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.hint-toggle-btn:hover {
+  opacity: 0.8;
+}
+
 .win-note {
   font-size: 11px;
   color: var(--muted);
   line-height: 1.7;
+}
+
+.win-note.hidden {
+  display: none;
 }
 
 /* Touch-only players get on-screen controls instead of the keyboard hint.
@@ -575,6 +639,15 @@ body.touch-controls .controls-hint {
     gap: 8px;
   }
 
+  /* .restart-btn's right/bottom offsets are anchored to .game-wrap's
+     padding (see its own comments) — they have to be re-derived here
+     whenever that padding changes, or the button drifts off its intended
+     spot instead of staying pinned to the canvas/status-row edge. */
+  .restart-btn {
+    right: 10px;
+    bottom: 32px;
+  }
+
   .game-header h1 {
     font-size: 16px;
     margin: 0;
@@ -586,6 +659,17 @@ body.touch-controls .controls-hint {
 
   .status-row {
     gap: 12px;
+  }
+
+  /* The post-start stats normally stay on one continuous line (see
+     .status-row-line above), but at mobile widths there isn't room for
+     all three — let them wrap onto two or three lines instead of
+     squeezing/overflowing. Each individual stat still keeps its own
+     nowrap from .controls-hint, so a wrap only ever happens between
+     stats, never mid-stat. */
+  .status-row-line {
+    flex-wrap: wrap;
+    row-gap: 4px;
   }
 
   .touch-controls-card {

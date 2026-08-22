@@ -277,6 +277,8 @@ codeFormEl.addEventListener('submit', async (e) => {
 const completionPopupEl = document.getElementById('completion-popup');
 const completionFlagEl = document.getElementById('completion-flag');
 const completionCloseBtn = document.getElementById('completion-close-btn');
+const winHintBtn = document.getElementById('win-hint-btn');
+const winNoteEl = document.getElementById('win-note');
 
 export let completionPopupOpen = false;
 
@@ -289,9 +291,16 @@ export function openCompletionPopup(flag) {
 export function closeCompletionPopup() {
   completionPopupOpen = false;
   completionPopupEl.classList.add('hidden');
+  winNoteEl.classList.add('hidden');
+  winHintBtn.setAttribute('aria-expanded', 'false');
 }
 
 completionCloseBtn.addEventListener('click', closeCompletionPopup);
+
+winHintBtn.addEventListener('click', () => {
+  const nowHidden = winNoteEl.classList.toggle('hidden');
+  winHintBtn.setAttribute('aria-expanded', String(!nowHidden));
+});
 
 // --- Full restart (restart button) ---
 // resetGame() (game/state.js) only resets movement/progress flags; this also

@@ -386,19 +386,23 @@ const TERRARIUM_PALETTE = {
   },
 
   // === light-switch-2.js — switch head, on state ===
-  // same brass frame/arm as lightSwitch, ruby-lit head
-  // distinct from tree-plant-1's z/Z gate moss red so recoloring the switch never touches the gate moss
+  // same brass frame/arm as lightSwitch, mostly dark blood-red head with a
+  // small brighter glow at the top/bottom edges, using tree-plant-1's z/Z
+  // gate moss red tones (kept as separate 7/8/9 keys so recoloring the
+  // switch never touches the gate moss sprites directly)
   'lightSwitch2': {
     'a': '#a9822f',
     'k': '#1a1a1a',
     'A': '#6b4f1c',
-    '7': '#8a1322', // switch head, lit ruby
+    '7': '#7a1414', // switch head, center — moss gate-lichen dark red (dominant)
+    '8': '#c43333', // switch head, mid fade
+    '9': '#ff5252', // switch head, edge — moss gate-lichen bright red glow accent
   },
 
   // === background-texture.js — hidden pixel-digit code ===
   // digit stroke shades 1/2 (warm highlight/amber)
   'backgroundTexture': {
-    'j': '#6b2605',
+    'j': '#4d1804',
     'J': '#4d1804',
   },
 

@@ -399,7 +399,7 @@ const LIGHT_SWITCH_PLACEMENT = { trunkX: 2350, layer: 8, attachRow: 70, side: 'r
 // lockstep.
 const BUG_PLACEMENTS = [
   // Always visible (indices 0-9)
-  { sprite: 'bug-1', x: 532, layer: 6 },
+  { sprite: 'bug-1', x: 10, layer: 6 },
   // Mounted on the x300 trunk's left face, just below its branch (attachRow
   // 88, side 'left' — see BRANCH_PLACEMENTS), reading as clinging beneath it.
   // Layer 5 (front-climb, not Cling to Sides), so `side` is cosmetic only —
@@ -409,12 +409,14 @@ const BUG_PLACEMENTS = [
   { sprite: 'bug-1', mode: 'trunk', trunkX: 300, layer: 5, attachRow: 95, side: 'left', scaleMultiplier: 1.2 },
   { sprite: 'bug-1', x: 626, layer: 6, mode: 'path', pathType: 'squiggle-diamond', heightAboveFloor: 100, pathSize: 24, pathSpeed: 0.09 },
   { sprite: 'bug-1', x: 890, layer: 6, mode: 'path', pathType: 'figure-eight', heightAboveFloor: 370, pathSize: 22, pathSpeed: 0.1, pathPhase: 0.6 },
-  { sprite: 'bug-1', x: 1153, layer: 6 },
-  { sprite: 'bug-1', x: 1416, layer: 6, mode: 'path', pathType: 'circle', heightAboveFloor: 60, pathSize: 26, pathSpeed: 0.11, pathPhase: 0.3 },
-  { sprite: 'bug-1', x: 1679, layer: 6 },
+  { sprite: 'bug-1', x: 1133, layer: 6, mode: 'path', pathType: 'circle', heightAboveFloor: 50, pathSize: 60, pathSpeed: 0.125, pathPhase: 0.4 },
+  { sprite: 'bug-1', x: 1416, layer: 6, mode: 'path', pathType: 'circle', heightAboveFloor: 220, pathSize: 26, pathSpeed: 0.11, pathPhase: 0.3 },
+  // Mounted near the top of the x1150 trunk's right face (attachRow 10),
+  // same front-climb/cosmetic-side reasoning as the x300 trunk bug above.
+  { sprite: 'bug-1', mode: 'trunk', trunkX: 1150, layer: 5, attachRow: 10, side: 'right' },
   { sprite: 'bug-1', x: 1942, layer: 6 },
   { sprite: 'bug-1', x: 2205, layer: 6, mode: 'path', pathType: 'figure-eight', heightAboveFloor: 60, pathSize: 28, pathSpeed: 0.08, pathPhase: 0.6 },
-  { sprite: 'bug-1', x: 2468, layer: 6 },
+  { sprite: 'bug-1', x: 2518, layer: 6, mode: 'path', pathType: 'squiggle-diamond', heightAboveFloor: 140, pathSize: 24, pathSpeed: 0.09, pathPhase: 0.4 },
   // Hidden until Cling to Sides is unlocked (indices 10-19)
   { sprite: 'bug-1', x: 232, layer: 6 },
   { sprite: 'bug-1', x: 495, layer: 6 },
