@@ -129,24 +129,21 @@ const TERRARIUM_PALETTE = {
   // === tree-plant-2 — Hanging Moss ===
   // leaf light/dark/highlight + shared outline
   // was keyed !/@ in the old flat palette to dodge a collision; reverted back to plain l/L now each sprite has its own object
-  // darkened/desaturated to the layer-5 ~32% saturation band (DEPTH-LAYERS.md)
-  // — the old pastel mint (#a5d6a7, ~74% lightness) read as an isolated
-  // highlight against the muted trunk/water backdrop instead of blending in
   'tree-plant-2': {
-    'k': '#1c241f',
-    'l': '#325d36',
-    'L': '#1f3d22',
-    'f': '#47854d',
+    'k': '#1a1a1a',
+    'l': '#66bb6a',
+    'L': '#2e7d32',
+    'f': '#a5d6a7',
   },
 
   // === tree-plant-2b — Hanging Moss (Large) ===
   // leaf light/dark/highlight + shared outline
   // same mossy-clump family and starting tones as tree-plant-2, now its own independently-tunable copy
   'tree-plant-2b': {
-    'k': '#1c241f',
-    'l': '#325d36',
-    'L': '#1f3d22',
-    'f': '#47854d',
+    'k': '#1a1a1a',
+    'l': '#66bb6a',
+    'L': '#2e7d32',
+    'f': '#a5d6a7',
   },
 
   // === tree-plant-3 — Spanish Moss ===
