@@ -5,7 +5,7 @@
 // splitting it further risks the physics and the drawing silently drifting
 // apart.
 
-import { SCALE, GROUND_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE, BUG_INTERACT_MARGIN } from './constants.js';
+import { SCALE, GROUND_TOP, PLAYER_H, PLAYER_W, TREE_BRANCH_TRUNK_OVERLAP, TREE_PLANT_TRUNK_OVERLAP, TREE_PLANT_2B_TRUNK_OVERLAP, SWITCH_TRUNK_OVERLAP, GATE_INTERACT_RANGE, LIGHT_SWITCH_INTERACT_RANGE, BUG_INTERACT_MARGIN } from './constants.js';
 import { state } from './state.js';
 
 // "ground-plant-3" -> TERRARIUM_SPRITES.groundPlant[2]
@@ -37,8 +37,15 @@ export function resolveTreeBranchSprite(id) {
 }
 
 export function resolveTreePlantSprite(id) {
+  if (TERRARIUM_SPRITES.treePlantVariants[id]) return TERRARIUM_SPRITES.treePlantVariants[id];
   const index = Number(id.slice('tree-plant-'.length)) - 1;
   return TERRARIUM_SPRITES.treePlant[index];
+}
+
+// "vine-2" -> TERRARIUM_SPRITES.vine[1]
+export function resolveVineSprite(id) {
+  const index = Number(id.slice('vine-'.length)) - 1;
+  return TERRARIUM_SPRITES.vine[index];
 }
 
 // "bug-1" -> TERRARIUM_SPRITES.bug[0]
@@ -117,6 +124,11 @@ export function branchGeometry(bp) {
     maxX: Math.max(baseX, tipX),
     thickness,
     tBend,
+    // Host trunk's sprite id, so drawTreeBranches (game/render.js) can merge
+    // this branch's own palette entry (just its 'k' outline) with the
+    // trunk's resolved bark palette, so the branch always matches whichever
+    // trunk it's mounted on (see sprites/palette/terrarium-palette.js).
+    trunkSpriteId: trunkPlacement.sprite,
   };
 }
 
@@ -133,15 +145,40 @@ export function treePlantGeometry(pp) {
   const trunkSprite = resolveTreeTrunkSprite(trunkPlacement.sprite);
   const plantSprite = resolveTreePlantSprite(pp.sprite);
   const trunkTopY = GROUND_TOP - trunkSprite.height * SCALE;
+  const overlap = pp.sprite === 'tree-plant-2b' ? TREE_PLANT_2B_TRUNK_OVERLAP : TREE_PLANT_TRUNK_OVERLAP;
   const originX = pp.side === 'right'
-    ? trunkPlacement.x + trunkSprite.width * SCALE - TREE_PLANT_TRUNK_OVERLAP * SCALE
-    : trunkPlacement.x - (plantSprite.width - TREE_PLANT_TRUNK_OVERLAP) * SCALE;
+    ? trunkPlacement.x + trunkSprite.width * SCALE - overlap * SCALE
+    : trunkPlacement.x - (plantSprite.width - overlap) * SCALE;
   const originY = trunkTopY + pp.attachRow * SCALE - (plantSprite.height - 1) * SCALE;
-  return { placement: pp, originX, originY };
+  // Host trunk's sprite id, so drawTreePlants (game/render.js) can merge
+  // this plant's own palette entry with the trunk's resolved bark palette —
+  // tree-plant-3/4/5's small bark-stub accent (k/R/r) matches whichever
+  // trunk they're mounted on, the same way branches do (see branchGeometry
+  // above and sprites/palette/terrarium-palette.js).
+  return { placement: pp, originX, originY, trunkSpriteId: trunkPlacement.sprite };
 }
 
 // All decorative trunk plants, resolved once at load time (TREE_PLANT_PLACEMENTS is static).
 export const TREE_PLANT_GEOMETRIES = TREE_PLANT_PLACEMENTS.map(treePlantGeometry).filter(Boolean);
+
+// World-space sprite origin for a VINE_PLACEMENTS entry (world-props.js) —
+// purely decorative, no physics. Vines hang from a branch's tip rather than
+// mounting on trunk bark, so this looks up the matching BRANCH_GEOMETRIES
+// entry (by trunkX/layer/branchAttachRow) instead of a trunk placement, and
+// anchors the sprite's top-center on that branch's tip point (tipX, tipY —
+// see branchGeometry above), matching each vine sprite's `anchor: "top"`
+// convention.
+export function vineGeometry(vp) {
+  const branch = BRANCH_GEOMETRIES.find((g) => g.placement.layer === vp.layer && g.placement.trunkX === vp.trunkX && g.placement.attachRow === vp.branchAttachRow);
+  if (!branch) return null;
+  const vineSprite = resolveVineSprite(vp.sprite);
+  const originX = branch.tipX - (vineSprite.width * SCALE) / 2;
+  const originY = branch.tipY;
+  return { placement: vp, originX, originY };
+}
+
+// All hanging vines, resolved once at load time (VINE_PLACEMENTS is static).
+export const VINE_GEOMETRIES = VINE_PLACEMENTS.map(vineGeometry).filter(Boolean);
 
 // World-space geometry for a BUG_PLACEMENTS entry (world-props.js) — three
 // modes: `ground` bugs snap to the floor at `x` like PLANT_PLACEMENTS;

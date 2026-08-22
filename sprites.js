@@ -8,6 +8,12 @@
 // drawSpriteBlocky in game/render.js, for sprites that don't need the blocky
 // background texture treatment.
 function drawSprite(ctx, spriteRows, x, y, scale, palette, fade, flipX, flipY) {
+  // Rounded to whole pixels — fractional x/y (e.g. from parallax offsets)
+  // makes the canvas anti-alias each cell's fillRect independently, leaving
+  // faint seams between adjacent cells. Same fix as drawSpriteBlocky in
+  // game/render.js.
+  x = Math.round(x);
+  y = Math.round(y);
   const lastRow = spriteRows.length - 1;
   for (let row = 0; row < spriteRows.length; row++) {
     const line = spriteRows[row];

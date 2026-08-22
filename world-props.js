@@ -33,17 +33,13 @@
 // Cleared for a trees/layers readjustment pass — re-add placements once the
 // new layout is settled.
 const PLANT_PLACEMENTS = [
-  { sprite: 'ground-plant-1', x: 15, layer: 5 },
-  { sprite: 'ground-plant-1', x: 400, layer: 5 },
-  { sprite: 'ground-plant-1', x: 800, layer: 5 },
-  { sprite: 'ground-plant-1', x: 1200, layer: 5 },
-  { sprite: 'ground-plant-1', x: 3050, layer: 5 },
+  { sprite: 'ground-plant-1', x: 15, layer: 3 },
+  { sprite: 'ground-plant-1', x: 400, layer: 3 },
+  { sprite: 'ground-plant-1', x: 800, layer: 3 },
+  { sprite: 'ground-plant-1', x: 1200, layer: 3 },
+  { sprite: 'ground-plant-1', x: 3050, layer: 3 },
   { sprite: 'ground-plant-6', x: 90, layer: 7 },
   { sprite: 'ground-plant-6', x: 530, layer: 7 },
-  { sprite: 'ground-plant-4', x: 760, layer: 7 },
-  { sprite: 'ground-plant-4', x: 890, layer: 7 },
-  { sprite: 'ground-plant-4', x: 3450, layer: 7 },
-  { sprite: 'ground-plant-4', x: 80, layer: 7 },
 ];
 
 // Purely cosmetic background scenery — furthest back, painted before the
@@ -89,7 +85,8 @@ const BACKGROUND_PLACEMENTS = [
 // glass line (see draw() in game/render.js) — same trunk-bg-*a/*b variety
 // as BACKGROUND_PLACEMENTS above (layer 6a excluded, kept a layer-2-only
 // landmark), just different x positions and a step up the depth-layer
-// saturation ladder (TERRARIUM_PALETTE_LAYER3_TREES, game/constants.js).
+// saturation ladder (resolveBarkPalette(placement.sprite, 3) in
+// game/render.js, driven by sprites/palette/bark-ladder.js).
 // Scrolls at BACKGROUND_DECOR_PARALLAX_LAYER3 (0.55, faster than layer 2's
 // 0.4 but still slower than the 1:1 interactive layers), so x positions are
 // spread across the wider [0, CAMERA_X_MAX * 0.55 + CANVAS_W] = [0, 2304]
@@ -157,11 +154,14 @@ const BRANCH_PLACEMENTS = [
   { trunkX: 2000, layer: 5, sprite: 'tree-branch-1', attachRow: 70, side: 'left' },
   { trunkX: 2000, layer: 5, sprite: 'tree-branch-1', attachRow: 110, side: 'right' },
 
-  // Layer 5 — Trunk Interact 3 at x2700 (11 wide x157 tall), two short
-  // branch-1s, alternating sides.
-  { trunkX: 2700, layer: 5, sprite: 'tree-branch-1', attachRow: 60, side: 'left' },
-  { trunkX: 2700, layer: 5, sprite: 'tree-branch-1', attachRow: 100, side: 'right' },
-
+  // Layer 5 — Trunk Interact 3 at x2700 previously had two short branch-1s
+  // here. Removed: with WORLD_WIDTH temporarily shortened to 2650 (see
+  // game/constants.js), that trunk sits just past the new right glass wall
+  // and is itself invisible/inaccessible, but its left-side branch's tip
+  // reached back to x2580 — inside the wall — so it floated on screen with
+  // no visible trunk attached. Re-add once the trunk itself is back in
+  // reach (WORLD_WIDTH restored, or the trunk moved).
+  //
   // Layer 5 — Trunk Interact 3 at x3200 (11 wide x157 tall), two long
   // branch-2s, alternating sides.
   { trunkX: 3200, layer: 5, sprite: 'tree-branch-2', attachRow: 30, side: 'right' },
@@ -239,6 +239,38 @@ const TREE_PLANT_PLACEMENTS = [
   // Shares the left face with that trunk's existing branch-3 at attachRow
   // 110 (see BRANCH_PLACEMENTS); this foliage sits higher up the trunk.
   { trunkX: 3550, layer: 7, sprite: 'tree-plant-2', attachRow: 21, side: 'left' },
+  // Layer 5 — Trunk Interact 3 at x300. Right face, very top of the trunk.
+  { trunkX: 300, layer: 5, sprite: 'tree-plant-2', attachRow: 10, side: 'right' },
+  // Left face, directly under the trunk's branch (tree-branch-1 at attachRow
+  // 78, side 'left' — see BRANCH_PLACEMENTS), reading as growing beneath it.
+  { trunkX: 300, layer: 5, sprite: 'tree-plant-2', attachRow: 90, side: 'left' },
+  // Right face, lower still — below the attachRow-60 instance above. Large
+  // (3x) variant so it reads clearly near the base of the trunk.
+  { trunkX: 300, layer: 5, sprite: 'tree-plant-2b', attachRow: 130, side: 'right' },
+
+  // Layer 5 — Trunk Interact 1 at x1150, the tall branch-bearing trunk (11
+  // wide x151 tall, branches at attachRow 25/right, 65/left, 105/right — see
+  // BRANCH_PLACEMENTS). 5 plants (3x tree-plant-2, 2x tree-plant-2b):  one at
+  // the very top, and one tucked under each branch reading as growing
+  // beneath it, plus an extra low on the trunk to balance. Sides alternate
+  // left/right/left/right/left (3 left, 2 right) which, combined with the
+  // trunk's 2-right/1-left branches, nets to 4 left / 4 right — evenly
+  // weighted overall.
+  { trunkX: 1150, layer: 5, sprite: 'tree-plant-2', attachRow: 5, side: 'left' },
+  { trunkX: 1150, layer: 5, sprite: 'tree-plant-2b', attachRow: 35, side: 'right' },
+  { trunkX: 1150, layer: 5, sprite: 'tree-plant-2', attachRow: 78, side: 'left' },
+  { trunkX: 1150, layer: 5, sprite: 'tree-plant-2', attachRow: 118, side: 'right' },
+  { trunkX: 1150, layer: 5, sprite: 'tree-plant-2b', attachRow: 140, side: 'left' },
+
+];
+
+// Hanging vines (sprites/vines/vine-1.js / vine-2.js) — dangle from a
+// branch's tip rather than mounting on trunk bark. `trunkX`/`layer` pick the
+// tree the same way BRANCH_PLACEMENTS does; `branchAttachRow` must match the
+// `attachRow` of one of that tree's BRANCH_PLACEMENTS entries exactly (that's
+// how vineGeometry in game/world-geometry.js finds which branch to hang
+// from).
+const VINE_PLACEMENTS = [
 ];
 
 // Hanging props — anchor at row 0 (top of the sprite) against LID_TOP

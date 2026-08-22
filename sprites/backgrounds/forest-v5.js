@@ -57,6 +57,10 @@ const BACKGROUND_FOREST_V5 = (function build() {
     'b': '#344640', // leaf, jade shade
   };
   const BRIGHTNESS = 0.62; // currently "one shade darker" than BASE_COLORS
+  // Nudges each color's channels away from its own gray point before the
+  // BRIGHTNESS scale is applied, a small bump above the ~15%-desaturated
+  // BASE_COLORS tier so layer 1 doesn't read as quite so washed-out.
+  const SATURATION_BOOST = 1.1;
 
   function scaleColor(hex, factor) {
     const r = parseInt(hex.slice(1, 3), 16);
@@ -66,9 +70,18 @@ const BACKGROUND_FOREST_V5 = (function build() {
     return `#${clamp(r).toString(16).padStart(2, '0')}${clamp(g).toString(16).padStart(2, '0')}${clamp(b).toString(16).padStart(2, '0')}`;
   }
 
+  function boostSaturation(hex, factor) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const avg = (r + g + b) / 3;
+    const clamp = (v) => Math.max(0, Math.min(255, Math.round(avg + (v - avg) * factor)));
+    return `#${clamp(r).toString(16).padStart(2, '0')}${clamp(g).toString(16).padStart(2, '0')}${clamp(b).toString(16).padStart(2, '0')}`;
+  }
+
   const palette = { '.': null };
   for (const [key, hex] of Object.entries(BASE_COLORS)) {
-    palette[key] = scaleColor(hex, BRIGHTNESS);
+    palette[key] = scaleColor(boostSaturation(hex, SATURATION_BOOST), BRIGHTNESS);
   }
 
   // Deterministic pseudo-random in [0, 1) — same hash shape used for
