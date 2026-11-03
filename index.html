@@ -285,8 +285,34 @@
         body.classList.remove('touch-controls');
       });
 
-      window.addEventListener('touchstart', function () {
-        body.classList.add('touch-controls');
+      // Only a tap counts as touch play. When the game is embedded mid-page
+      // (e.g. the portfolio's Projects tab), a touch-scroll that happens to
+      // start over the iframe would otherwise flip a touchscreen laptop
+      // into the on-screen buttons.
+      var TAP_SLOP = 10;
+      var touchStartX = 0, touchStartY = 0, touchMoved = false;
+
+      window.addEventListener('touchstart', function (event) {
+        var touch = event.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchMoved = false;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', function (event) {
+        var touch = event.touches[0];
+        if (Math.abs(touch.clientX - touchStartX) > TAP_SLOP ||
+            Math.abs(touch.clientY - touchStartY) > TAP_SLOP) {
+          touchMoved = true;
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchcancel', function () {
+        touchMoved = true;
+      }, { passive: true });
+
+      window.addEventListener('touchend', function () {
+        if (!touchMoved) body.classList.add('touch-controls');
       }, { passive: true });
     })();
 
