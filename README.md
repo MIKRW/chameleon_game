@@ -1,3 +1,5 @@
+> **EDITING OF COMMENTS AND CODE ONGOING**
+
 # Escape the Terrarium
 
 A small, self-contained pixel-art game: a chameleon explores a
