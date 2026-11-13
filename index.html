@@ -96,8 +96,8 @@
 
     <!-- Visible D-pad + action buttons for touch devices, stacked below the
          canvas in normal document flow (not overlaid on top of it) so they
-         never obstruct the game view. Gated to pointer:coarse via
-         body.touch-controls in style.css. -->
+         never obstruct the game view. Shown only while body.touch-controls
+         is set (see the input-mode script below and style.css). -->
     <div class="touch-controls-card">
       <div class="dpad">
         <button type="button" class="touch-btn dpad-up" data-key="arrowup" aria-label="Up">▲</button>
@@ -261,14 +261,12 @@
 
     // Decide whether to show the on-screen D-pad/buttons or the keyboard
     // hint (see body.touch-controls rules in style.css and the button
-    // wiring in game/input.js). A single pointer:coarse check at load time gets
-    // phones and most tablets right, but is wrong for hybrid devices — a
-    // touchscreen laptop with a keyboard, or a tablet with one paired —
-    // where the "right" answer is really "however the player is actually
-    // playing". So this takes an initial guess from pointer:coarse, then
-    // corrects live: real keyboard input switches to the keyboard hint,
-    // a real touch switches to the on-screen buttons, and whichever the
-    // player used most recently wins.
+    // wiring in game/input.js). It starts in the web/keyboard layout unless
+    // the browser identifies a phone or tablet, then corrects live for
+    // hybrid devices (touchscreen laptops, tablets with a paired keyboard):
+    // a game key or mouse movement switches to the keyboard hint, a tap
+    // switches to the on-screen buttons, and whichever the player used most
+    // recently wins.
     (function () {
       var body = document.body;
       var GAME_KEYS = {
@@ -276,7 +274,18 @@
         w: 1, a: 1, s: 1, d: 1, ' ': 1, e: 1
       };
 
-      if (window.matchMedia('(pointer: coarse)').matches) {
+      // Default to the web (keyboard) layout; only start in touch mode when
+      // the browser identifies a phone/tablet. Pointer/hover media queries
+      // proved unreliable — Windows touchscreen laptops can report no fine
+      // pointer and got the mobile layout. userAgentData.mobile (Chromium)
+      // is authoritative where available; otherwise fall back to the UA
+      // string, plus iPadOS, which reports itself as a Mac. A tap still
+      // switches to the on-screen buttons on anything misdetected.
+      var isMobileDevice = navigator.userAgentData
+        ? navigator.userAgentData.mobile
+        : /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isMobileDevice) {
         body.classList.add('touch-controls');
       }
 
@@ -284,6 +293,12 @@
         if (!(event.key.toLowerCase() in GAME_KEYS)) return;
         body.classList.remove('touch-controls');
       });
+
+      // Real mouse use also means desktop play. pointerType filters out the
+      // emulated mouse events a tap generates, so taps don't trip this.
+      window.addEventListener('pointermove', function (event) {
+        if (event.pointerType === 'mouse') body.classList.remove('touch-controls');
+      }, { passive: true });
 
       // Only a tap counts as touch play. When the game is embedded mid-page
       // (e.g. the portfolio's Projects tab), a touch-scroll that happens to

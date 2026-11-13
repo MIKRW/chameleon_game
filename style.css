@@ -616,9 +616,9 @@ body.touch-controls .devtools-btn {
 }
 
 /* Touch-only players get on-screen controls instead of the keyboard hint.
-   Which mode applies is decided in index.html: an initial pointer:coarse
-   guess, then live-corrected the moment the player actually uses a keyboard
-   or a touch input, so hybrid devices (touchscreen laptops, tablets with a
+   Which mode applies is decided in index.html: web layout by default unless
+   the browser identifies a phone/tablet, then live-corrected the moment the
+   player actually uses a keyboard, mouse or tap, so hybrid devices (touchscreen laptops, tablets with a
    paired keyboard) settle on whichever they're really using. */
 body.touch-controls .controls-hint {
   display: none;
