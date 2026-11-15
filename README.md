@@ -1,18 +1,75 @@
-> **EDITING OF COMMENTS AND CODE ONGOING**
+**EDITING OF COMMENTS AND CODE ONGOING - remove unnesscary flaourtext, secrets, adjust claudes code ongoing. **
 
 # Escape the Terrarium
 
-A small, self-contained pixel-art game: a chameleon explores a
-terrarium — walking, jumping, and climbing trunks/branches through a capped
-2D world. No build step, no dependencies — pure HTML/CSS/vanilla JS, so it
-runs directly on GitHub Pages.
+Cameron Chameleon wants to escape his terrarium, spot him in his enclosure and 
+then help him escape by solving puzzles and collecting bugs. 
 
-## Current state
+## Game Play
 
-This is a work in progress — core movement is playable, and more mechanics
-are still being built out.
+### Platforms: 
+Web Browser (Desktop)\
+Mobile Browser (in development)\
 
-## Playing locally
+### Controls:
+| Action | Keys |
+|:------:|:----:|
+| Left | A |
+| Right | D|
+| Up | W |
+| Down | s |
+| Interact | E |
+| Jump | Space |
+| Click | Left Mouse Click |
+
+### Buttons:
+| Button | What it does |
+|:------:|:------------:|
+| ↻ | Restart the Game, rest score, puzzles |
+| 🛠 | Open devtools (mobile only) |
+| Sun / Moon | Switch light/Dark mode |
+
+### Counters / Status Trackers:
+| Counter / Status| What it Tracks |
+|:-------:|:--------------:|
+| 
+## Features:
+
+### Art Style
+Pixel Art  - test in code no image files
+
+### Sound 
+None 
+
+## Development Status / Facts: 
+
+### Development Status:
+Main movement and puzzles are completed
+
+Finetuning: code, comments, bug movement patterns, game play feel, hints vs
+puzzle difficuilty vs obscurity. 
+
+Currently v1.0\
+Mobile compatibility is in development\
+Additional Level in planning\
+
+### Browser Compatability:
+Games uses widely supported features: canvas, JavaScript, local Storage,
+Web Crypto API
+
+Chrome (tested)\
+Edge (untested)\
+Firefox (untested)\
+Safari (untested)\
+Opera (untested)\
+Samsung Internet (untested)\
+Inter Exlorer ( NOT COMPATIBLE)
+
+
+
+## Unedited Claude ReadMe Sections. 
+
+### Playing locally
 
 Just open `index.html` in a browser. If you want to test it over `http://`
 instead of `file://`, serve the folder with any static server, e.g.:
@@ -27,7 +84,7 @@ or
 python -m http.server
 ```
 
-## Embedding in a portfolio
+### Embedding in a portfolio
 
 - **Link to it** as its own page (simplest), or
 - **`<iframe>` it** inside an existing portfolio page:
@@ -59,7 +116,7 @@ python -m http.server
   <iframe src="..." width="100%" height="480" style="border:0;" allowfullscreen></iframe>
   ```
 
-## Mobile dev tools
+### Mobile dev tools
 
 Puzzles 1 and 3 expect a player to use real browser devtools (view-source,
 storage inspection, a console — see `puzzles/README.md`), which mobile and

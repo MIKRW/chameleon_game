@@ -1,4 +1,4 @@
-// Motion paths for `path`-mode bugs (BUG_PLACEMENTS in world-props.js,
+//Motion paths for `path`-mode bugs (BUG_PLACEMENTS in world-props.js,
 // resolved by bugGeometry() in game/world-geometry.js) — bugs that aren't
 // perched on the ground, a plant, or a tree trunk instead drift through open
 // air along one of three closed, repeating shapes. Each path is evaluated in

@@ -13,6 +13,7 @@
 // below. To add a new variant: copy forest-v6.js, load the new file before
 // this one in index.html, and add it to BACKGROUND_VARIANTS.
 
+
 const BACKGROUND_VARIANTS = {
   forestV1: BACKGROUND_FOREST_V1,
   forestV2: BACKGROUND_FOREST_V2,
