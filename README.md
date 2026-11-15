@@ -49,7 +49,7 @@ Main movement and puzzles are completed
 Finetuning: code, comments, bug movement patterns, game play feel, hints vs
 puzzle difficuilty vs obscurity. 
 
-Currently v1.0\
+Currently v0.1\
 Mobile compatibility is in development\
 Additional Level in planning\
 
