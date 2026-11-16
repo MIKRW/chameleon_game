@@ -1,7 +1,7 @@
 // Aggregates every terrarium sprite "page" into one lookup table, the same
 // way user/player/index.js exposes a single SPRITES object. Load
 // palette/terrarium-palette.js and all the individual sprite files before
-// this one (or require() them in Node), then use TERRARIUM_SPRITES +
+// this one, then use TERRARIUM_SPRITES +
 // TERRARIUM_PALETTE + drawSprite (from ../sprites.js) to place props when
 // the terrarium scene is built.
 
@@ -53,10 +53,3 @@ const TERRARIUM_SPRITES = {
     right: GLASS_EDGE_RIGHT,
   },
 };
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    TERRARIUM_PALETTE: require('./palette/terrarium-palette.js'),
-    TERRARIUM_SPRITES,
-  };
-}

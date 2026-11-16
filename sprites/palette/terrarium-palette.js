@@ -405,21 +405,4 @@ const TERRARIUM_PALETTE = {
     'j': '#4d1804',
     'J': '#4d1804',
   },
-
-  // Leftover/unreferenced keys from the old flat palette — no sprite file
-  // currently reads any of these, kept only so the historical hex values
-  // aren't lost if a sprite that used them gets reintroduced.
-  '_unused': {
-    'y': '#fdd835', // ground-plant-2 (yellow bush) leaf light — GROUND_PLANT_2 has no sprite file today (see the intentional gap in TERRARIUM_SPRITES.groundPlant, sprites/index.js)
-    'Y': '#f9a825', // ground-plant-2 leaf dark
-    's': '#c0c8c6', // light-switch.js lever, off/down — sprite rows never actually reference this key
-    '8': '#1c3fa8', // light-switch-2.js sapphire facet glint — sprite rows never actually reference this key
-    'G': '#90caf9', // glass tint shade — none of the glass-edge-*.js sprites reference this key
-    'o': '#546e7a', // glass frame/seal — none of the glass-edge-*.js sprites reference this key
-    '4': '#7d5a30', // trunk-interact-3 walnut bark — an earlier, unused recolor; the sprite's rows use the shared r/R/h vivid bark instead
-    '5': '#4c3618', // walnut bark shade
-    '6': '#af8a65', // walnut bark highlight
-  },
 };
-
-if (typeof module !== 'undefined' && module.exports) module.exports = TERRARIUM_PALETTE;

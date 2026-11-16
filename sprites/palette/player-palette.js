@@ -53,7 +53,7 @@ const PLAYER_PALETTE = {
   ...PLAYER_PALETTE_OPTIONS.magenta, // default
 };
 
-// Console helper: setChameleonColor('coral' | 'magenta' | 'azure').
+// Console helper: setChameleonColor('amber' | 'magenta' | 'azure').
 // Mutates PLAYER_PALETTE in place so every module holding a reference to it
 // (game/render.js) picks up the change on the next frame with no reload.
 function setChameleonColor(name) {
@@ -65,6 +65,3 @@ function setChameleonColor(name) {
   Object.assign(PLAYER_PALETTE, option);
   console.log(`Chameleon color set to "${name}".`);
 }
-if (typeof window !== 'undefined') window.setChameleonColor = setChameleonColor;
-
-if (typeof module !== 'undefined' && module.exports) module.exports = PLAYER_PALETTE;

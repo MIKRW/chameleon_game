@@ -106,7 +106,3 @@ function buildBarkLayers(baseColors, baseLayer, layers) {
   }
   return result;
 }
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { LAYER_BARK_SATURATION, hexToHsl, hslToHex, deriveBarkColor, buildBarkLayers };
-}
