@@ -25,6 +25,9 @@
 
 - `main` is live on GitHub Pages: merge only finished versions into it
 - Day-to-day work happens on `dev`
+- Before merging into `main`, run `git pull --ff-only` on it. After
+  merging, push straight away. Local and GitHub `main` should never
+  diverge
 - Tag releases on `main` with annotated `vMAJOR.MINOR.PATCH` tags and a
   short description: MINOR for features or puzzles, PATCH for fixes,
   `v1.0` when the game is complete
