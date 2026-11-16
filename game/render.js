@@ -44,17 +44,22 @@ export function resolveBarkPalette(id, layer) {
   return entry;
 }
 
-// Front-climb uses the flat, head-on clinging pose; Cling to Sides uses whichever
-// left/right-facing pose matches the edge the player attached from (see
-// attachToTrunk). Every other state — grounded, mid-air — uses the default
-// sprite, which already reverts automatically once jumpOffTrunk() clears
-// state.climb.
+// Front-climb uses the flat, head-on clinging pose; Cling to Sides uses the
+// side pose (drawn for the right edge, see playerFlipForState). Every other
+// state — grounded, mid-air — uses the default sprite, which already reverts
+// automatically once jumpOffTrunk() clears state.climb.
 export function playerSpriteForState() {
   if (state.climb) {
-    if (state.climb.face === 'front') return SPRITES.playerFront;
-    return state.climb.side === 'left' ? SPRITES.playerSideLeft : SPRITES.playerSideRight;
+    return state.climb.face === 'front' ? SPRITES.playerClimbFront : SPRITES.playerClimbSide;
   }
-  return SPRITES.player;
+  return SPRITES.playerDefault;
+}
+
+// Both mirrored poses are drawn facing right: the default pose flips when
+// facing left, the side pose flips when clinging to a trunk's left edge.
+function playerFlipForState() {
+  if (state.climb) return state.climb.face === 'side' && state.climb.side === 'left';
+  return state.facing === 'left';
 }
 
 // Glass walls at the world's left/right edges and a lid at the top — the
@@ -604,8 +609,7 @@ export function draw() {
   if (window.CHAMELEON_VISIBLE) {
     const playerSprite = playerSpriteForState();
     const hanging = state.branch && state.branch.mode === 'hang';
-    const flipDefaultPose = !state.climb && state.facing === 'left';
-    drawSprite(ctx, playerSprite, state.player.x - camera.x, state.player.y - camera.y, SCALE, PLAYER_PALETTE, undefined, flipDefaultPose, hanging);
+    drawSprite(ctx, playerSprite, state.player.x - camera.x, state.player.y - camera.y, SCALE, PLAYER_PALETTE, undefined, playerFlipForState(), hanging);
   }
 
   // layer 8: near plants and tree trunks, in front of the player

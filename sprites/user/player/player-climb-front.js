@@ -2,10 +2,10 @@
 // Flat against the trunk, viewed head-on, legs splayed symmetrically to grip
 // both sides. Used while state.climb.face is 'front' (see game/movement.js
 // attachToTrunk and game/render.js playerSpriteForState).
-// 16-wide x 11-row grid, same dimensions as player.js. Uses PLAYER_PALETTE
+// 16-wide x 11-row grid, same dimensions as player-default.js. Uses PLAYER_PALETTE
 // from ../../palette/player-palette.js.
 
-const PLAYER_FRONT = [
+const PLAYER_CLIMB_FRONT = [
   '.......u........',
   '......kkkk......',
   '.....keppek.....',
@@ -19,4 +19,4 @@ const PLAYER_FRONT = [
   '.......k........',
 ];
 
-if (typeof module !== 'undefined' && module.exports) module.exports = PLAYER_FRONT;
+if (typeof module !== 'undefined' && module.exports) module.exports = PLAYER_CLIMB_FRONT;

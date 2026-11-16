@@ -68,7 +68,7 @@ export const GLASS_SIDE_THICKNESS = GLASS_BOTTOM_TILE_H;
 export const GLASS_SIDE_RENDER_SCALE = GLASS_SIDE_THICKNESS / GLASS_EDGE_LEFT.width;
 export const GLASS_SIDE_TILE_H = GLASS_EDGE_LEFT.height * GLASS_SIDE_RENDER_SCALE;
 
-// Player sprites (SPRITES.player / playerSideLeft / playerSideRight) are 16
+// Player sprites (SPRITES.playerDefault / playerClimbFront / playerClimbSide) are 16
 // columns x 11 rows.
 export const PLAYER_W = SCALE * 16;
 export const PLAYER_H = SCALE * 11;
