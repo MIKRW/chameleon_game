@@ -14,9 +14,9 @@ import { drawSprite, resolveSpritePalette } from './sprite.js';
 // automatically once jumpOffTrunk() clears state.climb.
 export function playerSpriteForState() {
   if (state.climb) {
-    return state.climb.face === 'front' ? SPRITES.playerClimbFront : SPRITES.playerClimbSide;
+    return state.climb.face === 'front' ? PLAYER_SPRITES.playerClimbFront : PLAYER_SPRITES.playerClimbSide;
   }
-  return SPRITES.playerDefault;
+  return PLAYER_SPRITES.playerDefault;
 }
 
 // Both mirrored poses are drawn facing right: the default pose flips when
