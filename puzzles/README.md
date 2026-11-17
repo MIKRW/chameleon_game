@@ -5,7 +5,7 @@ Each room's puzzle definition lives in its own file (`puzzle-1.js`,
 tools to cheat has to open each room's spoiler separately instead of
 reading every answer at once.
 
-`engine.js` holds the shared `PUZZLES` registry and answer-checking logic,
+`puzzle-answers.js` holds the shared `PUZZLES` registry and answer-checking logic,
 and loads before the `puzzle-N.js` files (see `index.html`).
 
 ## Answer checking

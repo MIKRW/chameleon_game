@@ -152,7 +152,7 @@ skillCloseBtn.addEventListener('click', closeSkillPopup);
 // collectNearbyBug() above, since either can be the one that finishes last.
 function maybeShowCompletion() {
   if (state.puzzlesComplete !== TOTAL_PUZZLES || state.bugsCollectedCount !== BUGS_REQUIRED) return;
-  // getFinalFlag() is a global from puzzles/engine.js (classic script, same
+  // getFinalFlag() is a global from puzzles/puzzle-answers.js (classic script, same
   // convention as checkAnswer() above) — every checkAnswer() call that got
   // puzzlesComplete here has already awaited and recorded its solvedAnswers
   // entry, so this is guaranteed non-null.
