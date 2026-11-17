@@ -18,10 +18,10 @@ files stay at the top level.
 |---|---|---|---|
 | `palette/terrarium-palette.js` | Shared color table for props (`TERRARIUM_PALETTE`) | — | — |
 | `palette/player-palette.js` | Color table for the player sprite (`PLAYER_PALETTE`) | — | — |
-| `user/player/player-default.js` | Default pose (`PLAYER_DEFAULT`), flipped when facing left | 16x11 | — |
-| `user/player/player-climb-front.js` | Front-climb pose (`PLAYER_CLIMB_FRONT`) | 16x11 | — |
-| `user/player/player-climb-side.js` | Side-climb pose (`PLAYER_CLIMB_SIDE`), flipped for the left edge | 16x11 | — |
-| `user/player/index.js` | Aggregates the poses into `SPRITES` | — | — |
+| `player/player-default.js` | Default pose (`PLAYER_DEFAULT`), flipped when facing left | 16x11 | — |
+| `player/player-climb-front.js` | Front-climb pose (`PLAYER_CLIMB_FRONT`) | 16x11 | — |
+| `player/player-climb-side.js` | Side-climb pose (`PLAYER_CLIMB_SIDE`), flipped for the left edge | 16x11 | — |
+| `player/index.js` | Aggregates the poses into `SPRITES` | — | — |
 | `ground-plants/ground-plant-1.js` … `ground-plant-5.js` | Ground foliage variants | 12x10 (ground-plant-3 is 12x20, green-mauve) | mid-ground, on floor |
 | `tree-plants/tree-plant-1.js` … `tree-plant-5.js` | Trunk-mounted foliage variants | 8x8 | background, mounts to a trunk knot row |
 | `tree-trunks-interact/trunk-interact-1.js` … `trunk-interact-3.js` | Climbable trunk variants (silhouettes 1-3), full-saturation bark | 8x14 (interact-1 is 11x151, full floor-to-lid height) | climbable, on floor |

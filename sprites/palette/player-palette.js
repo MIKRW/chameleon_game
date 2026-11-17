@@ -1,4 +1,4 @@
-// Palette for the player (chameleon) sprite in sprites/user/player/. Follows
+// Palette for the player (chameleon) sprite in sprites/player/. Follows
 // the same convention as TERRARIUM_PALETTE in ./terrarium-palette.js: '.' is
 // transparent, every other character maps to a hex color. Kept separate so
 // the player can be themed independently of the terrarium set.
