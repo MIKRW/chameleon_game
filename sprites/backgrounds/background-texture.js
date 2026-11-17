@@ -7,8 +7,8 @@
 //
 // Every non-digit cell is left transparent ('.') rather than painted with an
 // explicit fill — that's deliberate: this sprite draws on layer 2
-// (game/world-props.js / game/render.js scene stack), directly on top of the flat
-// layer-1 backdrop fill (#132218, see draw() in game/render.js), so the two colors
+// (game/world-props.js / game/render/index.js scene stack), directly on top of the flat
+// layer-1 backdrop fill (#132218, see draw() in game/render/index.js), so the two colors
 // already match without duplicating the hex here. The digit strokes ('j'/'J'
 // in palette/terrarium-palette.js) are bright warm tones against that dark backdrop, so the
 // grid reads clearly once drawn. It's only drawn once lightbulb-2's warm
@@ -17,7 +17,7 @@
 // drawn, not anything encoded in this file.
 //
 // Anchors at row 0 (top), hung directly under the lightbulb prop rather than
-// sitting on the floor (see drawBackgroundTexture() in game/render.js). Digit
+// sitting on the floor (see drawBackgroundTexture() in game/render/background.js). Digit
 // columns run left-to-right, same as normal reading order. Size: 35x51
 // (grid units, multiply by render scale). Uses the shared TERRARIUM_PALETTE
 // from palette/terrarium-palette.js.

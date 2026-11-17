@@ -2,7 +2,7 @@
 
 Design rule for how the terrarium's parallax layers should read as distance,
 agreed on before implementing the layer-3 background pass. Applies to
-`game/render.js` (draw order + fade logic) and `game/world-props.js` (placements),
+`game/render/` (draw order + fade logic) and `game/world-props.js` (placements),
 plus the palettes in `sprites/palette/`.
 
 ## The problem
@@ -109,5 +109,5 @@ change; 0.4/0.55 accounts for it, and also widens the separation from the
 Implemented — see `sprites/palette/terrarium-palette.js`, `game/constants.js`
 (`TERRARIUM_PALETTE_LAYER5_TREES`, `TERRARIUM_PALETTE_LAYER3_TREES`,
 `BACKGROUND_DECOR_PARALLAX_LAYER2/3`), `sprites/backgrounds/forest-v6.js`,
-`game/world-props.js` (`BACKGROUND_LAYER3_PLACEMENTS`), and `game/render.js`
+`game/world-props.js` (`BACKGROUND_LAYER3_PLACEMENTS`), and `game/render/`
 (`drawBackgroundDecor`, `drawTreeTrunks`/`drawTreeBranches`/`drawTreePlants`).

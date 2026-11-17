@@ -4,7 +4,7 @@
 // coating — not gated by Cling to Sides or any other puzzle state. Uses its
 // own muted K/W/X keys (see TERRARIUM_PALETTE) rather than the bright
 // ground-plant-2 y/Y, so it reads as a sickly coating instead of a
-// saturated accent. Drawn by drawTrunkSlime() in game/render.js, tiled the
+// saturated accent. Drawn by drawTrunkSlime() in game/render/trees.js, tiled the
 // same way drawGateMoss() tiles TREE_PLANT_1 down the Moss Tree trunk.
 // A skinny single-cell drip core (with an occasional adjacent highlight/
 // shade accent, never a full second core column) that zig-zags left/right

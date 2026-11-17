@@ -42,7 +42,7 @@ const BACKGROUND_FOREST_V7 = (function build() {
   const LIGHT_TOP = 0.36;
 
   // Sprite rows are indexed one character at a time (see drawSpriteBlocky,
-  // game/render.js) — every palette key MUST be a single character.
+  // game/render/sprite.js) — every palette key MUST be a single character.
   const KEY_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
   const TIER_COUNT = 18;

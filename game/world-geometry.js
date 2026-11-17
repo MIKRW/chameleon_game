@@ -119,7 +119,7 @@ export function branchGeometry(bp) {
     maxX: Math.max(baseX, tipX),
     thickness,
     tBend,
-    // Host trunk's sprite id, so drawTreeBranches (game/render.js) can merge
+    // Host trunk's sprite id, so drawTreeBranches (game/render/trees.js) can merge
     // this branch's own palette entry (just its 'k' outline) with the
     // trunk's resolved bark palette, so the branch always matches whichever
     // trunk it's mounted on (see sprites/palette/terrarium-palette.js).
@@ -152,7 +152,7 @@ export function treePlantGeometry(pp) {
     ? trunkPlacement.x + trunkSprite.width * SCALE - overlap * plantScale
     : trunkPlacement.x - (plantSprite.width - overlap) * plantScale;
   const originY = trunkTopY + pp.attachRow * SCALE - (plantSprite.height - 1) * plantScale;
-  // Host trunk's sprite id, so drawTreePlants (game/render.js) can merge
+  // Host trunk's sprite id, so drawTreePlants (game/render/plants.js) can merge
   // this plant's own palette entry with the trunk's resolved bark palette —
   // tree-plant-3/4/5's small bark-stub accent (k/R/r) matches whichever
   // trunk they're mounted on, the same way branches do (see branchGeometry
@@ -218,7 +218,7 @@ export function bugGeometry(bp) {
 }
 
 // All bugs, resolved once at load time (BUG_PLACEMENTS is static). Both
-// game/render.js (drawBugs) and game/interactions.js (collectNearbyBug)
+// game/render/actors.js (drawBugs) and game/interactions.js (collectNearbyBug)
 // iterate this same array in the same order, using the array index as the id
 // for state.bugsFound — so this is the single source of truth for "which bug
 // is which".
@@ -248,7 +248,7 @@ export function canReachBug(geo) {
 }
 
 // Bugs at BUG_LOCKED_START_INDEX (game/constants.js) and beyond are hidden
-// (drawBugs, game/render.js) and uncatchable (collectNearbyBug,
+// (drawBugs, game/render/actors.js) and uncatchable (collectNearbyBug,
 // game/interactions.js) until Cling to Sides is unlocked, so the last 10 of
 // the 20 total bugs can't be found before that puzzle is solved.
 export function isBugUnlocked(index) {
@@ -364,7 +364,7 @@ export function nearLightSwitch() {
 // World-space position of the background-texture grid (sprites/backgrounds/background-texture.js)
 // — no physical prop, just the pixel-digit backdrop hanging under the
 // lightbulb (HANGING_PLACEMENTS) at LID_TOP + the bulb's height. Same
-// centering math drawBackgroundTexture() (game/render.js) uses to place it
+// centering math drawBackgroundTexture() (game/render/background.js) uses to place it
 // on screen, just in world space (no camera offset) so it can be compared
 // against the player's position.
 export function backgroundTextureOrigin() {

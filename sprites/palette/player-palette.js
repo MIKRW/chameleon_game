@@ -55,7 +55,7 @@ const PLAYER_PALETTE = {
 
 // Console helper: setChameleonColor('amber' | 'magenta' | 'azure').
 // Mutates PLAYER_PALETTE in place so every module holding a reference to it
-// (game/render.js) picks up the change on the next frame with no reload.
+// (game/render/actors.js) picks up the change on the next frame with no reload.
 function setChameleonColor(name) {
   const option = PLAYER_PALETTE_OPTIONS[name];
   if (!option) {

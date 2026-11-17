@@ -2,8 +2,9 @@
 
 Static, hand-defined pixel-art "pages" for building out the terrarium scene
 and the player — one small file per prop/pose, following the same text-grid
-convention as the shared [`../sprites.js`](../sprites.js) (`drawSprite` works
-unchanged on all of these). No build step: each file just assigns a `const`,
+convention as the shared `drawSprite` in
+[`../game/render/sprite.js`](../game/render/sprite.js) (it works unchanged on
+all of these). No build step: each file just assigns a `const`,
 so in the browser they're loaded via `<script>` tags in file order and
 become globals; in Node each file also does a guarded `module.exports` for
 testing/tooling.
@@ -88,7 +89,7 @@ two themes can evolve independently.
 ## Using these to populate the terrarium
 
 Once wired into `index.html` (script tags, same pattern as the existing
-`sprites.js` include) and `index.js` loaded last, `TERRARIUM_SPRITES` gives a
+sprite includes) and `index.js` loaded last, `TERRARIUM_SPRITES` gives a
 single place to pull from when laying out the scene, e.g.:
 
 ```js

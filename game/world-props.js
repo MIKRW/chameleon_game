@@ -1,5 +1,5 @@
 // World prop placement — where each terrarium sprite instance sits, laid out
-// against the 10-layer scene stack (see draw() in game/render.js):
+// against the 10-layer scene stack (see draw() in game/render/index.js):
 //   1 background, 2 background decor (cosmetic only — no floor
 //   placement/occlusion logic, painted before everything else), 3 second
 //   background decor band (same idea as layer 2, closer/faster/more
@@ -90,11 +90,11 @@ const PLANT_PLACEMENTS = [
 const BACKGROUND_PLACEMENTS = [];
 
 // Second cosmetic background band, painted between layer 2 and the dirt/
-// glass line (see draw() in game/render.js) — same trunk-bg-*a/*b variety
+// glass line (see draw() in game/render/index.js) — same trunk-bg-*a/*b variety
 // as BACKGROUND_PLACEMENTS above (layer 6a excluded, kept a layer-2-only
 // landmark), just different x positions and a step up the depth-layer
 // saturation ladder (resolveBarkPalette(placement.sprite, 3) in
-// game/render.js, driven by sprites/palette/bark-ladder.js).
+// game/render/sprite.js, driven by sprites/palette/bark-ladder.js).
 // Scrolls at BACKGROUND_DECOR_PARALLAX_LAYER3 (0.55, faster than layer 2's
 // 0.4 but still slower than the 1:1 interactive layers), so x positions are
 // spread across the wider [0, CAMERA_X_MAX * 0.55 + CANVAS_W] = [0, 2304]
@@ -143,7 +143,7 @@ const TREE_PLACEMENTS = [
 // only 1 of the 5 layer-5 trees (25%, max 3 branches) and 4 of the 9 layer-8
 // trees (~44%, max 4 branches) get them. Each entry's `trunkX` + `layer` must
 // match a TREE_PLACEMENTS entry exactly (that's how drawTreeBranches in
-// game/render.js finds the trunk to hang off). `attachRow` is the row (0 = top of
+// game/render/trees.js finds the trunk to hang off). `attachRow` is the row (0 = top of
 // the trunk sprite, counting down toward the floor) where the branch's base
 // touches the bark; `side` picks which edge it grows from and whether the
 // branch-1/2 sprite gets flipped. Branches on the same trunk alternate sides
@@ -233,7 +233,7 @@ const BRANCH_PLACEMENTS = [
 // Decorative single-knot foliage (tree-plant-2..5, see sprites/tree-plants/)
 // mounted onto a subset of the trees above, excluding the Moss Tree
 // (x720/layer8 — TREE_PLANT_1, the moss variety, is reserved for that
-// Moss Tree's puzzle, tiled by drawGateMoss() in game/render.js, and
+// Moss Tree's puzzle, tiled by drawGateMoss() in game/render/trees.js, and
 // isn't reused decoratively here). 10 instances total across the other 4
 // varieties (3/3/2/2 split): 6
 // on layer 5 (the tall x1150 trunk gets two, on opposite sides; the four
@@ -364,7 +364,7 @@ const HANGING_PLACEMENTS = [
 // (same convention as BRANCH_PLACEMENTS); `attachRow` is the row (0 = top of
 // the trunk sprite) the switch is bolted to; `side` picks which face it's
 // drawn/interacted from (see lightSwitchOrigin()/nearLightSwitch() in
-// game/world-geometry.js / drawLightSwitch() in game/render.js — the sprite
+// game/world-geometry.js / drawLightSwitch() in game/render/actors.js — the sprite
 // mirrors when side is 'right'). Interacting with it while gripping that
 // trunk via Cling to Sides on the matching side (see handleInteractPress() in
 // game/interactions.js) flips state.lightOn, which swaps the drawn sprite
@@ -374,7 +374,7 @@ const HANGING_PLACEMENTS = [
 const LIGHT_SWITCH_PLACEMENT = { trunkX: 2350, layer: 8, attachRow: 70, side: 'right' };
 
 // Collectible bugs (see game/interactions.js collectNearbyBug() /
-// game/render.js drawBugs()), resolved by bugGeometry() in
+// game/render/actors.js drawBugs()), resolved by bugGeometry() in
 // game/world-geometry.js. 20 total (BUGS_REQUIRED, game/constants.js, is
 // just this array's length). The first BUG_LOCKED_START_INDEX (10, see
 // game/constants.js) entries are visible/catchable from the start; the rest

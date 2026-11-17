@@ -15,7 +15,7 @@
 // sticking out from the tree) and the skinny mounting arm sits at the
 // right (columns 10-15), its tip embedding into the trunk bark — this is
 // the natural orientation for a left-face mount; drawLightSwitch() in
-// game/render.js mirrors it horizontally when LIGHT_SWITCH_PLACEMENT.side is
+// game/render/actors.js mirrors it horizontally when LIGHT_SWITCH_PLACEMENT.side is
 // 'right' so the arm still embeds into whichever face it's mounted on. The
 // square's interior is solid black (k) here for off, and glows red (z,
 // light-switch-2.js) for on — the brass (a/A) frame and arm don't change

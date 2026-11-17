@@ -8,7 +8,7 @@ const BACKGROUND_SOLID_DARK_EMERALD = {
   name: 'Background: Solid Dark Emerald',
   theme: 'flat solid dark emerald fill, no texture',
   // Drawn as a plain canvas-wide fillRect (see drawBackgroundSprite,
-  // game/render.js) rather than a sprite grid — a 1x1 sprite cell would
+  // game/render/background.js) rather than a sprite grid — a 1x1 sprite cell would
   // only cover a single pixel-sized cell, not the whole backdrop.
   solidColor: '#0d3b2a',
   sprite: {

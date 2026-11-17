@@ -2,7 +2,7 @@
 // Theme: bright/dark red lichen-moss climbing a trunk's edge, with short
 // fingers sprigging outward from the bark.
 //
-// One edge-strip, not a full trunk-width span: game/render.js's
+// One edge-strip, not a full trunk-width span: game/render/trees.js's
 // drawGateMoss() tiles it top-to-bottom the same way drawGlassEdgeSide tiles
 // the tank walls, and draws it TWICE per row — once flush against the
 // trunk's left edge as-is, once flush against the right edge mirrored via

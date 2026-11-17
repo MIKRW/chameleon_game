@@ -1,6 +1,6 @@
 // Tunable numbers and derived layout constants shared across the game
 // modules. Depends on the sprite globals (GLASS_EDGE_BOTTOM/LEFT, etc.) from
-// sprites.js/sprites/*.js, which load as classic scripts before this module
+// sprites/*.js, which load as classic scripts before this module
 // runs.
 
 export const CANVAS_W = 720;
@@ -12,7 +12,7 @@ export const PLAYER_SPEED = 7;
 // world scenery (esp. layer 5/8 trunks, which must stay pixel-exact with
 // their collision geometry and so can't get their own slower parallax)
 // slides by more gently. World positions/collision are untouched — this
-// only smooths the camera.x/y used at render time (see draw(), game/render.js).
+// only smooths the camera.x/y used at render time (see draw(), game/render/index.js).
 export const CAMERA_EASE = 0.12;
 export const GRAVITY = 0.7;
 export const JUMP_VELOCITY = -12;
@@ -129,7 +129,7 @@ export const GLASS_FRONT_BOTTOM_ALPHA = 0.18; // hazy near the bottom, even at t
 // separate from scenery, regardless of camera position. Depth between
 // layers 2/3/5/8 is instead carried entirely by saturation + lightness, each
 // layer's bark palette getting progressively richer as it sits closer to
-// the camera. See resolveBarkPalette() in game/render.js for how a bark
+// the camera. See resolveBarkPalette() in game/render/sprite.js for how a bark
 // sprite's per-layer color is resolved at draw time from
 // sprites/palette/terrarium-palette.js's nested `.layers` entries.
 
@@ -140,7 +140,7 @@ export const GLASS_FRONT_BOTTOM_ALPHA = 0.18; // hazy near the bottom, even at t
 export const BACKGROUND_PIXEL_BLOCK = 2;
 
 // Fraction of camera.x the background-fill texture scrolls by (see
-// drawBackgroundSprite() in game/render.js) — far below 1 so it drifts slowly
+// drawBackgroundSprite() in game/render/background.js) — far below 1 so it drifts slowly
 // under the foreground instead of tracking the camera 1:1, the cue that
 // reads as "distant" rather than "stuck to the screen". background-fill.js
 // is generated wide enough (CHUNKS_W margin) to cover CAMERA_X_MAX *
@@ -148,7 +148,7 @@ export const BACKGROUND_PIXEL_BLOCK = 2;
 export const BACKGROUND_PARALLAX = 0.06;
 
 // Fraction of camera.x the layer-2/3 background-decor trunks (and, for
-// layer 3, ground-plant-1 — see drawGroundPlants(), game/render.js) scroll
+// layer 3, ground-plant-1 — see drawGroundPlants(), game/render/plants.js) scroll
 // by — each faster than BACKGROUND_PARALLAX (the layer-1 backdrop) but
 // still under 1:1, so the layers visibly separate as the camera pans:
 // 1 (0.06) < 2 (0.45) < 3 (0.6) < layers 5/8/player (1:1). Raised closer to

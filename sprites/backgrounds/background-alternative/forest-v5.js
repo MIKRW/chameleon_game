@@ -31,7 +31,7 @@
 const BACKGROUND_FOREST_V5 = (function build() {
   const CHUNKS_W = 150;
   // 60 chunks exactly covers CANVAS_H at zero scroll offset; the extra 6
-  // give drawBackgroundSprite's vertical parallax (game/render.js) room to
+  // give drawBackgroundSprite's vertical parallax (game/render/background.js) room to
   // shift the texture without exposing its bottom edge while climbing.
   const CHUNKS_H = 66;
 

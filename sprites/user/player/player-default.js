@@ -4,7 +4,7 @@
 // blue crest spike behind the head. Facing right; used for walking/falling/
 // mid-air — everything except front-climbing and Cling to Sides, which have their
 // own poses (see player-climb-front.js, player-climb-side.js). Mirrored at draw time
-// when facing left (see game/render.js playerFlipForState).
+// when facing left (see game/render/actors.js playerFlipForState).
 // 16-wide x 11-row grid (see PLAYER_W/PLAYER_H in game/constants.js, which
 // must match this grid's dimensions). Uses PLAYER_PALETTE from
 // ../../palette/player-palette.js.

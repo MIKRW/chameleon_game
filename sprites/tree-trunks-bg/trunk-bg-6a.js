@@ -9,7 +9,7 @@
 // cosmetic layer-2 pass drawn with drawBackgroundDecor() — no floor
 // occlusion/interaction logic touches it (see the comment above
 // BACKGROUND_PLACEMENTS), and that same draw path renders it blocky (2x2
-// px cells via BACKGROUND_PIXEL_BLOCK, see game/render.js) with a top-to-
+// px cells via BACKGROUND_PIXEL_BLOCK, see game/render/background.js) with a top-to-
 // bottom alpha fade, so it reads as a hazy, more pixelated silhouette
 // looming behind the interactive trees rather than another climbable trunk.
 //

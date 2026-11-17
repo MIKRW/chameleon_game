@@ -4,7 +4,7 @@
 // A clean, simple glass line: solid tint, tileable with no seams. `opacity`
 // makes the whole strip translucent so the terrarium reads through it. The
 // light-catch highlight is drawn once near the top of the wall in code
-// (game/render.js), not baked into this tileable body — a repeating highlight
+// (game/render/tank.js), not baked into this tileable body — a repeating highlight
 // would just look like a stack of blocks at any real render scale.
 // Size: 2x8 (grid units; multiply by render scale)
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.

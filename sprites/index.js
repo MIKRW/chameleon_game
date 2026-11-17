@@ -2,7 +2,7 @@
 // way user/player/index.js exposes a single SPRITES object. Load
 // palette/terrarium-palette.js and all the individual sprite files before
 // this one, then use TERRARIUM_SPRITES +
-// TERRARIUM_PALETTE + drawSprite (from ../sprites.js) to place props when
+// TERRARIUM_PALETTE + drawSprite (from game/render/sprite.js) to place props when
 // the terrarium scene is built.
 
 const TERRARIUM_SPRITES = {

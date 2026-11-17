@@ -1,5 +1,5 @@
 // Registers every swappable layer-1 backdrop variant and picks which one
-// drawBackgroundSprite() (game/render.js) actually draws. Each variant
+// drawBackgroundSprite() (game/render/background.js) actually draws. Each variant
 // carries its own { sprite, palette } — unlike the rest of
 // TERRARIUM_SPRITES, backgrounds don't share TERRARIUM_PALETTE, so tweaking
 // one variant's colors never affects another.

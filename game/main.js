@@ -9,7 +9,7 @@
 // vertically (when the chameleon jumps toward the canopy).
 
 import { update } from './movement.js';
-import { draw } from './render.js';
+import { draw } from './render/index.js';
 import { updateBugPaths } from './bug-motion.js';
 import { BUG_GEOMETRIES } from './world-geometry.js';
 import './input.js';

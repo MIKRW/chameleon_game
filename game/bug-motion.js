@@ -7,7 +7,7 @@
 //
 // updateBugPaths() is called once per frame from game/main.js and mutates
 // each path bug's originX/originY in place (the same fields ground/trunk
-// bugs set once at load) so drawBugs() (game/render.js) and the reach checks
+// bugs set once at load) so drawBugs() (game/render/actors.js) and the reach checks
 // (bugRect/bugInteractRect/canReachBug, game/world-geometry.js) don't need
 // to know a bug is animated at all — they just read wherever it currently is.
 

@@ -30,7 +30,7 @@
 // never touches forest-v2 or any other sprite.
 
 const BACKGROUND_FOREST_V6 = (function build() {
-  // Full sampled-pixel resolution. drawSpriteBlocky (game/render.js) walks
+  // Full sampled-pixel resolution. drawSpriteBlocky (game/render/sprite.js) walks
   // this in BACKGROUND_PIXEL_BLOCK-size steps, so every value here is a
   // real candidate pixel rather than a duplicated macro-block.
   const W = 300;
@@ -63,7 +63,7 @@ const BACKGROUND_FOREST_V6 = (function build() {
   const LIGHT_TOP = 0.34;
 
   // Sprite rows are indexed one character at a time (see drawSpriteBlocky,
-  // game/render.js), so every palette key here MUST be a single character —
+  // game/render/sprite.js), so every palette key here MUST be a single character —
   // multi-char keys joined into a row string silently corrupt the whole
   // grid (each character gets read back as its own separate key).
   const KEY_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

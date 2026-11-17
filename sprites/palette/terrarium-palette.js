@@ -9,8 +9,8 @@
 // and can be retuned without touching anything else.
 //
 // '.' is transparent, same convention as before — omitted (or `null`) is
-// equivalent, since sprites.js's drawSprite / game/render.js's
-// drawSpriteBlocky both do `if (!color) continue`.
+// equivalent, since drawSprite / drawSpriteBlocky (game/render/sprite.js)
+// both do `if (!color) continue`.
 //
 // Ladder-driven bark trunks (the trunk-interact-1/3 vivid r/R/h family and
 // the trunk-bg-*a muted q/Q/p family) are shaped differently: non-varying
@@ -22,7 +22,7 @@
 // stepping saturation/lightness, replacing the old hand-tuned
 // TERRARIUM_PALETTE_LAYER5_TREES / TERRARIUM_PALETTE_LAYER3_TREES tables
 // (formerly in game/constants.js) which drifted hue between layers. See
-// resolveBarkPalette() in game/render.js for how `.layers` gets merged over
+// resolveBarkPalette() in game/render/sprite.js for how `.layers` gets merged over
 // the base object at draw time.
 //
 // Bark sprites that only ever show at ONE fixed tone (no layer variation —
@@ -33,7 +33,7 @@
 // (tree-plant-3/4/5) don't own a bark color at all — at render time their
 // own entry (just 'k', plus any non-bark keys) is merged with whichever
 // trunk they're mounted to's resolved bark palette, so they always match
-// their host trunk. See drawTreeBranches/drawTreePlants in game/render.js.
+// their host trunk. See drawTreeBranches/drawTreePlants in game/render/.
 
 const TERRARIUM_PALETTE = {
   // === ground-plant-1 — Split-Leaf Philodendron ===
@@ -112,7 +112,7 @@ const TERRARIUM_PALETTE = {
 
   // === tree-plant-1 — Gate Moss ===
   // bright/dark red lichen
-  // no 'k' outline — the moss art itself is the outline; tiled by drawGateMoss() in game/render.js down the Moss Tree trunk until state.gateSolved
+  // no 'k' outline — the moss art itself is the outline; tiled by drawGateMoss() in game/render/trees.js down the Moss Tree trunk until state.gateSolved
   'tree-plant-1': {
     'z': '#ff5252',
     'Z': '#7a1414',
@@ -120,7 +120,7 @@ const TERRARIUM_PALETTE = {
 
   // === tree-plant-1b — Gate Moss Remnant ===
   // same red lichen tones as tree-plant-1 — a small leftover scrap left on the
-  // Moss Tree trunk after state.gateSolved, drawn by drawGateMossRemnant() in game/render.js
+  // Moss Tree trunk after state.gateSolved, drawn by drawGateMossRemnant() in game/render/trees.js
   'tree-plant-1b': {
     'z': '#ff5252',
     'Z': '#7a1414',
@@ -151,7 +151,7 @@ const TERRARIUM_PALETTE = {
 
   // === tree-plant-3 — Spanish Moss ===
   // pale silvery-sage hanging strands
-  // no 'k'/'R'/'r' here — the sprite's small bark stub (k/R/r) matches whichever trunk it's mounted on, merged in from that trunk's own bark palette at render time (see drawTreePlants in game/render.js)
+  // no 'k'/'R'/'r' here — the sprite's small bark stub (k/R/r) matches whichever trunk it's mounted on, merged in from that trunk's own bark palette at render time (see drawTreePlants in game/render/plants.js)
   'tree-plant-3': {
     'S': '#b7c4ad',
     'F': '#6d7d68',
@@ -288,7 +288,7 @@ const TERRARIUM_PALETTE = {
 
   // === tree-branch-1 / tree-branch-2 — vivid-bark branches ===
   // shared outline only
-  // no owned bark color — at render time, merged with whichever trunk-interact-N trunk they're mounted to's resolved bark palette (r/R/h), so a branch always matches its host trunk. See drawTreeBranches() in game/render.js
+  // no owned bark color — at render time, merged with whichever trunk-interact-N trunk they're mounted to's resolved bark palette (r/R/h), so a branch always matches its host trunk. See drawTreeBranches() in game/render/trees.js
   'tree-branch-1': {
     'k': '#1a1a1a',
   },
@@ -326,7 +326,7 @@ const TERRARIUM_PALETTE = {
   },
 
   // === glass-edge-3.js (left rim) ===
-  // glass tint only — the light-catch highlight is drawn separately in code (drawGlassEdgeSide, game/render.js), not baked into this tileable body
+  // glass tint only — the light-catch highlight is drawn separately in code (drawGlassEdgeSide, game/render/tank.js), not baked into this tileable body
   'glassEdgeLeft': {
     'g': '#bbdefb',
   },

@@ -34,7 +34,7 @@
 // stable across reloads instead of re-rolling every page load.
 //
 // Generated at a coarse 150x60 "chunk" grid (each chunk drawn 2x2 into the
-// full array) so drawBackgroundSprite() (game/render.js) can render it with
+// full array) so drawBackgroundSprite() (game/render/background.js) can render it with
 // drawSpriteBlocky's BACKGROUND_PIXEL_BLOCK chunking, same lo-fi/
 // further-away treatment drawBackgroundDecor() gives background trunks. At
 // SCALE (4) x BACKGROUND_PIXEL_BLOCK (2) = 8px per chunk, the 720x480

@@ -1,7 +1,7 @@
 // === Player - Side-Climb Pose ===
 // Body runs vertically (head up, tail curled down) for clinging to a
 // trunk's edge, with legs gripping outward. Drawn for the right edge;
-// game/render.js flips it horizontally for the left edge.
+// game/render/actors.js flips it horizontally for the left edge.
 // Used while state.climb.face is 'side' (see game/movement.js attachToTrunk).
 // 16x11, uses PLAYER_PALETTE.
 

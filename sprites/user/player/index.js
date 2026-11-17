@@ -2,7 +2,7 @@
 // ../../index.js exposes TERRARIUM_SPRITES. Load player-default.js,
 // player-climb-front.js, and player-climb-side.js before this one, then use
 // SPRITES + PLAYER_PALETTE (from ../../palette/player-palette.js) +
-// drawSprite (from ../../../sprites.js) to place the player.
+// drawSprite (from game/render/sprite.js) to place the player.
 
 const SPRITES = {
   playerDefault: PLAYER_DEFAULT,

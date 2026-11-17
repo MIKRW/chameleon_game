@@ -4,7 +4,7 @@
 // Was a small fern; widened into a broad paired leaf (base pattern shared
 // with ground-plant-5) with two punched-out fenestration slits for a
 // monstera/split-leaf silhouette. `renderScale` draws it larger than the
-// rest of the ground-plant set (see game/render.js drawGroundPlants) so it reads
+// rest of the ground-plant set (see game/render/plants.js drawGroundPlants) so it reads
 // at a size proportionate to the chameleon, like a real understory leaf.
 // Size: 12x10 (grid units; multiply by render scale x renderScale)
 // Uses the shared TERRARIUM_PALETTE from palette/terrarium-palette.js.
