@@ -1,8 +1,6 @@
-// Aggregates the player's poses into one lookup table, the same way
-// ../../index.js exposes TERRARIUM_SPRITES. Load player-default.js,
-// player-climb-front.js, and player-climb-side.js before this one, then use
-// SPRITES + PLAYER_PALETTE (from ../../palette/player-palette.js) +
-// drawSprite (from game/render/sprite.js) to place the player.
+// Player poses, keyed by name.
+// Loaded after player-default and other player sprites. So they are defined, 
+// when player\index is loaded. 
 
 const SPRITES = {
   playerDefault: PLAYER_DEFAULT,

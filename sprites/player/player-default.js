@@ -7,7 +7,7 @@
 // when facing left (see game/render/actors.js playerFlipForState).
 // 16-wide x 11-row grid (see PLAYER_W/PLAYER_H in game/constants.js, which
 // must match this grid's dimensions). Uses PLAYER_PALETTE from
-// ../../palette/player-palette.js.
+// ../palette/player-palette.js.
 
 const PLAYER_DEFAULT = [
   '................',
